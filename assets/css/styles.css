@@ -126,6 +126,29 @@ body {
 	background: var(--color-background-primary);
 }
 
+#app-container::before {
+	content: "";
+	background-image: var(--page-background);
+	background-position: center;
+	background-size: cover;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: -100;
+	opacity: 0.3;
+	filter: blur(20px);
+	transition: opacity 0.2s ease-in-out;
+}
+#app-container:not(:has(
+	.profile-page,
+	#all-groups-container[style*=display]
+)):before {
+	opacity: 0;
+}
+#app-container:has(#all-groups-container[style*=display]) {
+	--page-background: url("/css/images/cc0-lighthouse-goodfreephotos.jpg");
+}
+
 #current-group-container {
 	display: flex;
 	flex-direction: row;
@@ -149,6 +172,11 @@ body {
 
 .icon {
 	pointer-events: none;
+	user-select: none;
+}
+
+.user {
+	display: flex;
 	user-select: none;
 }
 

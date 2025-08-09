@@ -905,9 +905,16 @@ class StatedSession {
 										{
 											"input": "text",
 											"name": "displayname",
-											"label": "Display Name",
+											"label": "Display Name"
+										},
+										{
+											"input": "textarea",
+											"name": "bio",
+											"label": "Bio",
 											"separator": true
 										},
+										/*
+										TODO: these options
 										{
 											"label": "Privacy"
 										},
@@ -935,7 +942,7 @@ class StatedSession {
 											"name": "msgchimes",
 											"label": "Send and receive chimes",
 											"separator": true
-										},
+										},*/
 										{
 											"special": "logout"
 										}
@@ -944,8 +951,7 @@ class StatedSession {
 										displayname: this.user.displayname,
 										username: this.user.username,
 										pfp: this.user.pfp,
-										notifications: true,
-										msgchimes: true
+										bio: this.user.bio
 									}
 								}
 							},
@@ -974,13 +980,19 @@ class StatedSession {
 										this.user.pfp = event.fields.pfp;
 									}
 									
+									let bio_validation = await Validation.validate_bio(event.fields.bio);
+									if(bio_validation.type !== "success")
+										return this.socket.emit("program-output", bio_validation);
+									
 									// change values
 									this.user.username = event.fields.username;
 									this.user.displayname = event.fields.displayname;
+									this.user.bio = event.fields.bio;
 									
 									// sync changes
-									await this.db.run("UPDATE users SET username = ?, displayname = ?, pfp = ? WHERE userid = ?", [this.user.username, this.user.displayname, this.user.pfp, this.user.userid]);
+									await this.db.run("UPDATE users SET username = ?, displayname = ?, pfp = ?, bio = ? WHERE userid = ?", [this.user.username, this.user.displayname, this.user.pfp, this.user.bio, this.user.userid]);
 									
+									GlobalState.state_check(this);
 									// return final success state
 									this.socket.emit('program-output', {type: "success"})
 									setTimeout(() => {
@@ -1246,7 +1258,7 @@ class StatedSession {
 			case "show_profile":
 				{
 					
-					let user = await this.db.get("SELECT username, userid, displayname, pfp, creation FROM users WHERE userid = ?", event.userid);
+					let user = await this.db.get("SELECT username, userid, displayname, pfp, creation, bio FROM users WHERE userid = ?", event.userid);
 					if(!user)
 						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to show the profile of a user that does not exist.");
 					

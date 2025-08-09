@@ -3,7 +3,6 @@
 	width: 64px;
 	height: 100%;
 	flex: none;
-	background: var(--color-background-primary);
 	padding: 6px;
 	display: flex;
 	flex-direction: column;

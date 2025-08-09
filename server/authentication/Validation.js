@@ -92,6 +92,14 @@ class Validation {
 		return this.success;
 	}
 	
+	static async validate_bio(bio_content) {
+		
+		if(bio_content.length > 4096)
+			return this.error_banner("Bio length too long - 4,096 characters maximum");
+		
+		return this.success;
+	}
+	
 	static async validate_and_use_uploaded_file(session, id, type) {
 		
 		let validation = await this.validate_uploaded_file(session, id, type);
