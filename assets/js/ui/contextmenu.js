@@ -34,6 +34,7 @@ function ContextMenu(event, options) {
 	contextMenuOverlayEl.on('mousedown', function(evt){
 		if(evt.target !== contextMenuOverlayEl) return;
 		contextMenu.close();
+		evt.preventDefault();
 	});
 	
 	let addOptions = (contextMenuEl, options, submenu) => {
@@ -49,7 +50,7 @@ function ContextMenu(event, options) {
 			
 			optionEl.txt(option.text);
 			if(option.action)
-				optionEl.addc("has-action").on("click", () => option.action(contextMenu, submenu));
+				optionEl.addc("has-action").on("mouseup", () => option.action(contextMenu, submenu));
 			else
 				optionEl.addc("disabled");
 			if(option.submenu) {

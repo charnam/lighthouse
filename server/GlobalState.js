@@ -7,7 +7,7 @@ const Permissions = require("authentication/permissions.js");
 class GlobalState {
 	
 	// For the sake of having things be easily refactored in the future, please
-	// do not edit activeUsers directly. Use the helper functions instead.
+	// do not edit variables here directly. Use the helper functions instead.
 	activeSessions = []
 	
 	add_session(session) {
@@ -32,11 +32,16 @@ class GlobalState {
 		return "online";
 	}
 	
+	// TODO: remove state_check entirely and replace it with something less general-purpose (i.e "member_refresh", "group_refresh" or "role_refresh")
 	state_check(updated_session) {
-		// TODO: don't iterate on all active sessions and the members of their groups
-		let update_sessions = this.activeSessions.filter(session => session.currentGroup.members && session.currentGroup.members.filter(member => member.userid == updated_session.user.userid))
+		if(!updated_session || !updated_session.user) return false;
+		// TODO: don't iterate on all active sessions and the members of their groups so often
+		let update_sessions = this.activeSessions.filter(session =>
+			session.currentGroup.members &&
+			session.currentGroup.members.filter(member => member.userid == updated_session.user.userid).length > 0
+		);
+		
 		for(let session of update_sessions) {
-			// TODO: check what was changed and update as necessary
 			session.refresh_members();
 		}
 	}

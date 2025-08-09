@@ -13,6 +13,7 @@ import TextProgram from "./programs/text.js";
 import FriendsProgram from "./programs/friends.js";
 import InvitesProgram from "./programs/invites.js";
 import ConfigMenuProgram from "./programs/configMenuProgram.js";
+import ProfileView from "./programs/profile.js";
 
 window.notif = NotificationHandler;
 
@@ -354,6 +355,9 @@ class StatedSessionHandler {
 				break;
 			case "info":
 				InfoProgram(this);
+				break;
+			case "profile":
+				ProfileView(this);
 				break;
 			case "new":
 				this.socket.on("program-output", (event) => {
