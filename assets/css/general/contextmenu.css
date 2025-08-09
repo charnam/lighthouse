@@ -30,7 +30,7 @@
 	top: -2px;
 	transition: visibility 0.2s linear;
 }
-.submenu:empty::before {
+:is(.context-menu, .submenu):empty::before {
 	content: "< No items >";
 	padding: 10px;
 	font-style: italic;

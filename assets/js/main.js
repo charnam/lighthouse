@@ -172,13 +172,13 @@ class StatedSessionHandler {
 													})
 												}
 											},
-											{
+											/*{
 												text: "Migrate to...",
 												submenu: this.groups.map(group => ({
 													text: group.groupname
 												}))
-											},
-											{
+											},*/
+											~this.currentGroup.permissions & Permissions.DELETE_PROGRAMS ? null : {
 												text: "Remove...",
 												submenu: [
 													{text: "Really?"},

@@ -540,7 +540,6 @@ class StatedSession {
 					}
 					
 					
-					this.socket.join(program.programid);
 					
 					let messageHistory = await this.db.all(
 						`SELECT messageid, programid, content, creation, userid
@@ -621,6 +620,9 @@ class StatedSession {
 							}
 						}
 					);
+					
+					this.socket.join(program.programid);
+					
 					break;
 			}
 			

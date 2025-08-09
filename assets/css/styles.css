@@ -135,7 +135,7 @@ body {
 	height: 100%;
 	position: fixed;
 	z-index: -100;
-	opacity: 0.3;
+	opacity: 0.1;
 	filter: blur(20px);
 	transition: opacity 0.2s ease-in-out;
 }
