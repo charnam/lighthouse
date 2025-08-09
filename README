@@ -1,16 +1,12 @@
 # Lighthouse
 
-This is Lighthouse, a chat application similar to other popular ones, created by me, for fun.
-The code is as clean as I could manage to make it, albeit I wasn't focused on cleanliness the
-whole time, so certain things might be strange or difficult to decipher. If you want help making
-changes, or learning about the architecture, please feel free to ask me via email, at
-[charnam@lunarsphere.net](mailto:charnam@lunarsphere.net).
+This is Lighthouse, a chat application similar to other popular ones, created by me, for fun. The code is as clean as I could manage to make it, albeit I wasn't focused on cleanliness the whole time, so certain things might be strange or difficult to decipher. If you want help making changes, or learning about the architecture, please feel free to ask me via email, at [charnam@lunarsphere.net](mailto:charnam@lunarsphere.net), or on Matrix, at `@charnam:lunarsphere.net`.
 
 Lighthouse can be found online at... insert link here when it's ready ;)
 
-[Server + Dependencies Setup](#starting-the-server)
-[Contributing Guidelines](#contributing)
-[Licensing Details](#thanks-for-reading)
+- [Server + Dependencies Setup](#starting-the-server)
+- [Contributing](#contributing)
+- [Licensing](#thanks-for-reading)
 
 ---
 
@@ -28,7 +24,7 @@ To set up a development server, follow these steps:
 
 The server should now be ready. To start it, type:
 
-```
+```sh
 cd server
 ./start.sh
 ```
@@ -45,6 +41,45 @@ I also require you to set your editor to acknowledge these preferences:
 
 - Tabs are tabs. This allows for anyone to choose how they view the code; If two-character wide indenting is preferred, you can change how tabulators are displayed in your editor, but please do not use spaces for indentation.
 - Please do not auto-trim any of your whitespace. Trailing whitespace on non-blank lines should be removed, but on blank lines, please set your editor to keep it. This may not be common practice, but for this project, please make an exception. It makes adding code to certain sections much faster.
+
+### Solar.JS
+
+This project makes use of a helper library I created, named `solar.js`, for UI elements. Since it differs so much from traditional JavaScript conventions, I figured I'd give it its own section here.
+
+Solar.JS itself is outdated, and desperately in need of a rewrite. If you'd like to do so, I'd be more than happy to accept a pull request. For now, I don't really care to rewrite it myself, since it works as it should, and it doesn't seem like it's worth my time.
+
+Code making use of it should be fairly readable, but in case you're confused, this is essentially how it works:
+
+- `doc` is equivalent to `document.documentElement`
+- `.el(<CSS selector>)` is equivalent to `querySelector` and `.els(<CSS selector>)` to `querySelectorAll`
+- `.crel(<tag name>)` is equivalent to `createElement` and `appendChild` to the Element that it is invoked on (e.g `doc.crel("div")` creates a div in the current document)
+- `.addc(<class name>)`: add class, `.remc`: remove class, `.sid`: set ID
+- `.txt(<text>)` appends text to the inner content of an Element using `createTextNode`.
+- `.prnt()` takes no arguments, and is mapped to parentElement for syntax similarity purposes
+
+There is also `.anim`, which is a little more tricky to explain. You should be able to search for instances of it, and figure it out for yourself. `anim` is a powerful and useful command for animating elements on the page.
+
+Here is a sample of Solar.JS code for your convenience:
+
+```js
+let element = doc
+	.crel("div")
+		.addc("myDiv")
+		.txt("This is awesome!")
+	.prnt()
+	.crel("div") // "element" will be a reference to this
+		.addc("myOtherDiv")
+		.txt("Oh, how I love mayonnaise.")
+
+element.anim({
+	opacity: [0, 1],
+	translateY: [20, 0],
+	scale: [0, 1],
+	blur: [10, 1],
+	duration: 1000,
+	easing: "ease-out" // CSS transition type
+})
+```
 
 ---
 
