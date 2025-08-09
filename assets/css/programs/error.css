@@ -1,0 +1,25 @@
+
+
+.error-page {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    user-select: none;
+}
+
+.error-title {
+    font-size: 26px;
+    margin-bottom: 20px;
+}
+
+.error-subtitle {
+    font-size: 14px;
+}
+
+.error-page .img .icon {
+    height: 13vmin;
+	margin-bottom: 14px;
+}
+

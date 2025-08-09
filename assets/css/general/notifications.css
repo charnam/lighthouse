@@ -1,0 +1,28 @@
+#notifications-group {
+	overflow: visible;
+}
+.notification-ball {
+	border-radius: 50%;
+	background: radial-gradient(white, transparent);
+	aspect-ratio: 1 / 1;
+	width: 10px;
+	position: absolute;
+}
+#notifications-group[notification-count]::before {
+	content: attr(notification-count);
+	position: absolute;
+	top: -20%;
+	right: -20%;
+	border-radius: 50%;
+	aspect-ratio: 1 / 1;
+	width: 16px;
+	height: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f00;
+	z-index: 1000;
+	font-size: 13px;
+	font-weight: bold;
+	outline: 2px solid #0004;
+}

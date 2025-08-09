@@ -1,0 +1,9 @@
+
+.dragging {
+	opacity: 0.3;
+}
+
+body:has(.dragging) .dropping-on {
+	opacity: 0.3;
+}
+

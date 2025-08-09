@@ -1,0 +1,96 @@
+.program-title {
+	display: flex;
+	padding: 6px 16px;
+	background: #0005;
+	font-weight: bold;
+	font-size: 17px;
+	font-style: italic;
+	margin: 2px 5px;
+	border-radius: 5px;
+	margin-bottom: 0;
+	user-select: none;
+	display: none;
+}
+#current-program-container {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	
+}
+
+.program-container {
+	overflow: auto;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+#group-programs-container.hidden {
+	display: none;
+}
+.program-title.hidden {
+	display: none;
+}
+.program {
+	position: relative;
+	
+	padding: 10px;
+	padding-left: 36px;
+	height: 36px;
+	font-size: 15px;
+	box-sizing: border-box;
+	
+	cursor: pointer;
+	user-select: none;
+	
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.program:hover {
+	background: #fff1;
+}
+
+.program.open {
+	box-shadow: inset 0 0 0 1px gray;
+	background: #fff1;
+}
+
+.program:before {
+	
+	content: "";
+	width: 16px;
+	height: calc(100% - 1px); /* this looks better */
+	position: absolute;
+	left: 10px;
+	top: 0;
+	
+	background-image: url("/icons/question-square.svg");
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	
+}
+
+
+.separator {
+	text-align: center;
+	padding: 5px 10px;
+	user-select: none;
+	font-style: italic;
+	color: #999;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.program[program-type="text"]:before {
+	
+	background-image: url("/icons/hash.svg");
+	
+}
+.program[program-type="info"]:before {
+	
+	background-image: url("/icons/journal-bookmark-fill.svg");
+	
+}

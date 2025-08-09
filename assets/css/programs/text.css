@@ -1,0 +1,139 @@
+
+:root {
+	--text-message-spacing-from-pfp: 8px;
+}
+
+.messages-screen {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	background: var(--color-background-primary);
+}
+
+.messages-screen .messages {
+	width: 100%;
+	max-height: 100%;
+	padding-bottom: 20px;
+	overflow-y: scroll;
+}
+
+.message.is-not-first .sender {
+	display: none;
+}
+
+.message-date-marker {
+	display: flex;
+	padding: 10px;
+	align-items: center;
+	justify-content: space-around;
+	color: var(--color-background-tertiary);
+	font-weight: 600;
+	user-select: none;
+}
+.message-date-marker:before, .message-date-marker:after {
+	content: '';
+	margin: 10px;
+	background: currentColor;
+	width: 100%;
+	height: 1px;
+}
+
+.message.is-first {
+	display: flex;
+	flex-direction: column;
+}
+.message + .message.is-first {
+	margin-top: 10px;
+}
+
+.message {
+	padding-left: 10px;
+	padding-bottom: 2px;
+	padding-top: 2px;
+	padding-right: 40px;
+	display: flex;
+}
+.message:hover {
+	background: #0002;
+}
+.message .sender, .message .sender .user {
+	display: contents;
+}
+
+.sender .user-name {
+	user-select: none;
+}
+
+.sender .user {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.message.is-first {
+	display: grid;
+	flex-direction: column;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto auto;
+	grid-template-areas: "pfp name" "pfp text";
+}
+
+.message .user .user-pfp {
+	grid-area: pfp;
+}
+
+.message.is-first .message-content {
+	margin-left: var(--text-message-spacing-from-pfp);
+}
+
+.message.is-first .message-time {
+	display: none;
+}
+
+.messages {
+}
+
+.messages-screen .message-box {
+	flex: none;
+	box-sizing: border-box;
+	margin: 5px;
+	margin-top: 0;
+}
+
+.message-box textarea {
+	width: 100%;
+	resize: none;
+	box-sizing: border-box;
+	border-radius: 10px;
+	padding: 11px 11px;
+	background: var(--color-background-secondary);
+	margin: 0;
+}
+
+
+.message-content {
+	display: flex;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.message-time {
+	width: 40px;
+	display: inline-block;
+	padding-right: 8px;
+	text-align: center;
+	color: transparent;
+	user-select: none;
+	transform: scale(0.7);
+	white-space: nowrap;
+}
+.message:hover .message-time {
+	color: gray;
+}
+
+.message-text {
+	display: inline-block;
+}
+

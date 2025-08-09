@@ -1,0 +1,28 @@
+INCOMPLETE (important first):
+
+- add profile pages *
+
+- add role name validation
+
+- add read reciepts, file uploads, typing indicators
+
+- make messages list lazy-load
+
+COMPLETE (newest first):
+
+- add online indicators, better group members sidebar
+- make info pages work
+- add "hidden" field to config menus, or filter out null values
+
+- add ability to add roles to users
+
+- add "hidden" field to context menus, or filter out null values
+
+- finish simple group members sidebar
+
+- invites list and joining groups
+
+- fix selection highlight in roles manager
+
+- add role permissions config
+

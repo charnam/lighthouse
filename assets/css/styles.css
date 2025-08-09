@@ -1,0 +1,235 @@
+
+@import url("general/groups.css");
+@import url("general/local.css");
+@import url("general/programs.css");
+@import url("general/contextmenu.css");
+@import url("general/reordering.css");
+@import url("general/notifications.css");
+
+@import url("programs/friends.css");
+@import url("programs/login.css");
+@import url("programs/error.css");
+@import url("programs/text.css");
+@import url("programs/config.css");
+@import url("programs/roles.css");
+@import url("programs/invites.css");
+@import url("programs/info.css");
+
+@import url("themes/dark.css");
+/*@import url("themes/light.css");*/
+
+* {
+	outline: none;
+}
+
+::-webkit-scrollbar {
+	display: none;
+}
+
+body {
+	background: var(--color-background-primary);
+	font-family: Arimo;
+}
+@keyframes loading-ball-sizing {
+	
+	0% {
+		
+		transform: scale(1);
+		background: var(--bg2);
+		top: 2px;
+		
+	}
+	50% {
+		
+		transform: scale(0.5);
+		background: var(--bg1);
+		top: -4px;
+	}
+	100% {
+		transform: scale(1);
+		background: var(--bg2);
+		top: 2px;
+	}
+	
+}
+@keyframes loading-ball-movement {
+	
+	0% {
+		left: 10px;
+	}
+	50% {
+		
+		left: -10px;
+		
+	}
+	100% {
+		left: 10px;
+	}
+	
+}
+
+#loading-screen {
+	position: fixed;
+	left: 50vw;
+	top: 50vh;
+	transform: translate(-50%, -50%);
+	width: 10px;
+	height: 10px;
+	--bg1: #fff8;
+	--bg2: #fff;
+}
+
+#loading-screen::before, #loading-screen:after {
+	content: "";
+	position: fixed;
+	animation: 2s ease-in-out infinite;
+	animation-name: loading-ball-sizing, loading-ball-movement;
+	animation-duration: 1s, 1s;
+	animation-delay: -0.25s, 0s;
+	width: 10px;
+	height: 10px;
+	background: var(--bg2);
+	display: inline-block;
+}
+
+
+#loading-screen::after {
+	animation-delay: -0.75s, -0.5s;
+}
+
+.discrete-header {
+	
+	user-select: none;
+	font-size: 10px;
+	color: var(--color-background-tertiary);
+	text-transform: uppercase;
+	padding: 5px;
+	margin-top: 5px;
+	
+}
+
+#app {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+}
+
+#app-container {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--color-background-primary);
+}
+
+#current-group-container {
+	display: flex;
+	flex-direction: row;
+	position: relative;
+	width: 100%;
+}
+
+
+#app-container {
+	display: flex;
+}
+
+#user-info-container {
+	flex: none;
+	height: fit-content;
+}
+
+#user-info-container .user-name {
+	display: none;
+}
+
+.icon {
+	pointer-events: none;
+	user-select: none;
+}
+
+.user-pfp {
+	width: 40px;
+	height: 40px;
+	border-radius: 20%;
+	background: var(--image), url("/icons/question.svg"), linear-gradient(to bottom, #ccc, #aaa);
+	background-size: cover, 70%, 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+
+.user-name {
+	margin-left: var(--text-message-spacing-from-pfp);
+	font-weight: bold;
+	display: inline-flex;
+	align-items: center;
+	width: fit-content;
+}
+.role-icons {
+	display: contents;
+}
+.role-icons img {
+	width: 16px;
+	height: 16px;
+	margin-left: 5px;
+}
+
+
+.appear-clickable:hover {
+	background: #fff2;
+	cursor: pointer;
+}
+.appear-clickable:active {
+	filter: brightness(0.5);
+}
+
+input[type="submit"], input[type="reset"], button {
+	width: fit-content;
+	display: block;
+	background: var(--color-button-primary);
+	padding: 6px 10px;
+	font-size: 16px;
+	border: none;
+	border-radius: 6px;
+	box-shadow: inset 0 -3px 5px -2px #0005, inset 0 8px 5px -2px #fff5;
+	text-shadow: 0 1px #fff8;
+	transition: filter var(--quick-transition);
+	filter: brightness(1);
+	cursor: pointer;
+	color: var(--color-button-text-primary);
+}
+button:not(.primary), input[type="reset"] {
+	background: var(--color-button-secondary);
+	color: var(--color-button-text-secondary);
+	text-shadow: 0 1px #0008;
+}
+input[type="submit"]:hover, button:hover, input[type="reset"]:hover {
+	filter: brightness(0.9);
+}
+
+input[type="text"], input[type="password"], textarea {
+	background: var(--color-input-primary);
+	padding: 7px 10px;
+	border-radius: 6px;
+	color: inherit;
+	font-family: inherit;
+	border: none;
+	/*outline: 3px solid #0005;*/
+}
+
+input[type="text"] :-webkit-placeholder, input[type="password"] :placeholder, textarea :placeholder {
+	color: #fff8;
+}
+.button-group {
+	display: flex;
+}
+.button-group :not(:last-child) {
+	margin-right: 10px;
+}
+.button-group * {
+	width: 100% !important;
+}

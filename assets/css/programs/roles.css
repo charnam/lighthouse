@@ -1,0 +1,165 @@
+
+.roles-manager {
+	display: flex;
+	height: 100%;
+}
+
+.settings-container {
+	width: 100%;
+	background: var(--color-background-secondary);
+	margin: 5px;
+	border-radius: 8px;
+	border: 1px solid gray;
+}
+
+.roles-list {
+	width: 100%;
+	margin-top: 10px;
+	overflow-y: auto;
+}
+
+.roles-list > * {
+	border-radius: 5px;
+	padding: 7px;
+	margin: 0 10px;
+}
+.roles-list > *:hover {
+	background: #fff1;
+}
+.role.selected {
+	background: #fff2;
+	cursor: default;
+}
+
+.roles-list .add {
+	display: flex;
+	justify-content: center;
+}
+
+.roles-list > * {
+	user-select: none;
+	cursor: pointer;
+}
+.role-tabs {
+	display: flex;
+}
+
+.role-tabs .tab {
+	width: 100%;
+	text-align: center;
+	padding: 10px 20px;
+	margin: 10px;
+	border-bottom: 2px solid transparent;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	font-size: 16px;
+	font-weight: bold;
+	user-select: none;
+	cursor: pointer;
+	opacity: 0.5;
+	transition: all 0.2s ease-out;
+	transition-property: opacity, border, letter-spacing;
+}
+
+.settings-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.role-tabs {
+	flex: none;
+}
+
+.roles-tabbed {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
+.tab-content .config-screen {
+	transition: 0.3s ease-out;
+	transition-property: opacity, transform;
+	opacity: 1;
+}
+
+.tab-content[tab="style"] {
+	--translation: -50px;
+}
+.tab-content[tab="permissions"] {
+	--translation: 50px;
+}
+
+.settings-container[tab="style"] .tab-content:not([tab="style"]) .config-screen,
+.settings-container[tab="permissions"] .tab-content:not([tab="permissions"]) .config-screen {
+	transition-duration: 0.2s;
+	transform: translateX(var(--translation));
+	opacity: 0;
+	pointer-events: none;
+	z-index: -1;
+}
+.settings-container[tab="style"] .tab[tab="style"],
+.settings-container[tab="permissions"] .tab[tab="permissions"] {
+	border-bottom-color: #fff5;
+	letter-spacing: 2px;
+	opacity: 1;
+}
+
+.settings-container input[type="reset"] {
+	display: none;
+}
+
+.roles-manager:has(.config-save-button-container.visible) .roles-list {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.roles-manager > .banners {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+.roles-leftside {
+	position: relative;
+	width: 200px;
+	flex: none;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.roles-manager .apply-button {
+	margin: 10px;
+	transition: transform 0.2s ease-out;
+	transition-property: transform, opacity;
+}
+
+.roles-manager .apply-button:not(.visible) {
+	transform: translateY(100%);
+	opacity: 0;
+}
+
+@media (max-width: 1100px) {
+	body:has(.roles-manager) #group-members-container {
+		display: none;
+	}
+}
+
+.role {
+	display: flex;
+	align-content: center;
+}
+
+.role-icon {
+	width: 16px;
+	height: 16px;
+	display: flex;
+	image-rendering: pixelated;
+	margin-right: 5px;
+}
+

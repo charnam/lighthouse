@@ -1,0 +1,81 @@
+
+.context-menu-overlay {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 10000;
+}
+
+.context-menu, .context-menu .submenu {
+	position: fixed;
+	left: var(--x);
+	top: var(--y);
+	background: var(--color-background-primary);
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	padding: 1px;
+	border: 1px solid #fff5;
+	border-radius: 5px;
+	border-top-left-radius: 0;
+	min-width: 150px;
+	font-size: 15px;
+	user-select: none;
+}
+.context-menu-option .submenu {
+	position: absolute;
+	left: calc(100% + 3px);
+	top: -2px;
+	transition: visibility 0.2s linear;
+}
+.submenu:empty::before {
+	content: "< No items >";
+	padding: 10px;
+	font-style: italic;
+	color: gray;
+	text-align: center;
+}
+.context-menu-option:hover .submenu {
+	z-index: 10;
+}
+
+.context-menu-option {
+	padding: 7px;
+	background: #0000;
+	padding-left: 28px;
+	border-radius: 5px;
+	position: relative;
+	white-space: nowrap;
+	max-width: min(500px, 90vw);
+	text-overflow: ellipsis;
+}
+.context-menu-option .icon.submenu-icon {
+	right: 5px;
+	left: unset;
+}
+.context-menu-option.has-submenu:not(:hover) .submenu {
+	visibility: hidden;
+}
+
+
+.context-menu-option.has-action {
+	cursor: pointer;
+}
+
+.context-menu-option.has-action:hover {
+	background: #fff2;
+}
+
+.context-menu-option.disabled {
+	cursor: default;
+	opacity: 0.5;
+	font-style: italic;
+}
+.context-menu-option .icon {
+	position: absolute;
+	left: 9px;
+	width: 16px;
+}
+

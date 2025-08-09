@@ -1,0 +1,13 @@
+
+config/
+etc/
+tools/
+assets/icons/
+assets/css/fonts/
+
+.termdbms/
+.vscode/
+workspace.code-workspace
+
+server/node_modules/
+package-lock.json

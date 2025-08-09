@@ -1,0 +1,22 @@
+.invites-view:empty::after {
+	content: "No invites here. Ask someone to invite you to their group!";
+	text-align: center;
+	width: 100%;
+	display: inline-block;
+	font-style: italic;
+	color: gray;
+}
+.invites-view {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	max-width: 800px;
+}
+.invite span {
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

@@ -1,0 +1,25 @@
+
+:root {
+	--color-background-primary: hsl(220deg, 20%, 20%);
+	--color-background-secondary: hsl(220deg, 10%, 32%);
+	--color-background-tertiary: hsl(220deg, 5%, 40%);
+	
+	--color-button-primary: hsl(220deg, 100%, 85%);
+	--color-button-text-primary: black;
+	--color-button-secondary: hsl(220deg, 10%, 20%);
+	--color-button-text-secondary: white;
+	
+	--color-input-primary: hsl(220deg, 5%, 36%);
+	--quick-transition: 0.025s ease-in-out;
+	
+	--separator-color-primary: #fff5;
+	
+}
+body {
+	color: #eee;
+}
+
+.icon:not([src*="/uploads/"]),
+.program:before {
+	filter: invert(1);
+}
