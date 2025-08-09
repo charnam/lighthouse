@@ -84,7 +84,7 @@ class Validation {
 		return this.success;
 		
 	}
-	static async validate_program_info(info_content) {
+	static async validate_info_content(info_content) {
 		
 		if(info_content.length > 4096)
 			return this.error_banner("Info content length too long - 4,096 characters maximum");

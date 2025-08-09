@@ -15,8 +15,6 @@ import InvitesProgram from "./programs/invites.js";
 import ConfigMenuProgram from "./programs/configMenuProgram.js";
 import ProfileView from "./programs/profile.js";
 
-window.notif = NotificationHandler;
-
 if(!window.io || !window.doc)
 	throw alert("Looks like an important resource failed to load. Please refresh the page.");
 
@@ -25,6 +23,7 @@ class StatedSessionHandler {
 	
 	currentGroup = null
 	currentProgram = null
+	
 	
 	user = null
 	groups = null
@@ -557,16 +556,14 @@ class StatedSessionHandler {
 		});
 		
 		this.socket.on("disconnect", () => {
-			
-			
 			doc.el("#app-container").anim({
 				duration: 1000,
 				scale: [1, 0.8],
 				opacity: [1, 0]
 			})
-			
-		})
+		});
 		
+		this.notifications = new NotificationHandler(this);
 	}
 	refresh_groups(groups) {
 		

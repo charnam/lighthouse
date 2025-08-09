@@ -184,10 +184,15 @@ body {
 	width: 40px;
 	height: 40px;
 	border-radius: 20%;
-	background: var(--image), url("/icons/question.svg"), linear-gradient(to bottom, #ccc, #aaa);
-	background-size: cover, 70%, 100%;
+	background: var(--image);
+	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
+}
+.user-pfp[style*="uploads/null"] {
+	background-image: url("/icons/person-fill.svg"), linear-gradient(to bottom, #8888, #fff8);
+	filter: invert(1);
+	background-size: 60%, 100%;
 }
 
 
@@ -198,6 +203,16 @@ body {
 	align-items: center;
 	width: fit-content;
 }
+
+
+.user-tag:before {
+	content: "@";
+}
+.user-tag {
+	display: none;
+}
+
+
 .role-icons {
 	display: contents;
 }

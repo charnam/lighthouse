@@ -53,6 +53,8 @@ async function identifyImage(filename) {
 			message: "Unsupported image type. Try converting it to a more common image format first."
 		}
 	} else {
+		//let ftype = MAGIC_FILETYPES[identification.stdout]
+		//if(identification.stdout)
 		return {
 			type: "success",
 			filetype: MAGIC_FILETYPES[identification.stdout]

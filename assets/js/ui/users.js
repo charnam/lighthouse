@@ -19,9 +19,16 @@ function render_user(rendered_user, session = false) {
 	let pfpEl =
 		user
 			.crel("div").addc("user-pfp").attr("style", "--image: url('/uploads/"+rendered_user.pfp+"');")
+	
 	let usernameEl =
 		user
 			.crel("div").addc("user-name").txt(rendered_user.displayname)
+	
+	if(rendered_user.username && rendered_user.username !== rendered_user.displayname)
+		usernameEl
+			.crel("div")
+				.addc("user-tag")
+				.txt(rendered_user.username);
 	
 	let roleIconsEl =
 		usernameEl
