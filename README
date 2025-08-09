@@ -1,0 +1,47 @@
+# Lighthouse
+
+This is Lighthouse, a chat application similar to other popular ones, created by me, for fun.
+The code is as clean as I could manage to make it, albeit I wasn't focused on cleanliness the
+whole time, so certain things might be strange or difficult to decipher. If you want help making
+changes, or learning about the architecture, please feel free to ask me via email, at
+[charnam@lunarsphere.net](mailto:charnam@lunarsphere.net).
+
+Lighthouse can be found online at... insert link here when it's ready ;)
+
+---
+
+## Starting the Server
+
+This server should theoretically work under Windows or WSL, but it has not (and will not) be tested by me.
+To set up a development server, follow these steps:
+
+1. [Install node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+2. `cd` into the `server` directory, and then run `npm install` to install all required dependencies.
+3. Create a folder named `config` in the root directory of this project.
+4. Clone the sample database file into `config/database.db`
+5. Create the `config/uploads/` directory
+6. Download [bootstrap icons](https://icons.getbootstrap.com/). Place the directory containing the SVG files into `assets`, and title it `icons`. e.g, `assets/icons/caret.svg`.
+
+The server should now be ready. To start it, type:
+
+```
+cd server
+./start.sh
+```
+
+If you receive any errors at this point, please submit an issue. Otherwise, you're ready to start development! Check the contributing section below for guidelines on proper code etiquitte here.
+
+---
+
+## Contributing
+
+If you'd like to contribute, great! Check the TODO file to see what I have planned. Items with an asterisk (*) indicate that I am currently working on them. If you don't understand an entry, skip it.
+
+I also require you to set your editor to acknowledge these preferences:
+
+- Tabs are tabs. This allows for anyone to choose how they view the code; If two-character wide indenting is preferred, you can change how tabulators are displayed in your editor, but please do not use spaces for indentation.
+- Please do not auto-trim any of your whitespace. Trailing whitespace on non-blank lines should be removed, but on blank lines, please set your editor to keep it. This may not be common practice, but for this project, please make an exception. It makes adding code to certain sections much faster.
+
+
+And, that's mostly it. All code in this repository is licensed under the GNU Affero General Public License, version 3.0 or later.
+
