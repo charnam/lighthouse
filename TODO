@@ -1,16 +1,38 @@
-INCOMPLETE (important first):
+TODO list
 
-- add profile pages *
+items are sorted by importance in the INCOMPLETE section (important items go first)
+items are sorted by completion date in the COMPLETE section (complete items go first)
 
-- add role name validation
+at the end of a task name:
+*: in-progress / chosen
+~: paused, slowly progressing, or requires something else before it may be completed
+!: important / reminder
+
+mostly used by me (@charnam); I may be working on things that are not here due to their non-importance.
+
+Submit an issue if you'd like me to focus on something specific.
+
+---
+
+INCOMPLETE:
+
+- validate images more effectively; start cropping and converting images rather than using user-uploaded content "raw"
 
 - add read reciepts, file uploads, typing indicators
 
+- add online indicators, modifiable current status
+
 - make messages list lazy-load
 
-COMPLETE (newest first):
+- add profile pages ~
+	> add "wallpapers"
 
-- add online indicators, better group members sidebar
+- make CSS more readable, use more variables rather than hard-coding backgrounds and text colors for better theming
+
+COMPLETE:
+
+- add role name validation
+
 - make info pages work
 - add "hidden" field to config menus, or filter out null values
 
