@@ -391,6 +391,10 @@ class StatedSession {
 										return this.socket.emit("program-output", Banners.error("You cannot rearrange a role to be in a higher position than your own."))
 									}
 									
+									let roleNameVerification = await Validation.validate_role_name(updated_role.name);
+									if(roleNameVerification.type !== "success")
+										return this.socket.emit("program-output", roleNameVerification);
+									
 									if(role.icon !== updated_role.icon && updated_role.icon !== "") {
 										let icon_validation =
 											await Validation.validate_and_use_uploaded_file(this, updated_role.icon, "roleicon");
@@ -800,7 +804,7 @@ class StatedSession {
 										let requestUser = await this.db.get("SELECT userid FROM users WHERE username = ?", event.username);
 										if(!requestUser)
 											return show_error_banner("Couldn't find anyone by that name, sorry.");
-										let checkRequest = await this.db.get("SELECT id FROM friend_requests WHERE requestor = ? AND requestee = ?", [this.user.userid, requestUser.userid])
+										let checkRequest = await this.db.get("SELECT id FROM friend_requests WHERE (requestor = ? AND requestee = ?) OR (requestor = ? AND requestee = ?)", [this.user.userid, requestUser.userid, requestUser.userid, this.user.userid])
 										if(checkRequest)
 											return show_error_banner("Request already sent");
 										

@@ -98,5 +98,11 @@
 	background-size: 14px;
 	animation: bannerAnimated 1s linear infinite, blinkingBanner 2s ease-in-out infinite;
 }
+.banner.success {
+	background: #0f01;
+    box-shadow: 0 0 10px inset #0f05;
+	background-size: 14px;
+	animation: bannerAnimated 1s linear infinite;
+}
 
 

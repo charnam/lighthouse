@@ -163,3 +163,8 @@
 	margin-right: 5px;
 }
 
+.config-options:has([name="ADMIN"][value="yes"]:checked) .config-option:not(:has([name="ADMIN"])) {
+	pointer-events: none;
+	opacity: 0.5 !important;
+	transition: opacity 0.2s ease-in-out;
+}

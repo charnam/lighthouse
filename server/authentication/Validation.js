@@ -84,6 +84,19 @@ class Validation {
 		return this.success;
 		
 	}
+	static async validate_role_name(rolename) {
+		
+		if(rolename.length < 1)
+			return this.error_banner("Role name must not be empty");
+		
+		if(rolename.length > 32)
+			return this.error_banner("Role name too long - 32 characters maximum");
+		
+		return this.success;
+		
+		
+	}
+	
 	static async validate_info_content(info_content) {
 		
 		if(info_content.length > 4096)
