@@ -32,6 +32,19 @@ class GlobalState {
 		return "online";
 	}
 	
+	serialize_session(session) {
+		let serialized = {};
+		
+		serialized.group = JSON.stringify(session.group);
+		serialized.groups = JSON.stringify(session.groups);
+		
+	}
+	
+	check_changes(updated_session) {
+		
+		
+	}
+	
 	// TODO: remove state_check entirely and replace it with something less general-purpose (i.e "member_refresh", "group_refresh" or "role_refresh")
 	state_check(updated_session) {
 		if(!updated_session || !updated_session.user) return false;

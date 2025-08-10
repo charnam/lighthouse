@@ -121,6 +121,13 @@ class StatedSession {
 											uploadType: "groupicon"
 										},
 										{
+											label: "Group Wallpaper",
+											name: "wallpaper",
+											input: "image",
+											aspectRatio: [16,9],
+											uploadType: "wallpaper"
+										},
+										{
 											label: "Name",
 											name: "name",
 											input: "text"
@@ -128,7 +135,8 @@ class StatedSession {
 									],
 									defaults: {
 										name: group.groupname,
-										icon: group.icon
+										icon: group.icon,
+										wallpaper: group.wallpaper
 									}
 								}
 							}, async event => {
@@ -137,31 +145,44 @@ class StatedSession {
 										return false;
 									}
 									
+									if(event.fields.wallpaper == "") event.fields.wallpaper = null;
+									if(event.fields.icon == "") event.fields.icon = null;
+									
 									// validation
 									let name_validation = await Validation.validate_group_name(event.fields.name);
 									
 									if(name_validation.type !== "success")
 										return this.socket.emit('program-output', name_validation);
 									
-									// change values
-									group.groupname = event.fields.name;
-									
 									if(event.fields.icon != group.icon) {
-										if(event.fields.icon == "null") {
-											group.icon = null;
-										} else {
+										if(event.fields.icon !== null) {
 											let icon_validation =
 												await Validation.validate_and_use_uploaded_file(this, event.fields.icon, "groupicon");
 											if(icon_validation.type !== "success")
 												return this.socket.emit("program-output", icon_validation);
-											group.icon = event.fields.icon;
 										}
 									}
 									
+									if(event.fields.wallpaper != group.wallpaper) {
+										if(event.fields.wallpaper !== null) {
+											let wallpaper_validation =
+												await Validation.validate_and_use_uploaded_file(this, event.fields.wallpaper, "wallpaper");
+											if(wallpaper_validation.type !== "success")
+												return this.socket.emit("program-output", wallpaper_validation);
+										}
+									}
+									
+									// change values
+									group.groupname = event.fields.name;
+									group.icon = event.fields.icon;
+									group.wallpaper = event.fields.wallpaper;
+									
+									
 									// sync changes
-									await this.db.run("UPDATE groups SET groupname = ?, icon = ? WHERE groupid = ?", [
+									await this.db.run("UPDATE groups SET groupname = ?, icon = ?, wallpaper = ? WHERE groupid = ?", [
 										group.groupname,
 										group.icon,
+										group.wallpaper,
 										group.groupid
 									]);
 									
@@ -934,7 +955,14 @@ class StatedSession {
 										{
 											"input": "textarea",
 											"name": "bio",
-											"label": "Bio",
+											"label": "Bio"
+										},
+										{
+											"label": "Profile Wallpaper",
+											"input": "image",
+											"aspectRatio": [16, 9],
+											"name": "wallpaper",
+											"uploadType": "wallpaper",
 											"separator": true
 										},
 										/*
@@ -975,6 +1003,7 @@ class StatedSession {
 										displayname: this.user.displayname,
 										username: this.user.username,
 										pfp: this.user.pfp,
+										wallpaper: this.user.wallpaper,
 										bio: this.user.bio
 									}
 								}
@@ -1004,6 +1033,16 @@ class StatedSession {
 										this.user.pfp = event.fields.pfp;
 									}
 									
+									if(event.fields.wallpaper != this.user.wallpaper) {
+										let wallpaper_validation =
+											await Validation.validate_and_use_uploaded_file(this, event.fields.wallpaper, "wallpaper");
+										
+										if(wallpaper_validation.type !== "success")
+											return this.socket.emit("program-output", wallpaper_validation);
+										
+										this.user.wallpaper = event.fields.wallpaper;
+									}
+									
 									let bio_validation = await Validation.validate_bio(event.fields.bio);
 									if(bio_validation.type !== "success")
 										return this.socket.emit("program-output", bio_validation);
@@ -1014,7 +1053,14 @@ class StatedSession {
 									this.user.bio = event.fields.bio;
 									
 									// sync changes
-									await this.db.run("UPDATE users SET username = ?, displayname = ?, pfp = ?, bio = ? WHERE userid = ?", [this.user.username, this.user.displayname, this.user.pfp, this.user.bio, this.user.userid]);
+									await this.db.run("UPDATE users SET username = ?, displayname = ?, pfp = ?, wallpaper = ?, bio = ? WHERE userid = ?", [
+										this.user.username,
+										this.user.displayname,
+										this.user.pfp,
+										this.user.wallpaper,
+										this.user.bio,
+										this.user.userid
+									]);
 									
 									GlobalState.state_check(this);
 									// return final success state
@@ -1282,7 +1328,7 @@ class StatedSession {
 			case "show_profile":
 				{
 					
-					let user = await this.db.get("SELECT username, userid, displayname, pfp, creation, bio FROM users WHERE userid = ?", event.userid);
+					let user = await this.db.get("SELECT username, userid, displayname, pfp, wallpaper, creation, bio FROM users WHERE userid = ?", event.userid);
 					if(!user)
 						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to show the profile of a user that does not exist.");
 					

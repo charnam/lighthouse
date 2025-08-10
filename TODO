@@ -9,6 +9,9 @@ at the end of a task name:
 []: requires something else (specify)
 !: important / reminder
 
+before a task name:
+	>: sub-task
+
 mostly used by me (@charnam); I may be working on things that are not here due to their non-importance.
 
 Submit an issue if you'd like me to focus on something specific.
@@ -17,20 +20,26 @@ Submit an issue if you'd like me to focus on something specific.
 
 INCOMPLETE:
 
-- validate images more effectively; start cropping and converting images rather than using user-uploaded content "raw"
+- profile pages 
+	> add online indicators, modifiable current status
 
 - add read reciepts, file uploads, typing indicators
 
-- add online indicators, modifiable current status
-
 - make messages list lazy-load
 
-- ~[image validation] add profile pages 
-	> add "wallpapers"
+- make CSS more readable, use more variables rather than hard-coding backgrounds and text colors for better theming, upgrade programs sidebar
 
-- make CSS more readable, use more variables rather than hard-coding backgrounds and text colors for better theming
+- drop EXIF data from file uploads
+
+- test user-specific uploads
 
 COMPLETE:
+
+- make uploads slightly more secure by tracking which user uploaded what file
+
+- profile pages > add "wallpapers"
+
+- validate images more effectively; start cropping and converting images rather than using user-uploaded content "raw"
 
 - add role name validation
 

@@ -43,6 +43,13 @@
 	cursor: inherit;
 }
 
+.config-option:not([type]) .config-option-label-text {
+	font-size: 1.5em;
+	font-weight: bold;
+	padding-bottom: 5px;
+	width: 100%;
+}
+
 .config-option[type="textarea"] {
 	flex-direction: column;
 	align-items: flex-start;
@@ -101,7 +108,7 @@
 	content: "";
 	background-color: #fff5;
 	background-image: url("/icons/upload.svg");
-	background-size: 60%;
+	background-size: 60% 60%;
 	background-position: center;
 	background-repeat: no-repeat;
 	filter: invert(1);
@@ -118,6 +125,10 @@
 }
 .config-option .image-upload:hover:after {
 	opacity: 1;
+}
+
+.config-option[type="image"] {
+	align-items: start;
 }
 
 body:has(.image-upload[in-progress]) #all-groups-container,
@@ -142,8 +153,8 @@ body:has(.image-upload[in-progress]) .config-save-button-container {
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%) scale(0.5);
-	width: 80%;
-	height: 80%;
+	width: 128px;
+	height: 128px;
 	border: 8px solid black;
 }
 
@@ -231,7 +242,6 @@ body:has(.image-upload[in-progress]) .config-save-button-container {
 
 .new-group-dots {
 	display: flex;
-	flex-direction: ;
 	justify-content: space-between;
 	width: 40%;
 	margin: 10px;
@@ -261,7 +271,6 @@ body:has(.image-upload[in-progress]) .config-save-button-container {
 .threeway {
 	display: flex;
 	height: 32px;
-	width: ;
 	aspect-ratio: 3 / 1;
 	border-radius: 5px;
 	overflow: hidden;

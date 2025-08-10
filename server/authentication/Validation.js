@@ -136,6 +136,8 @@ class Validation {
 		if(upload.type !== type || upload.autodelete == 0)
 			return this.error_banner("Upload cannot be used here");
 		
+		if(upload.userid !== session.user.userid)
+			return this.error_banner("Session mismatch (try logging in again?)")
 		
 		return this.success;
 	}

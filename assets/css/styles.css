@@ -59,9 +59,7 @@ body {
 		left: 10px;
 	}
 	50% {
-		
 		left: -10px;
-		
 	}
 	100% {
 		left: 10px;
@@ -126,27 +124,27 @@ body {
 	background: var(--color-background-primary);
 }
 
-#app-container::before {
-	content: "";
-	background-image: var(--page-background);
-	background-position: center;
-	background-size: cover;
+.wallpaper,
+#app-container:before {
 	width: 100%;
 	height: 100%;
 	position: fixed;
-	z-index: -100;
-	opacity: 0.25;
+	object-fit: cover;
 	filter: blur(8px);
+	z-index: -100;
+}
+#app-container:before {
+	content: "";
+	opacity: 0.25;
 	transition: opacity 0.2s ease-in-out;
+	background-image: url("/css/images/cc0-lighthouse-goodfreephotos.jpg");
+	background-position: center;
+	background-size: cover;
 }
 #app-container:not(:has(
-	.profile-page,
 	#all-groups-container[style*=display]
 )):before {
 	opacity: 0;
-}
-#app-container:has(#all-groups-container[style*=display]) {
-	--page-background: url("/css/images/cc0-lighthouse-goodfreephotos.jpg");
 }
 
 #current-group-container {

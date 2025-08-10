@@ -10,7 +10,16 @@
 	height: 100%;
 	width: 100%;
 	position: absolute;
+}
+
+.messages-screen:before {
+	content: "";
+	position: absolute;
+	z-index: -100;
+	opacity: 0.8;
+	inset: 6px;
 	background: var(--color-background-primary);
+	border-radius: 10px;
 }
 
 .messages-screen .messages {
@@ -91,9 +100,6 @@
 
 .message.is-first .message-time {
 	display: none;
-}
-
-.messages {
 }
 
 .messages-screen .message-box {

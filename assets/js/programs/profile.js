@@ -1,12 +1,13 @@
 
 import User from "../ui/users.js";
+import wallpapers from "../ui/wallpapers.js";
 
 function ProfileView(session) {
 	let programContainerEl = doc.el("#current-program-container").html("");
 	
 	const user = session.currentProgram.user;
 	
-	doc.el("body").attr("style", `--page-background: url(/uploads/${user.pfp})`)
+	wallpapers.createWallpaper(user.wallpaper);
 	
 	programContainerEl
 		.crel("div")

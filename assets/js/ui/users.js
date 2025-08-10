@@ -1,6 +1,7 @@
 
 import Permissions from "../variables/permissions.js";
 import ContextMenu from "./contextmenu.js";
+import animations from "./animations.js";
 
 function render_user(rendered_user, session = false) {
 	
@@ -59,7 +60,7 @@ function render_user(rendered_user, session = false) {
 						{
 							text: "Edit profile",
 							icon: "icons/person-fill-gear.svg",
-							action: (contextMenu) => {
+							action: async (contextMenu) => {
 								contextMenu.close();
 								session.join_group("special:settings");
 							}
@@ -121,6 +122,7 @@ function render_user(rendered_user, session = false) {
 						text: "View profile",
 						action: async (contextMenu) => {
 							contextMenu.close();
+							await animations.groupOut();
 							await session.general_interact({type: "show_profile", userid: rendered_user.userid});
 						}
 					},

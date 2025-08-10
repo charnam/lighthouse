@@ -4,32 +4,27 @@ const uuid = require('uuid').v4;
 const multer = require("multer");
 const sharp = require("sharp");
 const UPLOAD_FILE_PATH = "config/uploads";
+const TEMP_UPLOAD_FILE_PATH = "config/temp-uploads";
+const ALLOWED_MIME_TYPES = [
+	"image/jpeg",
+	"image/png",
+	"image/gif",
+	"image/webp",
+	"image/bmp",
+	"image/tiff",
+	"image/apng",
+	"audio/mp3",
+	"audio/x-wav"
+];
+
+if(!fs.existsSync(UPLOAD_FILE_PATH))
+	fs.mkdirSync(UPLOAD_FILE_PATH);
+
+if(!fs.existsSync(TEMP_UPLOAD_FILE_PATH))
+	fs.mkdirSync(TEMP_UPLOAD_FILE_PATH);
 
 const userLogin = require("authentication/userLogin.js");
-
 const logger = require("helpers/logger.js");
-
-const spawn = require("child_process").spawn;
-
-function spawnPromise(command, args) {
-	return new Promise(res => {
-		let child = spawn(command, args);
-		
-		let stdout = "";
-		let stderr = "";
-		child.stdout.on("data", out => stdout+=out.toString());
-		child.stderr.on("data", err => stderr+=err.toString());
-		
-		child.on("close", status => {
-			res({
-				status,
-				stdout,
-				stderr
-			});
-		})
-		
-	})
-}
 
 function movePromise(file, destination) {
 	return new Promise(res =>
@@ -37,36 +32,11 @@ function movePromise(file, destination) {
 	);
 }
 
-const MAGIC_FILETYPES = {
-	"JPEG": "image/jpeg",
-	"PNG": "image/png",
-	"GIF": "image/gif",
-	"WEBP": "image/webp",
-	"BMP": "image/bmp"
-};
-async function identifyImage(filename) {
-	let identification = await spawnPromise("magick", ["identify", "-quiet", "-format", "%m", `${UPLOAD_FILE_PATH}/${filename}`]);
-	if(identification.status !== 0) {
-		return {
-			type: "banner",
-			banner: "error",
-			message: "Unsupported image type. Try converting it to a more common image format first."
-		}
-	} else {
-		//let ftype = MAGIC_FILETYPES[identification.stdout]
-		//if(identification.stdout)
-		return {
-			type: "success",
-			filetype: MAGIC_FILETYPES[identification.stdout]
-		}
-	}
-}
-
 
 const upload = multer({
 	storage: multer.diskStorage({
 		destination: function (req, file, cb) {
-			cb(null, `${UPLOAD_FILE_PATH}/`);
+			cb(null, `${TEMP_UPLOAD_FILE_PATH}/`);
 		},
 		filename: function (req, file, cb) {
 			cb(null, uuid());
@@ -74,21 +44,19 @@ const upload = multer({
 	})
 })
 
-const IMAGE_MIME_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/gif",
-	"image/webp",
-	"image/bmp",
-	"image/tiff",
-	"image/apng"
-];
-
 function setup(db, expressApp) {
 	
 	expressApp.post("/uploads/create", upload.single("file"), async function(req, res) {
+		const tempPath = req.file.path;
+		const targetPath = `${UPLOAD_FILE_PATH}/${req.file.filename}`;
 		let fail = (message) => {
-			fs.unlinkSync(req.file.path);
+			
+			if(fs.existsSync(tempPath))
+				fs.unlinkSync(tempPath);
+			
+			if(fs.existsSync(targetPath))
+				fs.unlinkSync(targetPath);
+			
 			res.json({
 				type: "banner",
 				banner: "error",
@@ -97,66 +65,87 @@ function setup(db, expressApp) {
 		};
 		
 		
-		let user = await userLogin(db, req.headers.cookie);
-		let iden = await identifyImage(req.file.filename);
-		
-		let mimetype = iden.filetype;
+		const user = await userLogin(db, req.headers.cookie);
+		let mimetype;
 		
 		if(!user) {
 			return fail("Invalid session");
 		}
+		
+		const convert = async (type, width, height, quality) => {
+			try {
+				
+				let constructed =
+					sharp(tempPath, { animated: true })
+						.resize({
+							width, 
+							height,
+							withoutEnlargement: true,
+							fit: "cover"
+						});
+				
+				if(type == "webp") {
+					constructed = constructed.webp({quality, alphaQuality: 100});
+					mimetype = "image/webp";
+				} else if(type == "png") {
+					constructed = constructed.png();
+					mimetype = "image/png";
+				}
+				
+				await constructed.toFile(targetPath);
+				
+				fs.unlinkSync(tempPath);
+				
+				return true;
+			} catch(err) {
+				fail("Unsupported image type.");
+				return false;
+			}
+		}
+		
 		switch(req.body.uploadType) {
 			case "pfp":
 			case "groupicon":
+				if(!await convert(
+					"webp",
+					256, 256,
+					80
+				)) return false;
+				break;
+			case "wallpaper":
+				if(!await convert(
+					"webp",
+					1280, 720,
+					70
+				)) return false;
+				break;
 			case "roleicon":
-				if(!iden.filetype) {
-					if(iden.type !== "success")
-						return res.json(iden);
-					else
-						return res.json({
-							type: "banner",
-							banner: "error",
-							message: "Filetype recognized, but not allowed. Ask for help."
-						})
-				}
-				/*
-					TODO: scaling of images
-					try {
-						await movePromise(req.file.filename, `${req.file.filename}-`);
-						await
-							sharp(req.file.filename)
-								.resize({
-									width: 256,
-									height: 256,
-									withoutEnlargement: true,
-									fit: "cover"
-								})
-								.toFile(req.file.filename);
-					} catch(err) {
-						console.error(err);
-						return res.json({
-							type: "banner",
-							banner: "error",
-							message: "Unsupported image type."
-						})
-					}
-				*/
+				if(!await convert(
+					"png",
+					16, 16,
+					100
+				)) return false;
 				break;
 			case "attachment":
-				
+				await movePromise(tempPath, targetPath);
+				mimetype = req.file.mimetype;
 				break;
 			default:
-				return fail("Invalid upload type");
+				return fail("Unknown upload type.");
 				break;
 		}
 		
+		if(!mimetype)
+			return fail("Unable to determine filetype of uploaded file.");
+		
 		let id = uuid();
-		await db.run("INSERT INTO uploads (uploadid, type, originalname, filename, mimetype, autodelete) VALUES (?,?,?,?,?,?)", [
+		await db.run("INSERT INTO uploads (uploadid, userid, type, originalname, filename, mimetype, autodelete) VALUES (?,?,?,?,?,?,?)", [
 			id,
+			user.userid,
 			req.body.uploadType,
 			req.file.originalname,
 			req.file.filename,
-			mimetype ? mimetype : req.file.mimetype,
+			mimetype,
 			Date.now()+30*60*1000
 		]);
 		res.json({
@@ -179,7 +168,7 @@ function setup(db, expressApp) {
 			res.sendFile(`${process.cwd()}/${UPLOAD_FILE_PATH}/${uploadData.filename}`,
 			{
 				headers: {
-					"Content-Type": IMAGE_MIME_TYPES.includes(uploadData.mimetype) ? uploadData.mimetype : "application/octet-stream"
+					"Content-Type": ALLOWED_MIME_TYPES.includes(uploadData.mimetype) ? uploadData.mimetype : "application/octet-stream"
 				}
 			})
 		}
