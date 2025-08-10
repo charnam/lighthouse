@@ -5,7 +5,8 @@ items are sorted by completion date in the COMPLETE section (complete items go f
 
 at the end of a task name:
 *: in-progress / chosen
-~: paused, slowly progressing, or requires something else before it may be completed
+~: paused, slowly progressing, or requires something else
+[]: requires something else (specify)
 !: important / reminder
 
 mostly used by me (@charnam); I may be working on things that are not here due to their non-importance.
@@ -24,7 +25,7 @@ INCOMPLETE:
 
 - make messages list lazy-load
 
-- add profile pages ~
+- ~[image validation] add profile pages 
 	> add "wallpapers"
 
 - make CSS more readable, use more variables rather than hard-coding backgrounds and text colors for better theming
