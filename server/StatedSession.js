@@ -359,6 +359,7 @@ class StatedSession {
 									return this.socket.emit("program-output", Banners.error("Role does not exist or has already been deleted"));
 								
 								await this.db.run("DELETE FROM roles WHERE roleid = ? AND groupid = ?", [event.roleid, group.groupid]);
+								await this.db.run("DELETE FROM role_assignation WHERE roleid = ?", event.roleid);
 								
 								this.socket.emit("program-output", {
 									type: "remove_role",
