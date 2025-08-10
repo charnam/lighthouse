@@ -352,13 +352,27 @@ class StatedSession {
 									role: await this.db.get("SELECT * FROM roles WHERE roleid = ?", new_id)
 								});
 							}
+							if(event.type == "remove_role") {
+								let has_role = await this.db.get("SELECT * FROM roles WHERE roleid = ? AND groupid = ?", [event.roleid, group.groupid]);
+								
+								if(has_role == null)
+									return this.socket.emit("program-output", Banners.error("Role does not exist or has already been deleted"));
+								
+								await this.db.run("DELETE FROM roles WHERE roleid = ? AND groupid = ?", [event.roleid, group.groupid]);
+								
+								this.socket.emit("program-output", {
+									type: "remove_role",
+									roleid: event.roleid
+								});
+							}
 							if(event.type == "submit") {
 								// validation
 								let role_update_data = {};
 								role_update_data = event.data;
 								
-								const user_roles = await this.permissions.get_roles(this.user.userid, group.groupid);
-								let max_role_pos = Math.min(...user_roles.map(role => role.position));
+								// TODO: fix privilege escalation exploits in roles menu (the client is not able to enable the EDIT_ROLES permission at this time - ADMIN should be used instead)
+								//const user_roles = await this.permissions.get_roles(this.user.userid, group.groupid);
+								let max_role_pos = 0; // Math.min(...user_roles.map(role => role.position));
 								
 								if(await this.permissions.permissions_group(group.groupid) & Permissions.ByName.ADMIN)
 									max_role_pos = 0;
@@ -386,10 +400,13 @@ class StatedSession {
 											(role.allow_permissions ^ updated_role.allow_permissions))
 										return this.socket.emit("program-output", Banners.error("You cannot grant a role permissions which you don't already have."));
 									
+									/*
+									TODO: fix privilege escalation in roles menu
 									if(updated_role.position < max_role_pos) {
 										console.log(updated_role.position, max_role_pos)
 										return this.socket.emit("program-output", Banners.error("You cannot rearrange a role to be in a higher position than your own."))
 									}
+									*/
 									
 									let roleNameVerification = await Validation.validate_role_name(updated_role.name);
 									if(roleNameVerification.type !== "success")

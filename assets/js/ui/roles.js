@@ -101,6 +101,10 @@ class RolesManager {
 		this.editing_role = roleid;
 		let role = this.state.roles[roleid];
 		this.settings_container.html("").attr("tab", "style");
+		
+		if(roleid == null)
+			return;
+		
 		this.settings_container
 			.crel("div").addc("role-tabs")
 				.crel("div").addc("tab")
@@ -163,6 +167,14 @@ class RolesManager {
 		let currentPermissions = {};
 		
 		for(let permission in Permissions) {
+			
+			// privilege escalation is possible with the EDIT_ROLES permission, so it's best to hide it from potential victims of an attack.
+			// for giving users the ability to edit roles, ADMIN should be used instead.
+			// it's okay that the client is technically able to do this. potential "hackers" can have their fun!
+			
+			// see the TODO note in StatedSession - privilege escalation should be patched before this is re-enabled.
+			if(permission == "EDIT_ROLES") continue;
+			
 			configItems.push({
 				label: this.permission_name(permission),
 				input: "threeway",
@@ -254,6 +266,13 @@ class RolesManager {
 			if(event.type == "add_role") {
 				this.state.roles[event.role.roleid] = event.role;
 				this.edit_role(event.role.roleid);
+			}
+			if(event.type == "remove_role") {
+				delete this.state.roles[event.roleid];
+				this.update_roles_list();
+				if(this.editing_role == event.roleid) {
+					this.edit_role(null);
+				}
 			}
 		});
 		
