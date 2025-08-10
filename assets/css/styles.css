@@ -180,6 +180,10 @@ body {
 	user-select: none;
 }
 
+.user[state="offline"] {
+	opacity: 0.3;
+}
+
 .user-pfp {
 	width: 40px;
 	height: 40px;

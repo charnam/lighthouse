@@ -298,7 +298,7 @@ class StatedSessionHandler {
 		
 		current_group_container.anim({
 			opacity: [0, 1],
-			translateY: [20, 0],
+			translateY: [-20, 0],
 			duration: 100,
 			easing: "ease-out"
 		})
@@ -421,7 +421,7 @@ class StatedSessionHandler {
 					doc.els("#current-group-container > *")
 						.anim({
 							opacity: [1, 0],
-							translateY: [0, -30],
+							translateY: [0, 30],
 							duration: 100,
 							easing: "ease-in",
 							delayBetween: 20
