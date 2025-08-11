@@ -47,7 +47,7 @@
 .group {
 	width: 100%;
 	aspect-ratio: 1 / 1;
-	background: var(--color-background-secondary);
+	background: #fff2;
 	border-radius: 24%;
 	display: flex;
 	align-content: center;
@@ -88,7 +88,9 @@
 
 .sidebar {
 	width: 230px;
-	background: var(--color-background-secondary);
+	/*background: var(--color-background-secondary);*/
+	background: #ccc3;
+	border: 1px solid var(--color-background-secondary);
 	height: calc(100% - 10px);
 	z-index: 100;
 	flex: none;
@@ -101,9 +103,8 @@
 
 #program-members-container {
 	margin-right: 5px;
-	background: #0003;
-	border: 1px solid var(--color-background-secondary);
 	display: flex;
+	background: #0003;
 	flex-direction: column;
 	user-select: none;
 }

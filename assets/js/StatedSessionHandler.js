@@ -110,16 +110,18 @@ class StatedSessionHandler {
 											~group.permissions & Permissions.EDIT_GROUP ? null : {
 												text: "Edit Group",
 												icon: "icons/gear-fill.svg",
-												action: context_menu => {
+												action: async context_menu => {
 													context_menu.close();
+													await animations.programOut();
 													this.group_interact({type: "edit_group"});
 												}
 											},
 											~group.permissions & Permissions.EDIT_ROLES ? null : {
 												text: "Edit Roles",
 												icon: "icons/tag-fill.svg",
-												action: context_menu => {
+												action: async context_menu => {
 													context_menu.close();
+													await animations.programOut();
 													this.group_interact({type: "edit_roles"});
 												}
 											}
@@ -138,12 +140,19 @@ class StatedSessionHandler {
 					current_group_container
 						.crel("div").sid("current-program-container");
 					
+					let lastWallpaper = null;
+					
 					const refresh_group = () => {
 						
 						let programs_container =
 							group_sidebar.el(".group-programs-container").html("");
 						
-						wallpapers.createWallpaper(group.wallpaper);
+						if(lastWallpaper != this.currentGroup.wallpaper) {
+							lastWallpaper = this.currentGroup.wallpaper;
+							
+							wallpapers.removeWallpapers();
+							wallpapers.createWallpaper(this.currentGroup.wallpaper);
+						}
 						
 						if(this.currentGroup.programs.length == 0) {
 							programs_container.html("")
@@ -252,14 +261,16 @@ class StatedSessionHandler {
 						.crel("div").addc("local-program")
 							.crel("img").addc("icon").attr("src", "/icons/person-fill.svg").prnt()
 							.crel("div").addc("local-program-name").txt("Friends").prnt()
-							.on("click", () => {
+							.on("click", async () => {
+								await animations.programOut();
 								this.group_interact({type: "friends_list"});
 							})
 						.prnt()
 						.crel("div").addc("local-program")
 							.crel("img").addc("icon").attr("src", "/icons/card-heading.svg").prnt()
 							.crel("div").addc("local-program-name").txt("Invites").prnt()
-							.on("click", () => {
+							.on("click", async () => {
+								await animations.programOut();
 								this.group_interact({type: "invites"});
 							})
 						.prnt()
@@ -275,7 +286,8 @@ class StatedSessionHandler {
 								friendsList
 									.crel('div').addc("friend").addc("appear-clickable")
 										.append(render_user(friend, this))
-										.on("click", () => {
+										.on("click", async () => {
+											await animations.programOut();
 											this.general_interact({type: "open-dm", userid: friend.userid});
 										})
 							}

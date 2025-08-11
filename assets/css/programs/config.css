@@ -123,6 +123,9 @@
 	border: 0px solid transparent;
 	box-sizing: border-box;
 }
+.config-option .image-upload[style*="/uploads/null"]::after {
+	opacity: 1;
+}
 .config-option .image-upload:hover:after {
 	opacity: 1;
 }

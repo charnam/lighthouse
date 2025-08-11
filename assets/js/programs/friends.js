@@ -1,4 +1,5 @@
 
+import animations from "../ui/animations.js";
 import Banner from "../ui/banners.js";
 import User from "../ui/users.js";
 
@@ -70,7 +71,9 @@ function FriendsView(session) {
 	session.currentProgram.friends.forEach(friend => {
 		
 		friends_list.crel("div").addc("friend").addc("appear-clickable")
-			.on("click", function(){
+			.on("click", async () => {
+				
+				await animations.programOut();
 				
 				session.general_interact({
 					type: "open-dm",

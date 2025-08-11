@@ -47,7 +47,8 @@ class StatedSession {
 			handleInteraction(event);
 		});
 		this.socket.emit("program-open", program);
-		GlobalState.state_check(this);
+		if(this.user && this.user.userid)
+			GlobalState.refresh_user(this.user.userid);
 	}
 	
 	async refresh_group(id = false) {
@@ -189,7 +190,7 @@ class StatedSession {
 									// return final success state
 									this.socket.emit('program-output', {type: "success"});
 									setTimeout(async () => {
-										await this.refresh_group();
+										await GlobalState.refresh_group(group.groupid);
 										show_edit_group();
 									}, 500);
 								}
@@ -345,7 +346,7 @@ class StatedSession {
 						if(event.action !== "add" && user_has_role)
 							await this.db.run("DELETE FROM role_assignation WHERE userid = ? AND roleid = ?", [event.userid, role.roleid]);
 						
-						await this.refresh_group();
+						await GlobalState.refresh_group(group.groupid);
 						
 						break;
 					case "edit_roles":
@@ -393,11 +394,16 @@ class StatedSession {
 								role_update_data = event.data;
 								
 								// TODO: fix privilege escalation exploits in roles menu (the client is not able to enable the EDIT_ROLES permission at this time - ADMIN should be used instead)
-								//const user_roles = await this.permissions.get_roles(this.user.userid, group.groupid);
-								let max_role_pos = 0; // Math.min(...user_roles.map(role => role.position));
 								
-								if(await this.permissions.permissions_group(group.groupid) & Permissions.ByName.ADMIN)
-									max_role_pos = 0;
+								/*
+									const user_roles = await this.permissions.get_roles(this.user.userid, group.groupid);
+									let max_role_pos = Math.min(...user_roles.map(role => role.position));
+									
+									if(await this.permissions.permissions_group(group.groupid) & Permissions.ByName.ADMIN)
+										max_role_pos = 0;
+								*/
+								
+								let max_role_pos = 0;
 								
 								
 								for(let roleid in role_update_data) {
@@ -469,7 +475,7 @@ class StatedSession {
 								
 								// return final success state
 								this.socket.emit('program-output', {type: "success"});
-								await this.refresh_group();
+								await GlobalState.refresh_group(group.groupid);
 							}
 						})
 						break;
@@ -904,6 +910,7 @@ class StatedSession {
 									if(!invite) return false;
 									if(event.type == "accept") {
 										await this.db.run("INSERT INTO user_group_relationships (userid, groupid) VALUES (?,?)", [this.user.userid, invite.groupid]);
+										await GlobalState.refresh_members(invite.groupid);
 									}
 									await this.db.run("DELETE FROM group_invites WHERE to_userid = ? AND groupid = ?", [this.user.userid, invite.groupid]);
 									this.join_program("special:invites");
@@ -1062,7 +1069,7 @@ class StatedSession {
 										this.user.userid
 									]);
 									
-									GlobalState.state_check(this);
+									GlobalState.refresh_user(this.user.userid);
 									// return final success state
 									this.socket.emit('program-output', {type: "success"})
 									setTimeout(() => {
@@ -1243,7 +1250,11 @@ class StatedSession {
 		let groups = await this.permissions.groups();
 		this.socket.emit("groups", groups);
 	}
+	
 	async refresh_members() {
+		if(this.currentGroup && this.currentGroup.members) {
+			this.refresh_group();
+		}
 		this.socket.emit("program-output",
 			{
 				type: "members",
@@ -1362,9 +1373,10 @@ class StatedSession {
 		this.special_program_handler = null;
 		this.friends = [];
 		
-		if(this.user && this.user.userid)
+		if(this.user && this.user.userid) {
 			GlobalState.add_session(this);
-		
+			GlobalState.refresh_user(this.user.userid);
+		}
 		socket.on("group-open", async (id) => {
 			await this.join_group(id);
 		})
@@ -1378,7 +1390,7 @@ class StatedSession {
 		socket.on("disconnect", () => {
 			if(this.user && this.user.userid) {
 				GlobalState.remove_session(this);
-				GlobalState.state_check(this);
+				GlobalState.refresh_user(this.user.userid);
 			}
 		})
 		

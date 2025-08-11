@@ -108,7 +108,8 @@ function TextProgram(session) {
 		}
 	})
 	
-	MembersSidebar(session);
+	if(session.currentGroup.members)
+		MembersSidebar(session);
 }
 
 export default TextProgram;

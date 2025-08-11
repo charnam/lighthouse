@@ -23,16 +23,16 @@ class GlobalState {
 		if(sessions.length == 0)
 			return "offline";
 		
-		if(programid && sessions.filter(session => session.currentProgram.programid == programid).length > 0)
+		if(programid && sessions.filter(session => session.currentProgram && session.currentProgram.programid == programid).length > 0)
 			return "program";
 		
-		if(groupid && sessions.filter(session => session.currentGroup.groupid == groupid).length > 0)
+		if(groupid && sessions.filter(session => session.currentGroup && session.currentGroup.groupid == groupid).length > 0)
 			return "group";
 		
 		return "online";
 	}
 	
-	serialize_session(session) {
+	/*serialize_session(session) {
 		let serialized = {};
 		
 		serialized.group = JSON.stringify(session.group);
@@ -42,20 +42,50 @@ class GlobalState {
 	
 	check_changes(updated_session) {
 		
+		const old_serialized = updated_session.serialized;
+		const new_serialized = this.serialize_session(updated_session);
 		
+		let serialized_entries_new = Object.entries(new_serialized);
+		
+		if(old_serialized.groups !== new_serialized.groups)
+			this.update_groups(updated_session);
+		
+		
+		
+		updated_session.serialized = 
+	}*/
+	
+	async refresh_members(groupid) {
+		for(let session of this.activeSessions) {
+			if(session.currentGroup && session.currentGroup.groupid == groupid) {
+				session.refresh_members();
+			}
+		}
 	}
 	
-	// TODO: remove state_check entirely and replace it with something less general-purpose (i.e "member_refresh", "group_refresh" or "role_refresh")
-	state_check(updated_session) {
-		if(!updated_session || !updated_session.user) return false;
-		// TODO: don't iterate on all active sessions and the members of their groups so often
-		let update_sessions = this.activeSessions.filter(session =>
-			session.currentGroup.members &&
-			session.currentGroup.members.filter(member => member.userid == updated_session.user.userid).length > 0
-		);
-		
-		for(let session of update_sessions) {
-			session.refresh_members();
+	async refresh_user(userid) {
+		for(let session of this.activeSessions) {
+			if(
+				session.currentGroup &&
+				session.currentGroup.members &&
+				session.currentGroup.members.some(member => member.userid == userid)
+			)
+				await session.refresh_members();
+			
+			if(Array.isArray(session.friends) && session.friends.some(friend => friend.userid == userid))
+				await session.refresh_friends();
+		}
+	}
+	
+	async refresh_group(groupid) {
+		for(let session of this.activeSessions) {
+			if((await session.permissions.groups()).some(group => group.groupid == groupid))
+				await session.refresh_groups();
+			
+			if(session.currentGroup && session.currentGroup.groupid == groupid) {
+				await session.refresh_group();
+				await session.refresh_members();
+			}
 		}
 	}
 }

@@ -85,7 +85,7 @@ function setup(db, expressApp) {
 						});
 				
 				if(type == "webp") {
-					constructed = constructed.webp({quality, alphaQuality: 100});
+					constructed = constructed.webp({quality, alphaQuality: 100, lossless: quality == 100});
 					mimetype = "image/webp";
 				} else if(type == "png") {
 					constructed = constructed.png();
@@ -121,7 +121,7 @@ function setup(db, expressApp) {
 				break;
 			case "roleicon":
 				if(!await convert(
-					"png",
+					"webp",
 					16, 16,
 					100
 				)) return false;
