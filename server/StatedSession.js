@@ -8,6 +8,7 @@ const create_token = require("authentication/create_token.js");
 const logger = require("helpers/logger.js");
 const Reorder = require("helpers/reorder.js");
 const Banners = require("helpers/banners.js");
+const Messages = require("helpers/messages.js");
 
 const GlobalState = require("GlobalState.js");
 
@@ -590,46 +591,14 @@ class StatedSession {
 					
 					
 					
-					let messageHistory = await this.db.all(
-						`SELECT messageid, programid, content, creation, userid
-							FROM messages
-							WHERE programid = ?
-							ORDER BY CREATION DESC
-							LIMIT 500`,
+					let messageHistory = await Messages.get_messages(this.db, `
+						WHERE messages.programid = ?
+						ORDER BY messages.creation DESC
+						LIMIT 50`,
 						program.programid
 					);
-					
-					let user_cache = {};
-					const message_to_event = async message => {
-						let user = user_cache[message.userid];
-						
-						if(!user) {
-							user = user_cache[message.userid] = await this.db.get(
-								`SELECT displayname, userid, username, pfp
-									FROM users
-									WHERE userid = ?`,
-								message.userid
-							);
-						}
-						
-						return {
-							type: "message",
-							messageid: message.messageid,
-							programid: message.programid,
-							content: message.content,
-							creation: message.creation,
-							//...messageHistory[i],
-							sender: {
-								user
-							}
-						};
-					}
-					
-					for(let i = 0; i < messageHistory.length; i++) {
-						messageHistory[i] = await message_to_event(messageHistory[i]);
-					}
-					
 					messageHistory = messageHistory.reverse();
+					
 					this.sync_program(
 						{
 							type: program.type,
@@ -640,6 +609,82 @@ class StatedSession {
 						},
 						async event => {
 							switch(event.type) {
+								case "read-message":
+									let alreadyRead = await this.db.get("SELECT * FROM read_indicators WHERE userid = ? AND messageid = ?", this.user.userid, event.messageid);
+									if(alreadyRead) return false;
+									
+									let message = await this.db.get("SELECT programid FROM messages WHERE messageid = ?", event.messageid);
+									
+									if(!message) return false;
+									if(message.programid !== program.programid) return false;
+									
+									await this.db.run("INSERT INTO read_indicators (userid, messageid, creation) VALUES (?,?,?)", this.user.userid, event.messageid, Date.now());
+									
+									break;
+								case "load-messages":
+									if(typeof event.offset !== "number")
+										return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "User attempted to load messages with a non-numeric offset value")
+									
+									let messages = await Messages.get_messages(this.db, `
+										WHERE messages.programid = ?
+										ORDER BY messages.creation DESC
+										LIMIT 50 OFFSET ?`,
+										[program.programid, event.offset]
+									);
+									messages = messages.reverse();
+									
+									this.socket.emit("program-output", {
+										type: "load",
+										offset: event.offset,
+										messages
+									})
+									break;
+								case "delete-message":
+									{
+										let message = await this.db.get("SELECT * FROM messages WHERE programid = ? AND messageid = ?", program.programid, event.messageid);
+										
+										if(!message)
+											return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Could not find deleted message.");
+										
+										if(~this.permissions.permissions_program(program.programid) & Permissions.DELETE_MESSAGES)
+										if((this.user.userid == message.userid && ~this.permissions.permissions_program(program.programid) & Permissions.DELETE_OWN_MESSAGES))
+											return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "You do not have permission to delete messages.");
+										
+										let edit_content_validation = await Validation.validate_message_content(event.content);
+										if(edit_content_validation.type !== "success")
+											return this.show_server_error(SERVER_ERRORS.BAD_ACTION, edit_content_validation.message);
+										
+										await this.db.run("UPDATE messages SET content = ?, edits = ? WHERE messageid = ?", event.content, message.edits+1, message.messageid)
+										
+										this.socket.to(this.currentProgram.programid).emit("program-output", {
+											type: "edit",
+											messageid: message.messageid,
+											content: event.content
+										});
+									}
+									break;	
+								case "edit-message":
+									{
+										let message = await this.db.get("SELECT * FROM messages WHERE userid = ? AND programid = ? AND messageid = ?", this.user.userid, program.programid, event.messageid);
+										
+										if(!message)
+											return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Could not find edited message.");
+										
+										if(~this.permissions.permissions_program(program.programid) & Permissions.EDIT_MESSAGES)
+											return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "You do not have permission to edit messages.");
+										
+										let edit_content_validation = await Validation.validate_message_content(event.content);
+										if(edit_content_validation.type !== "success")
+											return this.show_server_error(SERVER_ERRORS.BAD_ACTION, edit_content_validation.message);
+										
+										await this.db.run("UPDATE messages SET content = ?, edits = ? WHERE messageid = ?", event.content, message.edits+1, message.messageid)
+										
+										this.socket.to(this.currentProgram.programid).emit("program-output", {
+											type: "edit",
+											...await Messages.get_message(this.db, "WHERE messages.messageid = ?", message.messageid)
+										});
+									}
+									break;
 								case "send-message":
 									
 									if(event.text.trim() == "")
@@ -650,20 +695,32 @@ class StatedSession {
 									let creation = Date.now();
 									let messageid = uuid();
 									
+									let message_content_validation = await Validation.validate_message_content(event.text);
+									if(message_content_validation.type !== "success")
+										this.show_server_error(SERVER_ERRORS.BAD_ACTION, message_content_validation.message);
+									
 									await this.db.run(
 										`INSERT INTO messages (messageid, userid, programid, content, creation) VALUES (?,?,?,?,?)`,
 										[messageid, this.user.userid, this.currentProgram.programid, event.text, creation]
 									);
-									const newMessage = await this.db.get(
-										"SELECT userid, messageid, programid, content, creation FROM messages WHERE messageid = ?",
+									
+									const newMessage = await Messages.get_message(this.db, `
+										WHERE messages.messageid = ?
+										LIMIT 1`,
 										messageid
 									);
 									if(!newMessage) return this.show_server_error(SERVER_ERRORS.SERVER_ERROR);
 									
-									let messageEvent = await message_to_event(newMessage);
-									
 									// broadcast message
-									this.socket.to(this.currentProgram.programid).emit("program-output", messageEvent);
+									this.socket.to(this.currentProgram.programid).emit("program-output", {
+										type: 'message',
+										...newMessage
+									});
+									
+									await GlobalState.refresh_notification(this, {
+										type: "message",
+										messageid
+									});
 									
 									break
 							}
@@ -860,6 +917,11 @@ class StatedSession {
 										await this.db.run("INSERT INTO friend_requests (requestor, requestee) VALUES (?, ?)", [this.user.userid, requestUser.userid]);
 										this.socket.emit("program-output", Banners.banner("success", "Friend request sent!"));
 										
+										await GlobalState.refresh_notification(this, {
+											type: "friend_request",
+											to: requestUser.userid
+										});
+										
 										break;
 									
 									case "accept-request":
@@ -869,6 +931,7 @@ class StatedSession {
 									case "reject-request":
 										await this.db.run("DELETE FROM friend_requests WHERE requestor = ? AND requestee = ?", [event.userid, this.user.userid]);
 										await this.refresh_friends();
+										await this.refresh_notifications();
 										await this.join_program("special:friends");
 										break;
 									
@@ -1174,7 +1237,6 @@ class StatedSession {
 							async event => {
 								if(event.type == "submit") {
 									if(event.special && event.special.isBack && this.currentProgram.page == 0) return this.show_server_error(SERVER_ERRORS.BAD_ACTION);
-									//if(await new_group_check_config_values(event.config)) {
 									
 									this.currentProgram.enteredValues = {...this.currentProgram.enteredValues, ...event.fields};
 									let tempValue = this.currentProgram.tempValue = Math.random();
@@ -1282,6 +1344,55 @@ class StatedSession {
 		this.socket.emit("friends", relations);
 	}
 	
+	async refresh_notifications() {
+		if(!this.user)
+			return false;
+		
+		let notifications = [];
+		
+		
+		let message_counts = await this.db.all(`
+			SELECT COUNT(messageid) AS count, users.username, users.userid, MAX(messages.creation) AS creation FROM messages
+			JOIN users ON users.userid = messages.userid
+			WHERE messages.programid IN
+				(SELECT programid FROM friends WHERE userid1 = ? OR userid2 = ?)
+					AND
+				NOT messages.userid = ?
+					AND
+				NOT messages.messageid IN
+					(SELECT messageid FROM read_indicators WHERE userid = ?)
+			GROUP BY messages.programid`,
+			[this.user.userid, this.user.userid, this.user.userid, this.user.userid]
+		);
+		
+		for(let row of message_counts) {
+			notifications.push({
+				type: "messages",
+				count: row.count,
+				username: row.username,
+				userid: row.userid,
+				creation: row.creation
+			});
+		}
+		
+		let friend_requests = await this.db.get(`
+			SELECT COUNT(id) AS count, MAX(creation) AS creation FROM friend_requests
+			WHERE requestee = ?
+			GROUP BY requestee`,
+			this.user.userid)
+			
+		if(friend_requests && friend_requests.count > 0)
+			notifications.push({
+				type: "friend_requests",
+				count: friend_requests.count,
+				creation: friend_requests.creation
+			});
+		
+		
+		notifications = notifications.sort((notifA, notifB) => notifA.creation - notifB.creation);
+		this.socket.emit("notifications", notifications);
+	}
+	
 	async general_interaction(event) {
 		if(!this.user) return;
 		
@@ -1380,9 +1491,6 @@ class StatedSession {
 		socket.on("group-open", async (id) => {
 			await this.join_group(id);
 		})
-		socket.on("program-open", async (id) => {
-			//await this.join_program(id);
-		})
 		socket.on("general-interaction", (event) => {
 			this.general_interaction(event);
 		});
@@ -1396,6 +1504,7 @@ class StatedSession {
 		
 		this.refresh_groups();
 		this.refresh_friends();
+		this.refresh_notifications();
 	}
 }
 

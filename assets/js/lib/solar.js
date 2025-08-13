@@ -18,23 +18,39 @@ Element.prototype.attr = function(n, d) {
         return this.getAttribute(n);
     }
 };
-Element.prototype.addc = Element.prototype.addC = Element.prototype.addclass = Element.prototype.addClass = function(n) {
+Element.prototype.addc = function(n) {
     this.classList.add(n);
     return this;
 };
-Element.prototype.remc = Element.prototype.remC = Element.prototype.removeclass = Element.prototype.removeClass = function(n) {
+Element.prototype.remc = function(n) {
     this.classList.remove(n);
     return this;
 };
-Element.prototype.CrEl = Element.prototype.crEl = Element.prototype.crel = Element.prototype.cr = Element.prototype.create = function(n){
+Element.prototype.crel = function(n){
     var s = document.createElement(n);
     this.appendChild(s);
+    return s;
+};
+Element.prototype.prel = function(n){
+    var s = document.createElement(n);
+    this.prepend(s);
     return s;
 };
 Element.prototype.append = function(n) {
     this.appendChild(n);
     return this;
 }
+Element.prototype.crelBefore = function(n) {
+    var s = document.createElement(n);
+    this.insertAdjacentElement("beforebegin", s);
+    return s;
+}
+Element.prototype.crelAfter = function(n) {
+    var s = document.createElement(n);
+    this.insertAdjacentElement("afterend", s);
+    return s;
+}
+
 Element.prototype.prnt = function(){
     return this.parentElement;
 };
@@ -67,21 +83,6 @@ Element.prototype.sid = function(id){ // set ID
     return this;
     
 };
-//ABOVE THIS LINE IS FROM: SQ.js by Sojaquad (Updated in 2021)
-
-/*
-Object.prototype.addJSON = function(json) {
-    var keys = Object.keys(json);
-    var vals = Object.values(json);
-    for (var i = 0; i < keys.length; i++) {
-        this[keys[i]] = json[vals[i]];
-    }
-} 
-*/
-
-//e
-
-
 
 Element.prototype.els = function(e) {
     return this.querySelectorAll(e);

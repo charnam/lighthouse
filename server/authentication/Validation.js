@@ -8,6 +8,18 @@ class Validation {
 	
 	static success = {type: "success"}
 	
+	static async validate_message_content(content) {
+		
+		if(!content)
+			return this.error_banner("Message content is not a string value.");
+		if(content.length > 2048)
+			return this.error_banner("Message is over 2,048 characters");
+		if(content.length == 0)
+			return this.error_banner("Message cannot be blank");
+		
+		return this.success;
+	}
+	
 	static async validate_username(username) {
 		
 		if(!/^[a-z0-9\-_.]+$/.test(username))

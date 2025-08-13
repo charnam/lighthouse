@@ -36,7 +36,7 @@ class StatedSessionHandler {
 		let current_group_container = doc.el("#current-group-container").html("");
 		
 		if(group !== null) {
-			doc.els('.group.open').forEach(groupButton => groupButton.remc("open"));
+			doc.els('.group.open:not(#notifications-group)').forEach(groupButton => groupButton.remc("open"));
 			let groupButton = doc.el(".group[groupid=\""+group.groupid+"\"]");
 			if(groupButton)
 				groupButton.addc("open");
@@ -173,10 +173,11 @@ class StatedSessionHandler {
 									})
 									.on("contextmenu", event => {
 										ContextMenu(event, [
-											~this.currentGroup.permissions & Permissions.EDIT_GROUP ? null : {
+											~this.currentGroup.permissions & Permissions.EDIT_PROGRAM ? null : {
 												text: "Edit",
-												action: context_menu => {
+												action: async context_menu => {
 													context_menu.close();
+													await animations.programOut();
 													this.group_interact({
 														type: "edit_program",
 														programid: program.programid
@@ -463,6 +464,11 @@ class StatedSessionHandler {
 						.crel("div").addc("group").sid("direct-group").attr("groupid", "special:direct")
 							.on("click", () => {
 								this.join_group("special:direct");
+								doc.el("#direct-group .icon").anim({
+									translateY: [0, -3, 2, 0],
+									duration: 300,
+									easing: "ease-in-out"
+								})
 							})
 							.crel("img").addc("icon").attr("src", "/icons/envelope-fill.svg").prnt()
 						.prnt()
@@ -471,10 +477,18 @@ class StatedSessionHandler {
 					.prnt()
 					.crel("div").sid("system-groups-container")
 						.crel("div").addc("group").sid("notifications-group").attr("groupid", "special:notifications")
+							.on("mousedown", () => {
+								this.notifications.toggle_menu();
+							})
 							.crel("img").addc("icon").attr("src", "/icons/bell-fill.svg").prnt()
 						.prnt()
 						.crel("div").addc("group").sid("settings-group").attr("groupid", "special:settings")
 							.on("click", () => {
+								doc.el("#settings-group .icon").anim({
+									rotate: [0, 90],
+									duration: 300,
+									easing: "ease-out"
+								})
 								this.join_group("special:settings");
 							})
 							.crel("img").addc("icon").attr("src", "/icons/gear-fill.svg").prnt()
@@ -482,6 +496,16 @@ class StatedSessionHandler {
 					.prnt()
 				.prnt()
 				.crel("div").sid("current-group-container")
+				.prnt()
+				.crel("div").sid("notifications-menu-container")
+					.on("mousedown", (event) => {
+						if(event.target.id == "notifications-menu-container") {
+							this.notifications.close_menu();
+							event.preventDefault();
+						}
+					})
+					.crel("div").sid("notifications-menu")
+					.prnt()
 				.prnt()
 		
 		animations.appIn();
@@ -569,6 +593,13 @@ class StatedSessionHandler {
 			.crel("div").addc("group").addc("add-group")
 				.attr("groupid", "special:new")
 				.on("click", () => {
+					doc.el(".add-group .icon").anim({
+						scale: [1, 0.7, 1.1, 1],
+						translateY: [0, 1, -1, 0],
+						//rotate: [0, -15, 45, 90],
+						duration: 300,
+						easing: "ease-in-out"
+					})
 					this.join_group("special:new");
 				})
 				.crel("img").addc("icon").attr("src", "/icons/plus.svg").prnt()

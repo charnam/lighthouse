@@ -3,6 +3,23 @@
 	<head>
 		<title>whaaat</title>
 		<link rel="stylesheet" href="/css/styles.css" />
+		<style>
+			#has-test {
+				z-index: 1000;
+				position: fixed;
+				right: 0;
+				top: 0;
+				padding: 10px;
+				background: black;
+				opacity: 0.9;
+				border-bottom-left-radius: 10px;
+				box-shadow: 0 0 10px black;
+				pointer-events: none;
+			}
+			#has-test:has(.banner) {
+				display: none;
+			}
+		</style>
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
@@ -13,6 +30,9 @@
 			
 			
 			
+		</div>
+		<div id="has-test">
+			<div class="banner error">It looks like your browser is too old to be running this program. Please try using an updated browser.</div>
 		</div>
 		<noscript>
 			<div class="banner error">This page does not function without JavaScript! Please enable JavaScript or use a browser that supports it.</div>

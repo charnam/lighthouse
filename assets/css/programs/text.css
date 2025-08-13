@@ -64,6 +64,7 @@
 	padding-top: 2px;
 	padding-right: 40px;
 	display: flex;
+	position: relative;
 }
 .message:hover {
 	background: #0002;
@@ -118,10 +119,13 @@
 	background: var(--color-background-secondary);
 	margin: 0;
 }
-
+.message-box textarea:focus::placeholder {
+	color: transparent;
+}
 
 .message-content {
 	display: flex;
+	width: 100%;
 	white-space: pre-wrap;
 	overflow-wrap: anywhere;
 }
@@ -141,5 +145,74 @@
 
 .message-text {
 	display: inline-block;
+}
+
+.message-content:has(.message-editor) .message-text {
+	display: none;
+}
+
+.message-editor {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.message-editor textarea {
+	height: fit-content;
+	background: transparent;
+	padding: 0;
+	margin: 0;
+	resize: none;
+}
+.message:has(textarea):before {
+	content: "Editing";
+	font-style: italic;
+	color: #fff9;
+	display: inline-flex;
+	justify-content: flex-end;
+	align-items: flex-start;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: #ff03;
+	z-index: -100;
+	padding: 2px 20px;
+	box-sizing: border-box;
+	font-size: 0.8em;
+}
+
+.message-editor .buttons-container {
+	display: flex;
+	gap: 5px;
+	padding-top: 5px;
+}
+
+.message-text:not([edits="0"])::after {
+	content: "Message edited "attr(edits)" times";
+	font-size: 0.7em;
+	height: fit-content;
+	display: inline-block;
+	color: gray;
+	margin: 0 5px;
+}
+.message-text[edits="1"]::after {
+	content: "Message edited";
+}
+.load-wrapper:empty {
+	height: 1000px;
+	position: relative;
+}
+.load-wrapper:empty::before {
+	content: "Loading history...";
+	text-align: center;
+	width: 100%;
+	display: block;
+	padding: 50px;
+	box-sizing: border-box;
+	color: gray;
+	animation: blinkingBanner 2s ease-in-out infinite;
+	background: linear-gradient(to bottom, #0000, #0008, #0000);
 }
 

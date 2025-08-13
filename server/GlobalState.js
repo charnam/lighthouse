@@ -1,12 +1,12 @@
 
 // Manages currently active users, updates caused by others, and notifications.
-// If adding multi-server architecture support, this file is certainly an important one to refactor.
+// If adding multi-server architecture support, this file is certainly an important one to change.
 
 const Permissions = require("authentication/permissions.js");
 
 class GlobalState {
 	
-	// For the sake of having things be easily refactored in the future, please
+	// For the sake of having things be easily changed in the future, please
 	// do not edit variables here directly. Use the helper functions instead.
 	activeSessions = []
 	
@@ -23,37 +23,57 @@ class GlobalState {
 		if(sessions.length == 0)
 			return "offline";
 		
-		if(programid && sessions.filter(session => session.currentProgram && session.currentProgram.programid == programid).length > 0)
+		if(programid && sessions.some(session => session.currentProgram && session.currentProgram.programid == programid))
 			return "program";
 		
-		if(groupid && sessions.filter(session => session.currentGroup && session.currentGroup.groupid == groupid).length > 0)
+		if(groupid && sessions.some(session => session.currentGroup && session.currentGroup.groupid == groupid))
 			return "group";
 		
 		return "online";
 	}
 	
-	/*serialize_session(session) {
-		let serialized = {};
-		
-		serialized.group = JSON.stringify(session.group);
-		serialized.groups = JSON.stringify(session.groups);
-		
+	async refresh_notification(session, options) {
+		switch(options.type) {
+			case "message":
+				
+				let message = await session.db.get("SELECT programid FROM messages WHERE messageid = ?", options.messageid);
+				if(!message)
+					return false;
+			
+				let friendship = await session.db.get("SELECT * FROM friends WHERE programid = ?", message.programid);
+				
+				if(friendship) {
+					let friends = [friendship.userid1, friendship.userid2];
+					for(let friend of friends) {
+						let member = this.activeSessions.find(member => friends.includes(member.user.userid));
+						member.refresh_friends();
+					}
+				}
+				
+				let members = await session.permissions.program_members(message.programid);
+				
+				for(let session of this.activeSessions) {
+					let member = members.find(member => member.userid == session.user.userid);
+					if(!member) continue;
+					
+					if(!(session.currentProgram && session.currentProgram.programid == message.programid)) {
+						session.refresh_notifications();
+					} else {
+						setTimeout(() => session.refresh_notifications().catch(err => console.error(err)), 2000);
+					}
+				}
+			
+				break;
+			case "friend_request":
+				
+				let member = this.activeSessions.find(session => session.user.userid == options.to);
+				if(!member) return;
+				
+				member.refresh_notifications();
+				
+				break;
+		}
 	}
-	
-	check_changes(updated_session) {
-		
-		const old_serialized = updated_session.serialized;
-		const new_serialized = this.serialize_session(updated_session);
-		
-		let serialized_entries_new = Object.entries(new_serialized);
-		
-		if(old_serialized.groups !== new_serialized.groups)
-			this.update_groups(updated_session);
-		
-		
-		
-		updated_session.serialized = 
-	}*/
 	
 	async refresh_members(groupid) {
 		for(let session of this.activeSessions) {

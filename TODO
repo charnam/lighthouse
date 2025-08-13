@@ -20,12 +20,14 @@ Submit an issue if you'd like me to focus on something specific.
 
 INCOMPLETE:
 
+- double click notification icon to jump to most recent notification
+
 - profile pages 
 	> add online indicators, modifiable current status
 
-- add read reciepts, file uploads, typing indicators
+- add file uploads, typing indicators
 
-- make messages list lazy-load
+- visible read reciepts
 
 - make CSS more readable, use more variables rather than hard-coding backgrounds and text colors for better theming, upgrade programs sidebar
 
@@ -34,6 +36,8 @@ INCOMPLETE:
 - test user-specific uploads
 
 COMPLETE:
+
+- make messages list lazy-load
 
 - make uploads slightly more secure by tracking which user uploaded what file
 
