@@ -25,17 +25,21 @@ INCOMPLETE:
 - profile pages 
 	> add online indicators, modifiable current status
 
-- add file uploads, typing indicators
-
 - visible read reciepts
+
+- message removal
 
 - make CSS more readable, use more variables rather than hard-coding backgrounds and text colors for better theming, upgrade programs sidebar
 
-- drop EXIF data from file uploads
-
-- test user-specific uploads
+- drop EXIF data from file uploads !!
 
 COMPLETE:
+
+- typing indicators
+
+- add file uploads
+
+- test user-specific uploads
 
 - make messages list lazy-load
 

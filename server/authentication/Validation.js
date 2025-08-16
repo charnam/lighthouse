@@ -8,13 +8,14 @@ class Validation {
 	
 	static success = {type: "success"}
 	
-	static async validate_message_content(content) {
+	static async validate_message_content(content, ignoreBlank) {
 		
-		if(!content)
+		if(typeof content !== "string")
 			return this.error_banner("Message content is not a string value.");
+		
 		if(content.length > 2048)
 			return this.error_banner("Message is over 2,048 characters");
-		if(content.length == 0)
+		if(content.length == 0 && !ignoreBlank)
 			return this.error_banner("Message cannot be blank");
 		
 		return this.success;
@@ -52,6 +53,9 @@ class Validation {
 	
 	static async validate_password(password) {
 		
+		if(typeof password !== "string")
+			return this.error_banner("Password is not a string value");
+		
 		if(password.length < 8)
 			return this.error_banner("Password too short - 8 characters minimum");
 		
@@ -63,6 +67,9 @@ class Validation {
 	}
 	
 	static async validate_display_name(displayname) {
+		
+		if(typeof displayname !== "string")
+			return this.error_banner("Display name is not a string value");
 		
 		if(displayname.length < 1)
 			return this.error_banner("Display name must not be empty");
@@ -76,6 +83,9 @@ class Validation {
 	
 	static async validate_group_name(groupname) {
 		
+		if(typeof groupname !== "string")
+			return this.error_banner("Group name is not a string value");
+		
 		if(groupname.length < 1)
 			return this.error_banner("Group name must not be empty");
 		
@@ -87,6 +97,9 @@ class Validation {
 	}
 	static async validate_program_name(programname) {
 		
+		if(typeof programname !== "string")
+			return this.error_banner("Program name is not a string value");
+		
 		if(programname.length < 1)
 			return this.error_banner("Program name must not be empty");
 		
@@ -97,6 +110,9 @@ class Validation {
 		
 	}
 	static async validate_role_name(rolename) {
+		
+		if(typeof rolename !== "string")
+			return this.error_banner("Role name is not a string value");
 		
 		if(rolename.length < 1)
 			return this.error_banner("Role name must not be empty");
@@ -111,6 +127,9 @@ class Validation {
 	
 	static async validate_info_content(info_content) {
 		
+		if(typeof info_content !== "string")
+			return this.error_banner("Info content is not a string value");
+		
 		if(info_content.length > 4096)
 			return this.error_banner("Info content length too long - 4,096 characters maximum");
 		
@@ -118,6 +137,9 @@ class Validation {
 	}
 	
 	static async validate_bio(bio_content) {
+		
+		if(typeof bio_content !== "string")
+			return this.error_banner("Bio is not a string value");
 		
 		if(bio_content.length > 4096)
 			return this.error_banner("Bio length too long - 4,096 characters maximum");
@@ -149,7 +171,7 @@ class Validation {
 			return this.error_banner("Upload cannot be used here");
 		
 		if(upload.userid !== session.user.userid)
-			return this.error_banner("Session mismatch (try logging in again?)")
+			return this.error_banner("Uploaded file: Session mismatch (try logging in again?)")
 		
 		return this.success;
 	}

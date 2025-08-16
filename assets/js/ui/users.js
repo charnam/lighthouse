@@ -23,7 +23,8 @@ function render_user(rendered_user, session = false) {
 	
 	let usernameEl =
 		user
-			.crel("div").addc("user-name").txt(rendered_user.displayname)
+			.crel("div").addc("user-name")
+				.crel("div").addc("user-name-text").txt(rendered_user.displayname).prnt()
 	
 	if(rendered_user.username && rendered_user.username !== rendered_user.displayname)
 		usernameEl

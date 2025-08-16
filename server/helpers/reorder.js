@@ -39,6 +39,26 @@ class Reorder {
 		await db.run("UPDATE programs SET position = ? WHERE programid = ?", [new_placement, programid]);
 		return { type: "success" };
 	}
+	static async reorder_group(db, userid, groupid, new_placement) {
+		
+		// push all other group positions up
+		let testFor = {
+			position: new_placement,
+			groupid: groupid
+		};
+		while(testFor !== false) {
+			let cont = await db.get("SELECT groupid FROM user_group_relationships WHERE userid = ? AND position = ? AND NOT groupid = ?", [userid, testFor.position, testFor.groupid]);
+			if(cont) {
+				await db.get("UPDATE user_group_relationships SET position = ? WHERE groupid = ? AND userid = ?", [++testFor.position, cont.groupid, userid]);
+				testFor.groupid = cont.groupid;
+			} else {
+				testFor = false;
+			}
+		}
+		
+		await db.run("UPDATE user_group_relationships SET position = ? WHERE groupid = ? AND userid = ?", [new_placement, groupid, userid]);
+		return { type: "success" };
+	}
 }
 
 module.exports = Reorder;

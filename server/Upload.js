@@ -17,12 +17,6 @@ const ALLOWED_MIME_TYPES = [
 	"audio/x-wav"
 ];
 
-if(!fs.existsSync(UPLOAD_FILE_PATH))
-	fs.mkdirSync(UPLOAD_FILE_PATH);
-
-if(!fs.existsSync(TEMP_UPLOAD_FILE_PATH))
-	fs.mkdirSync(TEMP_UPLOAD_FILE_PATH);
-
 const userLogin = require("authentication/userLogin.js");
 const logger = require("helpers/logger.js");
 
@@ -98,7 +92,14 @@ function setup(db, expressApp) {
 				
 				return true;
 			} catch(err) {
-				fail("Unsupported image type.");
+				if(err.message.includes("unsupported image format")) {
+					fail("Unsupported image type.");
+				} else if(err.message.includes("exceeds pixel limit")) {
+					fail("Uploaded image is too big. If this is an animation, try reducing the frame rate.");
+				} else {
+					fail("Failed to process image.");
+					logger.log(0, "Failed to process uploaded image "+tempPath+". Error log: "+err);
+				}
 				return false;
 			}
 		}
@@ -139,18 +140,21 @@ function setup(db, expressApp) {
 			return fail("Unable to determine filetype of uploaded file.");
 		
 		let id = uuid();
-		await db.run("INSERT INTO uploads (uploadid, userid, type, originalname, filename, mimetype, autodelete) VALUES (?,?,?,?,?,?,?)", [
+		await db.run("INSERT INTO uploads (uploadid, userid, type, originalname, filename, size, mimetype, autodelete) VALUES (?,?,?,?,?,?,?,?)", [
 			id,
 			user.userid,
 			req.body.uploadType,
 			req.file.originalname,
 			req.file.filename,
+			req.file.size,
 			mimetype,
 			Date.now()+30*60*1000
 		]);
 		res.json({
 			type: "success",
-			uploadid: id
+			uploadid: id,
+			originalname: req.file.originalname,
+			mimetype
 		});
 	})
 	
@@ -181,7 +185,11 @@ function setup(db, expressApp) {
 			await db.run("DELETE FROM uploads WHERE uploadid = ?", upload.uploadid);
 			if(upload.filename.includes("."))
 				throw new Error("Uploaded file path contains a dot. This is unsafe! Halted.");
-			fs.unlinkSync(`${UPLOAD_FILE_PATH}/${upload.filename}`);
+			try {
+				fs.unlinkSync(`${UPLOAD_FILE_PATH}/${upload.filename}`);
+			} catch(err) {
+				logger.log(4, err)
+			}
 		});
 	}, 30*1000) // every 30 seconds
 	
@@ -190,6 +198,7 @@ function setup(db, expressApp) {
 
 module.exports = {
 	UPLOAD_FILE_PATH,
+	TEMP_UPLOAD_FILE_PATH,
 	setup
 }
 

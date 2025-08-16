@@ -31,7 +31,7 @@
 }
 
 
-#notifications-menu-container {
+.group-menu-container {
 	position: fixed;
 	left: 0;
 	top: 0;
@@ -40,16 +40,12 @@
 	z-index: 500;
 }
 
-#notifications-menu {
+.group-menu {
 	position: fixed;
-	width: 400px;
 	left: 80px;
-	bottom: 50px;
 	background: var(--color-background-primary);
-	padding: 10px;
 	border-radius: 5px;
 	border: 1px solid gray;
-	max-height: 500px;
 	overflow-y: auto;
 	transition: 0.2s ease-out;
 	transition-property: transform, opacity;
@@ -57,26 +53,22 @@
 	flex-direction: column-reverse;
 	min-height: 100px;
 }
+#notifications-menu {
+	width: 400px;
+	bottom: 50px;
+	padding: 10px;
+}
 
-#notifications-menu-container:not(.visible) #notifications-menu {
+.group-menu-container:not(.visible) .group-menu {
 	transform: translateX(-40px);
 	transition-timing-function: ease-in;
 	opacity: 0;
+	max-height: 500px;
 }
-#notifications-menu-container:not(.visible) {
+.group-menu-container:not(.visible) {
 	pointer-events: none;
 }
-.notification {
-	padding: 5px 10px;
-	cursor: pointer;
-	user-select: none;
-}
-.notification:hover {
-	background: #fff2;
-	border-radius: 5px;
-}
-
-#notifications-menu:empty:before {
+.group-menu:empty:before {
 	content: 'No unread notifications.';
 	position: absolute;
 	white-space: pre-wrap;
@@ -85,4 +77,14 @@
 	top: 50%;
 	color: gray;
 	transform: translate(-50%, -50%);
+}
+
+.notification {
+	padding: 5px 10px;
+	cursor: pointer;
+	user-select: none;
+}
+.notification:hover {
+	background: #fff2;
+	border-radius: 5px;
 }

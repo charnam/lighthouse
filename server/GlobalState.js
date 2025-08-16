@@ -44,10 +44,8 @@ class GlobalState {
 				
 				if(friendship) {
 					let friends = [friendship.userid1, friendship.userid2];
-					for(let friend of friends) {
-						let member = this.activeSessions.find(member => friends.includes(member.user.userid));
-						member.refresh_friends();
-					}
+					let sessions = this.activeSessions.filter(member => friends.includes(member.user.userid));
+					sessions.forEach(session => session.refresh_friends());
 				}
 				
 				let members = await session.permissions.program_members(message.programid);
@@ -59,17 +57,17 @@ class GlobalState {
 					if(!(session.currentProgram && session.currentProgram.programid == message.programid)) {
 						session.refresh_notifications();
 					} else {
+						// give the client some time to read the message
 						setTimeout(() => session.refresh_notifications().catch(err => console.error(err)), 2000);
 					}
 				}
 			
 				break;
 			case "friend_request":
+			case "invite":
 				
-				let member = this.activeSessions.find(session => session.user.userid == options.to);
-				if(!member) return;
-				
-				member.refresh_notifications();
+				let sessions = this.activeSessions.filter(session => session.user.userid == options.to);
+				sessions.forEach(session => session.refresh_notifications());
 				
 				break;
 		}
@@ -80,6 +78,13 @@ class GlobalState {
 			if(session.currentGroup && session.currentGroup.groupid == groupid) {
 				session.refresh_members();
 			}
+		}
+	}
+	
+	async refresh_friends(userid) {
+		for(let session of this.activeSessions) {
+			if(session.user.userid == userid)
+				await session.refresh_friends();
 		}
 	}
 	

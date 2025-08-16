@@ -55,6 +55,9 @@
 	cursor: pointer;
 	position: relative;
 	overflow: hidden;
+	transition: outline 0.2s ease-out;
+	outline: 1px solid transparent;
+	outline-offset: -1px;
 }
 .group:after {
 	content: "";
@@ -175,10 +178,11 @@
 }
 
 .group.open {
-	outline: 1px solid gray;
-	outline-offset: -1px;
-	animation: group-open-anim 0.5s ease-in-out;
+	outline-color: gray;
 	cursor: default;
 	background-color: var(--color-background-secondary);
+}
+.group.open-anim {
+	animation: group-open-anim 0.5s ease-in-out;
 }
 

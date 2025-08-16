@@ -2,6 +2,41 @@
 import User from "../ui/users.js";
 import MembersSidebar from "../ui/membersSidebar.js";
 import ContextMenu from "../ui/contextmenu.js";
+import UploadFile from "../ui/upload.js";
+
+const messageReceiveSound = new Audio();
+messageReceiveSound.src = "/audio/message-receive.mp3";
+
+const messageSendSound = new Audio();
+messageSendSound.src = "/audio/message-send.mp3";
+
+
+function getFormattedBytes(pBytes) {
+    if(pBytes == 0) return '0 Bytes';
+    if(pBytes == 1) return '1 Byte';
+
+    var bytes = Math.abs(pBytes)
+	
+	var orderOfMagnitude = Math.pow(2, 10);
+	var abbreviations = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+	
+    var i = Math.floor(Math.log(bytes) / Math.log(orderOfMagnitude));
+    var result = (bytes / Math.pow(orderOfMagnitude, i));
+
+    // This will get the sign right
+    if(pBytes < 0) {
+        result *= -1;
+    }
+
+    // This bit here is purely for show. it drops the percision on numbers greater than 100 before the units.
+    // it also always shows the full number of bytes if bytes is the unit.
+    if(result >= 99.995 || i==0) {
+        return result.toFixed(0) + ' ' + abbreviations[i];
+    } else {
+        return result.toFixed(2) + ' ' + abbreviations[i];
+    }
+}
+
 
 function autoresize(event) {
 	
@@ -22,6 +57,8 @@ function TextProgram(session) {
 	
 	let text_container = container
 		.crel("div").addc("messages-screen")
+		
+	let typing_users = [];
 	
 	function editMessageDirection(direction) {
 		if(direction !== "up" && direction !== "down") return false;
@@ -32,7 +69,7 @@ function TextProgram(session) {
 			if(direction == "down") {
 				if(doc.el(".message-editor"))
 					doc.el(".message-editor").remove();
-				return mainInput.focus();
+				return main_input.focus();
 			}
 			let allMessages = doc.els(".message");
 			if(direction == "up") {
@@ -52,47 +89,148 @@ function TextProgram(session) {
 			doc.el(".message-editor").remove();
 		
 		if(!editingMessage) {
-			return mainInput.focus();
+			return main_input.focus();
 		}
 		
 		editMessage(editingMessage, true);
 	}
 	
-	text_container
-			.crel("div").addc("messages")
-				.crel("div").addc("load-wrapper")
+	let chat_scroll_container = text_container
+		.crel("div").addc("chat-relative-container")
+	
+	let messages_container = chat_scroll_container
+		.crel("div").addc("messages")
+	
+	let load_wrapper = messages_container
+		.crel("div").addc("load-wrapper")
+	
+	let attachments_container = chat_scroll_container
+		.crel("div").addc("attachments")
+	
+	let message_box = text_container
+		.crel("div").addc("message-box")
+	
+	let upload_field = message_box
+		.crel("label").addc("upload-extra")
+			.crel("img").addc("icon").attr("src", "/icons/upload.svg").prnt()
+			.crel("input").attr("type", "file").prnt();
+	
+	upload_field.on("change", async (event) => {
+		
+		let attachmentEl = attachments_container
+			.crel("div").addc("attachment")
+				.attr("type", event.target.files[0].type)
+				.attr("in-progress", "")
+				.crel("div").addc("icon").prnt()
+				.crel("div").addc("filename")
+					.txt("Uploading...")
 				.prnt()
-			.prnt()
-			.crel("div").addc("message-box")
-				.crel("upload-extra")
+		
+		let upload = await UploadFile({
+			fileInput: event.target,
+			uploadType: "attachment",
+			progress: (progress) => {
+				attachmentEl.attr("style", `
+					--progress: ${progress}%;
+				`);
+			}
+		});
+		
+		
+		if(upload.type == "success") {
+			attachmentEl.removeAttribute("in-progress");
+			attachmentEl.attr("upload-id", upload.uploadid);
+			
+			attachmentEl.attr("type", upload.mimetype);
+			attachmentEl.el(".filename").html("").txt(upload.originalname);
+			
+			attachmentEl
+				.crel("div").addc("delete-button")
+					.crel("img").addc("icon").attr("src", "/icons/trash.svg").prnt()
+					.on("click", () => attachmentEl.remove());
+			
+		} else if(upload.type == "banner") {
+			attachmentEl.attr(upload.banner, upload.message);
+			setTimeout(() => attachmentEl.remove(), 5000);
+		}
+	})
+	
+	let lastTypingIndicator = 0;
+	let main_input = message_box
+		.crel("textarea")
+			.attr("rows", "1")
+			.attr("placeholder", "Send a message...")
+			.on("input", autoresize)
+			.on("keypress", event => {
+				if(lastTypingIndicator < Date.now()-3000) {
+					lastTypingIndicator = Date.now();
+					session.program_interact({type: "typing"});
+				}
+			})
+			.on("keydown", function(event) {
+				if(event.key == "Enter" && !event.shiftKey) {
+					if(attachments_container.el(".attachment[in-progress]")) return false;
 					
-				.prnt()
-				.crel("textarea")
-					.attr("rows", "1")
-					.attr("placeholder", "Send a message...")
-					.on("input", autoresize)
-					.on("keydown", function(event) {
-						if(event.key == "Enter" && !event.shiftKey) {
-							session.program_interact({type: "send-message", text: event.target.value});
-							event.target.value = "";
-							event.target.style.height = "";
-							event.preventDefault();
-						}
-						if(event.key == "ArrowUp" && event.target.value == "") {
-							event.preventDefault();
-							editMessageDirection("up");
-						}
-					})
-				.prnt()
-			.anim({
-				opacity: [0, 1],
-				translateY: [10, 0],
-				duration: 200,
-				easing: "ease-out"
+					
+					let attachments = [...attachments_container.els(".attachment[upload-id]")];
+					attachments = attachments.map(attachmentEl => {
+						let upload = attachmentEl.attr("upload-id");
+						attachmentEl.remove();
+						return upload;
+					});
+					
+					session.program_interact({type: "send-message", text: event.target.value, attachments});
+					event.target.value = "";
+					lastTypingIndicator = 0;
+					event.target.style.height = "";
+					event.preventDefault();
+				}
+				if(event.key == "ArrowUp" && event.target.value == "") {
+					event.preventDefault();
+					editMessageDirection("up");
+				}
 			})
 	
-	const messagesContainer = text_container.el(".messages")
-	const mainInput = text_container.el(".message-box textarea");
+	
+	let typing_indicators = text_container
+		.crel("div").addc("typing-indicators")
+	
+	function check_typing() {
+		typing_indicators.html("");
+		for(let userid in typing_users) {
+			if(typing_users[userid].time < Date.now()-4900)
+				delete typing_users[userid];
+		}
+		
+		let users = Object.values(typing_users).map(event => event.user);
+		
+		if(users.length == 1) {
+			typing_indicators
+				.append(User(users[0], session))
+				.txt(" is typing")
+		}
+		if(users.length == 2) {
+			typing_indicators
+				.append(User(users[0], session))
+				.txt(" and ")
+				.append(User(users[1], session))
+				.txt(" are typing")
+		}
+		if(users.length == 3) {
+			typing_indicators
+				.append(User(users[0], session))
+				.txt(", ")
+				.append(User(users[1], session))
+				.txt(", and ")
+				.append(User(users[2], session))
+				.txt(" are typing")
+		}
+		if(users.length > 3) {
+			typing_indicators
+				.txt(users.length+" people are typing")
+		}
+		
+	}
 	
 	function editMessage(messageEl, startedByArrow) {
 		
@@ -113,7 +251,7 @@ function TextProgram(session) {
 							form.remove();
 						else
 							save_edits();
-						mainInput.focus();
+						main_input.focus();
 					}
 					if(event.key == "Escape") {
 						event.preventDefault();
@@ -121,7 +259,7 @@ function TextProgram(session) {
 							editMessage(messageEl, true);
 						else {
 							form.remove();
-							mainInput.focus();
+							main_input.focus();
 						}
 					}
 					if(event.key == "ArrowUp" && input.value == input.defaultValue && input.selectionStart == cursorStartPos && input.selectionEnd == cursorStartPos) {
@@ -198,7 +336,12 @@ function TextProgram(session) {
 				)
 				.attr("messageid", message.messageid)
 				.on("contextmenu", evt => {
-					if(!evt.target.parentElement.classList.contains("user"))
+					if(
+						evt.target.classList.contains("message-content") ||
+						evt.target.classList.contains("message") ||
+						evt.target.classList.contains("message-text") ||
+						evt.target.classList.contains("attachments") ||
+						evt.target.classList.contains("message-time"))
 						ContextMenu(evt, [
 							{
 								text: "Copy message",
@@ -224,6 +367,28 @@ function TextProgram(session) {
 					.crel("div").addc("message-text").prnt()
 				.prnt()
 		
+				
+		if(message.attachments.length > 0) {
+			let attachments_container = messageEl.crel("div").addc("attachments");
+			for(let attachment of message.attachments) {
+				let attachmentEl = attachments_container
+					.crel("div").addc("attachment").attr("type", attachment.mimetype)
+						.crel("div").addc("icon").prnt()
+						.crel("a").addc("filename")
+							.attr("target", "_blank")
+							.attr("href", "/uploads/"+attachment.uploadid+"/"+attachment.originalname)
+							.attr("download", attachment.originalname)
+							.txt(attachment.originalname)
+						.prnt()
+						.crel("div").addc("filesize").txt(getFormattedBytes(attachment.size)).prnt();
+				
+				if(attachment.mimetype.startsWith('image/')) {
+					attachmentEl
+						.addc("image")
+						.crel("img").attr("src", "/uploads/"+attachment.uploadid).addc("image");
+				}
+			}
+		}
 		if(!message.seenBy.includes(session.user.userid)) {
 			readObserver.observe(messageEl);
 		}
@@ -254,13 +419,23 @@ function TextProgram(session) {
 		for(let entry of entries) {
 			if(entry.intersectionRatio <= 0) continue;
 			
-			session.program_interact({type: "read-message", messageid: entry.target.attr("messageid")});
 			readObserver.unobserve(entry.target);
+			const markAsRead = () => session.program_interact({type: "read-message", messageid: entry.target.attr("messageid")});
+			if(document.hasFocus)
+				markAsRead();
+			else {
+				let listener = () => {
+					markAsRead();
+					document.removeEventListener("focus", listener);
+				}
+				document.addEventListener("focus", listener);
+			}
 		}
 	})
 	
 	function loadMessages(parent, messages) {
 		
+		parent.addc("loaded");
 		let lastMessageDetails = {time: null, date: null, user: null};
 		if(messages.length >= 50) {
 			lastMessageDetails = getMessageDetails(messages.shift());
@@ -278,15 +453,15 @@ function TextProgram(session) {
 			//wrapper = parent.crelBefore("div").addc("load-wrapper").attr("offset", offset)
 			//wrapperObserver.observe(wrapper);
 		}
-		let initialScroll = messagesContainer.scrollTop;
-		let initialParentRect = parent.getBoundingClientRect();
+		let initialScroll = chat_scroll_container.scrollTop;
+		//let initialParentRect = parent.getBoundingClientRect();
 		
 		for(let message of messages) {
 			lastMessageDetails = addMessage(parent, message, lastMessageDetails);
 		}
 		
-		let parentRect = parent.getBoundingClientRect();
-		messagesContainer.scrollTop = initialScroll + parentRect.height - initialParentRect.height;
+		//let parentRect = parent.getBoundingClientRect();
+		chat_scroll_container.scrollTop = initialScroll; // + parentRect.height //- initialParentRect.height;
 		/*text_container.els(".load-wrapper:not(:empty) + .load-wrapper + .load-wrapper:not(:empty)").forEach(wrapper => {
 			wrapper.html("");
 		})*/
@@ -295,18 +470,29 @@ function TextProgram(session) {
 	
 	let latestMessageDetails = null;
 	if(session.currentProgram.messageHistory) {
-		latestMessageDetails = loadMessages(doc.el(".load-wrapper:empty"), session.currentProgram.messageHistory);
+		latestMessageDetails = loadMessages(load_wrapper, session.currentProgram.messageHistory);
 	}
-	
-	messagesContainer.scrollTop = messagesContainer.scrollHeight;
+	chat_scroll_container.scrollTop = 0;
 	
 	session.socket.on("program-output", function(event) {
 		if(event.type == "message") {
 			latestMessageDetails = addMessage(doc.el(".load-wrapper:last-child"), event, latestMessageDetails);
 			
-			let messages = messagesContainer;
-			if(messages.scrollTop > messages.scrollHeight - messages.offsetHeight - 100 || message.user.userid == session.user.userid)
-				messages.scrollTop = messages.scrollHeight;
+			let messages = chat_scroll_container;
+			if(messages.scrollTop > messages.scrollHeight - messages.offsetHeight - 100 || event.user.userid == session.user.userid)
+				messages.scrollTop = 0;
+			
+			delete typing_users[event.user.userid];
+			check_typing();
+			
+			let sound;
+			if(event.user.userid == session.user.userid) {
+				sound = messageSendSound.cloneNode(true);
+			} else {
+				sound = messageReceiveSound.cloneNode(true);
+			}
+			sound.play();
+			sound.onended = () => sound.remove();
 		}
 		if(event.type == "load") {
 			loadMessages(doc.el(".load-wrapper[offset=\""+event.offset+"\"]"), event.messages);
@@ -321,10 +507,23 @@ function TextProgram(session) {
 			if(messageEl)
 				messageEl.remove();
 		}
+		if(event.type == "typing" && event.user.userid !== session.user.userid) {
+			typing_users[event.user.userid] = event;
+			check_typing();
+			setTimeout(check_typing, 5000);
+		}
 	})
 	
 	if(session.currentGroup.members)
 		MembersSidebar(session);
+	
+	message_box
+		.anim({
+			opacity: [0, 1],
+			translateY: [10, 0],
+			duration: 200,
+			easing: "ease-out"
+		})
 }
 
 export default TextProgram;

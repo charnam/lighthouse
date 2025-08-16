@@ -32,6 +32,10 @@
 	justify-content: center;
 }
 
+.profile-page .user-name-text {
+	white-space: wrap;
+}
+
 .profile-page .user-tag {
 	display: inline-block;
 	font-size: 0.5em;

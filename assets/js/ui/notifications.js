@@ -47,10 +47,12 @@ class NotificationHandler {
 	}
 	open_menu() {
 		doc.el("#notifications-group").classList.add("open");
+		doc.el("#notifications-group").classList.add("open-anim");
 		doc.el("#notifications-menu-container").classList.add("visible");
 	}
 	close_menu() {
 		doc.el("#notifications-group").classList.remove("open");
+		doc.el("#notifications-group").classList.remove("open-anim");
 		doc.el("#notifications-menu-container").classList.remove("visible");
 	}
 	
@@ -117,6 +119,19 @@ class NotificationHandler {
 							.on("mouseup", async () => {
 								this.close_menu();
 								this.session.join_group("special:direct");
+							})
+						break;
+					case "invites":
+						notificationEl
+							.addc("message-notification")
+							.txt(notification.count+" unaccepted invite"+(notification.count > 1 ? "s" : ""))
+							.on("mouseup", async () => {
+								this.close_menu();
+								if(this.session.currentGroup.special !== "direct")
+									await this.session.join_group("special:direct");
+								else
+									await animations.programOut();
+								await this.session.group_interact({type: "invites"});
 							})
 						break;
 				}

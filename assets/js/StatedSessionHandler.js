@@ -36,10 +36,17 @@ class StatedSessionHandler {
 		let current_group_container = doc.el("#current-group-container").html("");
 		
 		if(group !== null) {
-			doc.els('.group.open:not(#notifications-group)').forEach(groupButton => groupButton.remc("open"));
+			doc.els(':is(.group.open, .group.open-anim):not(#notifications-group)').forEach(groupButton => {
+				groupButton.remc("open")
+				groupButton.remc("open-anim");
+			});
+			
 			let groupButton = doc.el(".group[groupid=\""+group.groupid+"\"]");
-			if(groupButton)
+			
+			if(groupButton) {
 				groupButton.addc("open");
+				groupButton.addc("open-anim");
+			}
 			
 			switch(group.special) {
 				case undefined:
@@ -124,6 +131,22 @@ class StatedSessionHandler {
 													await animations.programOut();
 													this.group_interact({type: "edit_roles"});
 												}
+											},
+											{
+												text: "Leave...",
+												icon: "icons/door-open-fill.svg",
+												submenu: [
+													{
+														text: "Are you sure?"
+													},
+													{
+														text: "Yes",
+														action: context_menu => {
+															context_menu.close();
+															this.group_interact({type: "leave"});
+														}
+													}
+												]
 											}
 										])
 									}
@@ -143,6 +166,8 @@ class StatedSessionHandler {
 					let lastWallpaper = null;
 					
 					const refresh_group = () => {
+						
+						group_sidebar.el(".group-title-container").html("").txt(this.currentGroup.groupname);
 						
 						let programs_container =
 							group_sidebar.el(".group-programs-container").html("");
@@ -243,6 +268,12 @@ class StatedSessionHandler {
 				case "registration":
 					
 					doc.el("#all-groups-container").attr("style", "display: none");
+					let release_info_container = doc.el("#app-container").crel("div").addc("release-info");
+					
+					(async () => {
+						let releaseInfo = await fetch("/js/variables/release.txt").then(res => res.text());
+						release_info_container.html("").txt(releaseInfo);
+					})();
 					
 					current_group_container
 						.crel("div").sid("current-program-container");
@@ -383,19 +414,25 @@ class StatedSessionHandler {
 							
 				switch(program.errorid) {
 					case 2:
-						error_container.crel("div").addc("error-subtitle")
-							.txt("We're really not happy with you now. Do that again, and you're fired.")
-						.prnt();
-						error_container.crel("div").addc("error-subtitle")
-							.txt("Reason: ")
-							.crel("i")
-								.txt(program.message)
+						error_container
+							.crel("div").addc("error-subtitle")
+								.txt("You tried to click something, but you weren't allowed to continue. Please create a bug report.")
 							.prnt()
-						.prnt();
+							.crel("div").addc("error-subtitle")
+								.txt("Reason: ")
+								.crel("i")
+									.txt(program.message)
+								.prnt()
+							.prnt();
 						break;
 					default:
-						error_container.crel("div").addc("error-subtitle")
-							.txt("The server didn't like that. Let's try something else.")
+						error_container
+							.crel("div").addc("error-subtitle")
+								.txt("We're really not happy with you now. Do that again, and you're fired.")
+							.prnt()
+							.crel("div").addc("error-subtitle")
+								.txt("The server didn't like that. Let's try something else.")
+							.prnt()
 						break;
 				}
 				break;
@@ -497,14 +534,14 @@ class StatedSessionHandler {
 				.prnt()
 				.crel("div").sid("current-group-container")
 				.prnt()
-				.crel("div").sid("notifications-menu-container")
+				.crel("div").addc("group-menu-container").sid("notifications-menu-container")
 					.on("mousedown", (event) => {
 						if(event.target.id == "notifications-menu-container") {
 							this.notifications.close_menu();
 							event.preventDefault();
 						}
 					})
-					.crel("div").sid("notifications-menu")
+					.crel("div").addc("group-menu").sid("notifications-menu")
 					.prnt()
 				.prnt()
 		
@@ -572,6 +609,7 @@ class StatedSessionHandler {
 					.attr("style", `
 						--image: url("/uploads/${group.icon}")
 					`)
+					.attr("position", group.position)
 					.on("click", () => {
 						this.join_group(group.groupid);
 					})
@@ -589,6 +627,18 @@ class StatedSessionHandler {
 				groupEl.addc("open");
 			
 		})
+		
+		Reordering.make_reorderable({
+			elements: doc.els("#groups-container > *"),
+			callback: (el, new_pos) => {
+				this.general_interact({
+					type: "reorder_group",
+					groupid: el.attr("groupid"),
+					position: new_pos
+				});
+			}
+		});
+		
 		doc.el("#groups-container")
 			.crel("div").addc("group").addc("add-group")
 				.attr("groupid", "special:new")

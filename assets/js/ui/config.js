@@ -1,7 +1,7 @@
 
 import Banner from "./banners.js";
 import UploadFile from "./upload.js";
-import RolesManager from "./roles.js";
+import animations from "./animations.js";
 
 function quicklySerializeForm(formEl) {
 	return new URLSearchParams(new FormData(formEl)).toString()
@@ -130,13 +130,12 @@ function configMenu(parent, config, action, session = null) {
 							progress: (progress) => {
 								imageUploadButton.attr("style", `
 									${imageUploadStyle}
-									--progress: ${progress}%;
+									--progress:${progress}%;
 								`);
-								if(progress == 100)
-									imageUploadButton.removeAttribute("in-progress");
 							}
 						});
 						
+						imageUploadButton.removeAttribute("in-progress");
 						if(upload.type !== "success") {
 							return new Banner(bannersEl, upload);
 						}
@@ -203,14 +202,16 @@ function configMenu(parent, config, action, session = null) {
 						if(configItem.current == "log-in") {
 							mainButtonText = "Log in";
 							secondaryButtonText = "Sign up instead";
-							secondaryButtonAction = () => {
+							secondaryButtonAction = async () => {
+								await formHelper.hide();
 								session.program_interact({type: "signup"});
 							}
 						}
 						if(configItem.current == "sign-up") {
 							mainButtonText = "Sign up";
 							secondaryButtonText = "Log in instead";
-							secondaryButtonAction = () => {
+							secondaryButtonAction = async () => {
+								await formHelper.hide();
 								session.program_interact({type: "login"});
 							}
 						}
@@ -305,14 +306,16 @@ function configMenu(parent, config, action, session = null) {
 	
 	let formHelper = {
 		hide: () => {
-			saveButtonContainer.remc("visible");
-			configFormEl.els(".config-option").anim({
-				opacity: [1, 0],
-				translateY: [0, -100],
-				easing: "ease-in",
-				duration: 300,
-				delayBetween: 10
-			})
+			return new Promise(res => {
+				saveButtonContainer.remc("visible");
+				configFormEl.els(".config-option").anim({
+					opacity: [1, 0],
+					translateY: [0, -100],
+					easing: "ease-in",
+					duration: 300,
+					delayBetween: 10
+				}).onfinish(() => setTimeout(res, 100))
+			});
 		},
 		submit: async (special) => {
 			if(configFormEl.els("[in-progress]").length > 0) {

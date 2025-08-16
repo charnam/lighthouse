@@ -94,7 +94,7 @@
     white-space: pre-wrap;
 }
 .banner.error {
-	background: repeating-linear-gradient(45deg, #f003 0px, #f003 5px, #f001 5px, #f001 10px);
+	background: var(--error-bg);
 	background-size: 14px;
 	animation: bannerAnimated 1s linear infinite, blinkingBanner 2s ease-in-out infinite;
 }

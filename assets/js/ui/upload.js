@@ -29,11 +29,6 @@ async function uploadFile(input) {
 				input.progress(100);
 			let response = JSON.parse(upload.response);
 			res(response);
-			/*if(response.type !== "success") {
-				return new Banner(bannersEl, response);
-			}
-			formInput.value = response.uploadid;
-			checkChange();*/
 		}
 		
 		upload.open("POST", "/uploads/create", true);

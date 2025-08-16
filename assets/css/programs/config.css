@@ -104,6 +104,22 @@
 	height: 100%;
 	
 }
+
+@keyframes spin {
+	0% {
+		transform: var(--transform) rotate(0deg);
+	}
+	100% {
+		transform: var(--transform) rotate(360deg);
+	}
+}
+
+.config-option .image-upload[in-progress][style*="progress:100"]::after {
+	background-image: conic-gradient(#000 15%, #0000 15%, #0000 50%, #000 50%, #000 65%, #0000 65%);
+	animation: spin 1s linear infinite;
+	--transform: translate(-50%, -50%) scale(0.5);
+}
+
 .config-option .image-upload:after {
 	content: "";
 	background-color: #fff5;

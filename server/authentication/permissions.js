@@ -52,7 +52,7 @@ class Permissions {
 		);
 		
 		for(let member of members) {
-			member.roles = await this.db.all("SELECT roles.roleid, roles.name, roles.icon FROM roles WHERE roleid IN (SELECT roleid FROM role_assignation WHERE userid = ?) AND groupid = ?", [member.userid, groupid]);
+			member.roles = await this.db.all("SELECT roles.roleid, roles.name, roles.icon FROM roles WHERE roleid IN (SELECT roleid FROM role_assignation WHERE userid = ?) AND groupid = ? ORDER BY position", [member.userid, groupid]);
 			member.state = GlobalState.user_state(member.userid, programid, groupid);
 		}
 		

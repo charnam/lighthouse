@@ -1,4 +1,5 @@
 // # Imports
+const fs = require('node:fs');
 const express = require('express');
 const sqlite3 = require("sqlite3");
 const sqlite = require("sqlite");
@@ -15,6 +16,10 @@ const StatedSession = require("StatedSession.js");
 const Upload = require("Upload.js");
 const Permissions = require("authentication/permissions.js");
 
+function mkdirSilent(dirname) {
+	if(!fs.existsSync(dirname))
+		fs.mkdirSync(dirname);
+}
 
 // # Main program
 async function main() {
@@ -22,11 +27,30 @@ async function main() {
 	logger.setLogLevel(0);
 	const cwd = process.cwd();
 	
+	// # Initialization
+	mkdirSilent("cache");
+	mkdirSilent("config");
+	mkdirSilent(Upload.UPLOAD_FILE_PATH);
+	mkdirSilent(Upload.TEMP_UPLOAD_FILE_PATH);
+	
+	if(!fs.existsSync("config/release.txt"))
+		fs.copyFileSync("server/variables/default-release.txt", "config/release.txt");
+	
+	let server_version = fs.readFileSync("server/variables/version.txt").toString();
+	let release_info = fs.readFileSync("config/release.txt").toString();
+	
+	release_info = release_info.replace("{version}", server_version);
+	
+	fs.writeFileSync("cache/release.txt", release_info);
+	
 	// # Database setup
 	let db = await sqlite.open({
 		filename: "config/database.db",
 		driver: sqlite3.Database
 	});
+	
+	let database_structure = fs.readFileSync("server/variables/structure.sql").toString();
+	await db.exec(database_structure);
 	
 	// # Server setup
 	const expressApp = express();
@@ -36,6 +60,10 @@ async function main() {
 	// # Helper functions
 	expressApp.get('/', (req, res) => {
 		res.sendFile(path.join(cwd, 'assets/index.html'));
+	});
+	
+	expressApp.get('/js/variables/release.txt', (req, res) => {
+		res.sendFile(path.join(cwd, "cache/release.txt"));
 	});
 	
 	expressApp.get('/js/variables/permissions.js', (req, res) => {

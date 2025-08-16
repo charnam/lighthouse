@@ -13,6 +13,11 @@ class Messages {
 		let seenBy = await db.all("SELECT userid FROM read_indicators WHERE messageid = ?", message.messageid);
 		seenBy = seenBy.map(event => event.userid);
 		
+		let mentions = await db.all("SELECT userid FROM message_mentions WHERE messageid = ?", message.messageid);
+		mentions = mentions.map(event => event.userid);
+		
+		let attachments = await db.all("SELECT uploads.originalname, uploads.mimetype, uploads.uploadid, uploads.size FROM message_attachments JOIN uploads ON uploads.uploadid = message_attachments.uploadid WHERE message_attachments.messageid = ?", message.messageid);
+		
 		return {
 			messageid: message.messageid,
 			programid: message.programid,
@@ -25,7 +30,8 @@ class Messages {
 				username: message.sender_username,
 				pfp: message.sender_pfp
 			},
-			seenBy
+			seenBy,
+			attachments
 		};
 	}
 	

@@ -104,6 +104,13 @@ class StatedSession {
 			this.sync_group(group, async event => {
 				
 				switch(event.type) {
+					case "leave":
+						await this.db.run("DELETE FROM user_group_relationships WHERE userid = ? AND groupid = ?", [this.user.userid, group.groupid]);
+						await GlobalState.refresh_members(group.groupid);
+						
+						await this.refresh_groups();
+						await this.join_group("special:direct");
+						break;
 					case "edit_group":
 						if(~await this.permissions.permissions_group(group.groupid) & Permissions.ByName.EDIT_GROUP)
 							return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "User attempted to edit a group without sufficient privileges");
@@ -147,9 +154,6 @@ class StatedSession {
 										return false;
 									}
 									
-									if(event.fields.wallpaper == "") event.fields.wallpaper = null;
-									if(event.fields.icon == "") event.fields.icon = null;
-									
 									// validation
 									let name_validation = await Validation.validate_group_name(event.fields.name);
 									
@@ -157,21 +161,24 @@ class StatedSession {
 										return this.socket.emit('program-output', name_validation);
 									
 									if(event.fields.icon != group.icon) {
-										if(event.fields.icon !== null) {
+										if(event.fields.icon !== "") {
+											
 											let icon_validation =
 												await Validation.validate_and_use_uploaded_file(this, event.fields.icon, "groupicon");
+											
 											if(icon_validation.type !== "success")
 												return this.socket.emit("program-output", icon_validation);
-										}
+											
+										} else event.fields.icon = null;
 									}
 									
 									if(event.fields.wallpaper != group.wallpaper) {
-										if(event.fields.wallpaper !== null) {
+										if(event.fields.wallpaper !== "") {
 											let wallpaper_validation =
 												await Validation.validate_and_use_uploaded_file(this, event.fields.wallpaper, "wallpaper");
 											if(wallpaper_validation.type !== "success")
 												return this.socket.emit("program-output", wallpaper_validation);
-										}
+										} else event.fields.wallpaper = null;
 									}
 									
 									// change values
@@ -315,9 +322,8 @@ class StatedSession {
 						show_edit_program();
 						break;
 					case "reorder_program":
-						if(~await this.permissions.permissions_group(group.groupid) & Permissions.ByName.EDIT_PROGRAM)
+						if(~await this.permissions.permissions_program(event.programid) & Permissions.ByName.EDIT_PROGRAM)
 							return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "User attempted to reorder programs without sufficient privileges");
-						
 						
 						let result = await Reorder.reorder_program(this.db, event.programid, event.order);
 						
@@ -441,11 +447,14 @@ class StatedSession {
 									if(roleNameVerification.type !== "success")
 										return this.socket.emit("program-output", roleNameVerification);
 									
-									if(role.icon !== updated_role.icon && updated_role.icon !== "") {
-										let icon_validation =
-											await Validation.validate_and_use_uploaded_file(this, updated_role.icon, "roleicon");
-										if(icon_validation.type !== "success")
-											return this.socket.emit("program-output", icon_validation);
+									if(role.icon !== updated_role.icon) {
+										if(updated_role.icon == "") updated_role.icon = null;
+										else {
+											let icon_validation =
+												await Validation.validate_and_use_uploaded_file(this, updated_role.icon, "roleicon");
+											if(icon_validation.type !== "success")
+												return this.socket.emit("program-output", icon_validation);
+										}
 									}
 								}
 								
@@ -500,7 +509,16 @@ class StatedSession {
 						if(already_sent)
 							return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "User has already been invited");
 						
+						let already_in_group = await this.db.get("SELECT * FROM user_group_relationships WHERE userid = ? AND groupid = ?", [event.userid, group.groupid])
+						if(already_in_group)
+							return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "User is already in group");
+						
 						await this.db.run("INSERT INTO group_invites (from_userid, to_userid, groupid, creation) VALUES (?,?,?,?)", [this.user.userid, event.userid, group.groupid, Date.now()]);
+						
+						await GlobalState.refresh_notification(this, {
+							type: "invite",
+							to: event.userid
+						});
 						
 						break;
 					default:
@@ -599,6 +617,7 @@ class StatedSession {
 					);
 					messageHistory = messageHistory.reverse();
 					
+					let lastNotificationTimeout = null; // used to prevent spam in refreshing notifications on message read
 					this.sync_program(
 						{
 							type: program.type,
@@ -609,6 +628,20 @@ class StatedSession {
 						},
 						async event => {
 							switch(event.type) {
+								case "typing":
+									
+									this.socket.to(this.currentProgram.programid).emit("program-output", {
+										type: "typing",
+										time: Date.now(),
+										user: {
+											displayname: this.user.displayname,
+											username: this.user.username,
+											userid: this.user.userid,
+											pfp: this.user.pfp,
+										}
+									});
+									
+									break;
 								case "read-message":
 									let alreadyRead = await this.db.get("SELECT * FROM read_indicators WHERE userid = ? AND messageid = ?", this.user.userid, event.messageid);
 									if(alreadyRead) return false;
@@ -619,6 +652,12 @@ class StatedSession {
 									if(message.programid !== program.programid) return false;
 									
 									await this.db.run("INSERT INTO read_indicators (userid, messageid, creation) VALUES (?,?,?)", this.user.userid, event.messageid, Date.now());
+									
+									let myTimeout = lastNotificationTimeout = setTimeout(() => {
+										// used to prevent spam in refreshing notifications upon message read
+										if(myTimeout == lastNotificationTimeout)
+											this.refresh_notifications();
+									}, 1000)
 									
 									break;
 								case "load-messages":
@@ -687,17 +726,43 @@ class StatedSession {
 									break;
 								case "send-message":
 									
-									if(event.text.trim() == "")
+									if(typeof event.text !== "string") return false;
+									
+									const hasAttachments = Array.isArray(event.attachments) && event.attachments.length > 0;
+									
+									if(event.text.trim() == "" && !hasAttachments)
 										return false;
-									if(!event.text)
-										return this.show_server_error(SERVER_ERRORS.BAD_ACTION);
+									
+									if(~await this.permissions.permissions_program(program.programid) & Permissions.ByName.SEND_MESSAGES)
+										return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "You're not allowed to send messages here.");
 									
 									let creation = Date.now();
 									let messageid = uuid();
 									
-									let message_content_validation = await Validation.validate_message_content(event.text);
+									let message_content_validation = await Validation.validate_message_content(event.text, hasAttachments);
 									if(message_content_validation.type !== "success")
 										this.show_server_error(SERVER_ERRORS.BAD_ACTION, message_content_validation.message);
+									
+									if(hasAttachments) {
+										// validation
+										if(~await this.permissions.permissions_program(program.programid) & Permissions.ByName.SEND_FILES)
+											return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "You're not allowed to send files here.");
+										
+										for(let uploadid of event.attachments) {
+											let attachment_validation =
+												await Validation.validate_uploaded_file(this, uploadid, "attachment");
+											
+											if(attachment_validation.type !== "success")
+												return this.socket.emit("program-output", attachment_validation);
+										}
+										
+										// use files
+										for(let uploadid of event.attachments) {
+											await this.db.run("UPDATE uploads SET autodelete = 0 WHERE uploadid = ?", uploadid);
+											await this.db.run("INSERT INTO message_attachments (messageid, uploadid) VALUES (?,?)", [messageid, uploadid]);
+											
+										}
+									}
 									
 									await this.db.run(
 										`INSERT INTO messages (messageid, userid, programid, content, creation) VALUES (?,?,?,?,?)`,
@@ -906,6 +971,8 @@ class StatedSession {
 										let requestUser = await this.db.get("SELECT userid FROM users WHERE username = ?", event.username);
 										if(!requestUser)
 											return show_error_banner("Couldn't find anyone by that name, sorry.");
+										if(requestUser.userid == this.user.userid)
+											return show_error_banner("You can't send a friend request to yourself.");
 										let checkRequest = await this.db.get("SELECT id FROM friend_requests WHERE (requestor = ? AND requestee = ?) OR (requestor = ? AND requestee = ?)", [this.user.userid, requestUser.userid, requestUser.userid, this.user.userid])
 										if(checkRequest)
 											return show_error_banner("Request already sent");
@@ -931,6 +998,7 @@ class StatedSession {
 									case "reject-request":
 										await this.db.run("DELETE FROM friend_requests WHERE requestor = ? AND requestee = ?", [event.userid, this.user.userid]);
 										await this.refresh_friends();
+										await GlobalState.refresh_friends(event.userid);
 										await this.refresh_notifications();
 										await this.join_program("special:friends");
 										break;
@@ -972,12 +1040,16 @@ class StatedSession {
 									);
 									if(!invite) return false;
 									if(event.type == "accept") {
-										await this.db.run("INSERT INTO user_group_relationships (userid, groupid) VALUES (?,?)", [this.user.userid, invite.groupid]);
-										await GlobalState.refresh_members(invite.groupid);
+										let already_in_group = await this.db.get("SELECT * FROM user_group_relationships WHERE userid = ? AND groupid = ?", [this.user.userid, invite.groupid]);
+										if(!already_in_group) {
+											await this.db.run("INSERT INTO user_group_relationships (userid, groupid, position) VALUES (?,?,?)", [this.user.userid, invite.groupid, Date.now()]);
+											await GlobalState.refresh_members(invite.groupid);
+										}
 									}
 									await this.db.run("DELETE FROM group_invites WHERE to_userid = ? AND groupid = ?", [this.user.userid, invite.groupid]);
 									this.join_program("special:invites");
 									this.refresh_groups();
+									this.refresh_notifications();
 								}
 							}
 						);
@@ -1096,21 +1168,25 @@ class StatedSession {
 										return this.socket.emit("program-output", display_name_validation);
 									
 									if(event.fields.pfp != this.user.pfp) {
-										let pfp_validation =
-											await Validation.validate_and_use_uploaded_file(this, event.fields.pfp, "pfp");
-										if(pfp_validation.type !== "success")
-											return this.socket.emit("program-output", pfp_validation);
-										this.user.pfp = event.fields.pfp;
+										if(event.fields.pfp !== "") {
+											let pfp_validation =
+												await Validation.validate_and_use_uploaded_file(this, event.fields.pfp, "pfp");
+											if(pfp_validation.type !== "success")
+												return this.socket.emit("program-output", pfp_validation);
+											this.user.pfp = event.fields.pfp;
+										} else this.user.pfp = null;
 									}
 									
 									if(event.fields.wallpaper != this.user.wallpaper) {
-										let wallpaper_validation =
-											await Validation.validate_and_use_uploaded_file(this, event.fields.wallpaper, "wallpaper");
-										
-										if(wallpaper_validation.type !== "success")
-											return this.socket.emit("program-output", wallpaper_validation);
-										
-										this.user.wallpaper = event.fields.wallpaper;
+										if(event.fields.wallpaper !== "") {
+											let wallpaper_validation =
+												await Validation.validate_and_use_uploaded_file(this, event.fields.wallpaper, "wallpaper");
+											
+											if(wallpaper_validation.type !== "success")
+												return this.socket.emit("program-output", wallpaper_validation);
+											
+											this.user.wallpaper = event.fields.wallpaper;
+										} else this.user.wallpaper = null;
 									}
 									
 									let bio_validation = await Validation.validate_bio(event.fields.bio);
@@ -1179,7 +1255,7 @@ class StatedSession {
 									],
 									defaults: defaults
 								},
-								{
+								/*{
 									groupCreation: true,
 									items: [
 										{
@@ -1200,15 +1276,12 @@ class StatedSession {
 										stepsItem
 									],
 									defaults: defaults
-								},
+								},*/
 								{
 									groupCreation: true,
 									items: [
 										{
-											title: "Ready?"
-										},
-										{
-											label: "todo: add something here, lol"
+											label: "This menu is not finished yet. Click 'Next' to create your group."
 										},
 										stepsItem
 									],
@@ -1239,6 +1312,13 @@ class StatedSession {
 									if(event.special && event.special.isBack && this.currentProgram.page == 0) return this.show_server_error(SERVER_ERRORS.BAD_ACTION);
 									
 									this.currentProgram.enteredValues = {...this.currentProgram.enteredValues, ...event.fields};
+									
+									if(this.currentProgram.page == 0) {
+										let groupNameValidation = await Validation.validate_group_name(this.currentProgram.enteredValues.groupname);
+										if(groupNameValidation.type !== "success")
+											return this.socket.emit("program-output", groupNameValidation);
+									}
+									
 									let tempValue = this.currentProgram.tempValue = Math.random();
 									this.socket.emit("program-output", {type: "success"});
 									setTimeout(async () => {
@@ -1246,6 +1326,7 @@ class StatedSession {
 										let lastPage = new_group_set_page(this.currentProgram.page + (event.special && event.special.isBack ? -1 : 1));
 										
 										if(lastPage === true) {
+											
 											
 											let newGroupId = uuid();
 											
@@ -1388,6 +1469,20 @@ class StatedSession {
 				creation: friend_requests.creation
 			});
 		
+		let invites = await this.db.get(`
+			SELECT COUNT(id) AS count, MAX(creation) AS creation FROM group_invites
+			WHERE to_userid = ?
+			GROUP BY to_userid`,
+			this.user.userid)
+			
+		if(invites && invites.count > 0)
+			notifications.push({
+				type: "invites",
+				count: invites.count,
+				creation: invites.creation
+			});
+		
+		
 		
 		notifications = notifications.sort((notifA, notifB) => notifA.creation - notifB.creation);
 		this.socket.emit("notifications", notifications);
@@ -1404,13 +1499,16 @@ class StatedSession {
 					
 					await this.db.run("DELETE FROM friends WHERE id = ?", relationship.id);
 					
+					await GlobalState.refresh_friends(event.userid);
 					await this.refresh_friends();
 				}
 				break;
 			case "friend-request":
 				{
+					if(event.userid == this.user.userid)
+						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "You cannot send a friend request to yourself");
 					
-					let requestUser = await this.db.get("SELECT * FROM users WHERE userid = ?");
+					let requestUser = await this.db.get("SELECT * FROM users WHERE userid = ?", event.userid);
 					
 					if(requestUser == null)
 						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to friend nonexistent user");
@@ -1430,7 +1528,7 @@ class StatedSession {
 			case "open-dm":
 				{
 					let relationship = await this.db.get("SELECT id, programid FROM friends WHERE (userid1 = ? AND userid2 = ?) OR (userid1 = ? AND userid2 = ?)", [this.user.userid, event.userid, event.userid, this.user.userid]);
-					if(!relationship) return this.show_server_error(SERVER_ERRORS.BAD_ACTION);
+					if(!relationship) return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to open a direct message with someone who is not friends with the current user.");
 					
 					if(this.currentGroup.special !== "direct")
 						await this.join_group("special:direct");
@@ -1465,6 +1563,16 @@ class StatedSession {
 						user
 					}, () => {});
 					
+				}
+				break;
+			case "reorder_group":
+				{
+					if(typeof event.position !== "number")
+						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to reorder group with non-numeric position value");
+					
+					await Reorder.reorder_group(this.db, this.user.userid, event.groupid, event.position);
+					
+					await this.refresh_groups();
 				}
 				break;
 			default:
