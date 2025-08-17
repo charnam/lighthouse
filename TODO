@@ -20,15 +20,17 @@ Submit an issue if you'd like me to focus on something specific.
 
 INCOMPLETE:
 
-- double click notification icon to jump to most recent notification
+- drop EXIF data from file uploads !
 
-- visible read reciepts
+- add unread icons to groups and programs
 
 - message removal
 
+- visible read reciepts
+
 - refactor CSS and JS to be more readable; split code into smaller files and reorganize strangely placed CSS code
 
-- drop EXIF data from file uploads !!
+- double click notification icon to jump to most recent notification
 
 COMPLETE:
 
