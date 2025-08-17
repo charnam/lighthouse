@@ -22,9 +22,6 @@ INCOMPLETE:
 
 - double click notification icon to jump to most recent notification
 
-- profile pages 
-	> modifiable current status
-
 - visible read reciepts
 
 - message removal
@@ -35,7 +32,9 @@ INCOMPLETE:
 
 COMPLETE:
 
-- add online indicators
+- profile pages 
+	> modifiable current status
+	> add online indicators
 
 - typing indicators
 
