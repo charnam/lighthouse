@@ -1,8 +1,12 @@
+## Before we begin
+
+Hello! For people here who are new to GitHub, and are trying to submit a bug report or feature request, click the "Issues" tab at the top of this page, and then click "New Issue." You may need to create a GitHub account.
+
 # Lighthouse
 
 This is Lighthouse, a chat application similar to other popular ones, created by me, for fun. The code is as clean as I could manage to make it, albeit I wasn't focused on cleanliness the whole time, so certain things might be strange or difficult to decipher. If you want help making changes, or learning about the architecture, please feel free to ask me via email, at [charnam@lunarsphere.net](mailto:charnam@lunarsphere.net), or on Matrix, at `@charnam:lunarsphere.net`.
 
-Lighthouse can be found online at... insert link here when it's ready ;)
+Lighthouse's latest release can be found online, at [lighthouse.lunarsphere.net](https://lighthouse.lunarsphere.net/).
 
 - [Server and Dependency Setup](#starting-the-server)
 - [Contributing](#contributing)
@@ -12,10 +16,10 @@ Lighthouse can be found online at... insert link here when it's ready ;)
 
 ## Starting the Server
 
-This server should theoretically work under Windows or WSL, but it has not (and will not) be tested by me.
+This server should theoretically work under Windows or WSL, but this has not (and will not) be tested by me.
 To set up a development server, follow these steps:
 
-1. [Install node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). It is recommended to use the latest LTS releases, but if for some reason that does not work, the latest version of Node should work.
+1. [Install Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). It is recommended to use the latest LTS releases, but if for some reason that does not work, try Node's latest release instead.
 2. `cd` into the `server` directory, and then run `npm install` to install all required dependencies.
 3. Download [bootstrap icons](https://icons.getbootstrap.com/). Place the directory containing the SVG files into `assets`, and title it `icons`. This should allow you to find a file named `check.svg` at `assets/icons/check.svg`.
 
