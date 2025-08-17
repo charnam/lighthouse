@@ -502,8 +502,9 @@ class StatedSessionHandler {
 							.on("click", () => {
 								this.join_group("special:direct");
 								doc.el("#direct-group .icon").anim({
-									translateY: [0, -3, 2, 0],
-									duration: 300,
+									translateY: [0, -3, 0, 2, 0],
+									scaleX: [1, 0.9, 0.8, 1.2, 1],
+									duration: 400,
 									easing: "ease-in-out"
 								})
 							})
@@ -513,11 +514,40 @@ class StatedSessionHandler {
 					.crel("div").sid("groups-container")
 					.prnt()
 					.crel("div").sid("system-groups-container")
-						.crel("div").addc("group").sid("notifications-group").attr("groupid", "special:notifications")
+						.crel("div").addc("group").sid("notifications-group")
 							.on("mousedown", () => {
 								this.notifications.toggle_menu();
 							})
 							.crel("img").addc("icon").attr("src", "/icons/bell-fill.svg").prnt()
+						.prnt()
+						.crel("div").addc("group").sid("status-group")
+							.on("mousedown", (event) => {
+								event.preventDefault();
+								doc.el("#status-group .icon").anim({
+									translateY: [0, 3, -3, 0],
+									scaleY: [1, 0.8, 1.2, 1],
+									scaleX: [1, 1.2, 0.8, 1],
+									duration: 400,
+									easing: "ease-in-out"
+								});
+								/*
+								doc.el("#status-group .icon").anim({
+									rotate: [0, -40, 30, -30, 0],
+									scale: [1, 1.2, 1.1, 0.9, 1],
+									translateX: [0, 3, -1, 2, 0],
+									translateY: [0, -1, 3, 2, 0],
+									scaleY: [1, 0.8, 0.9, 1.2, 1],
+									duration: 500,
+									easing: "ease-in-out"
+								});
+								*/
+								doc.el("#status-group")
+									.addc("open")
+									.addc("open-anim");
+								doc.el("#status-menu-container")
+									.addc("visible");
+							})
+							.crel("img").addc("icon").attr("src", "/icons/chat-left-quote-fill.svg").prnt()
 						.prnt()
 						.crel("div").addc("group").sid("settings-group").attr("groupid", "special:settings")
 							.on("click", () => {
@@ -542,6 +572,39 @@ class StatedSessionHandler {
 						}
 					})
 					.crel("div").addc("group-menu").sid("notifications-menu")
+					.prnt()
+				.prnt()
+				.crel("div").addc("group-menu-container").sid("status-menu-container")
+					.on("mousedown", (event) => {
+						if(event.target.id == "status-menu-container") {
+							event.preventDefault();
+							doc.el("#status-group").classList.remove("open");
+							doc.el("#status-group").classList.remove("open-anim");
+							doc.el("#status-menu-container").classList.remove("visible");
+						}
+					})
+					.crel("div").addc("group-menu").sid("status-menu")
+						.crel("input")
+							.attr("type", "text")
+							.attr("placeholder", "What's up?")
+						.prnt()
+						.crel("button")
+							.txt("Update Status")
+							.on("click", async () => {
+								doc.el("#status-group").classList.remove("open");
+								doc.el("#status-group").classList.remove("open-anim");
+								doc.el("#status-menu-container").classList.remove("visible");
+								
+								doc.el("#status-group .icon").anim({
+									scaleX: [1, 0.7, 1.2, 0.9, 1],
+									scaleY: [1, 1.3, 0.8, 1.1, 1],
+									duration: 350,
+									easing: "ease-out"
+								})
+								
+								this.general_interact({type: "status", status: doc.el("#status-menu input").value});
+							})
+						.prnt()
 					.prnt()
 				.prnt()
 		

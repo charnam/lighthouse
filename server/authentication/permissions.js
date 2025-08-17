@@ -40,7 +40,7 @@ class Permissions {
 	
 	async group_members(groupid, programid = null) {
 		let members = await this.db.all(
-			`SELECT userid, username, displayname, pfp FROM users
+			`SELECT userid, username, displayname, pfp, status FROM users
 			WHERE userid IN
 				(
 					SELECT userid FROM user_group_relationships WHERE groupid = ?

@@ -20,6 +20,7 @@
 .profile-page .user {
 	display: flex;
 	font-size: 2em;
+	align-items: center;
 }
 
 .profile-page .user-pfp {

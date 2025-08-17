@@ -23,17 +23,19 @@ INCOMPLETE:
 - double click notification icon to jump to most recent notification
 
 - profile pages 
-	> add online indicators, modifiable current status
+	> modifiable current status
 
 - visible read reciepts
 
 - message removal
 
-- make CSS more readable, use more variables rather than hard-coding backgrounds and text colors for better theming, upgrade programs sidebar
+- refactor CSS and JS to be more readable; split code into smaller files and reorganize strangely placed CSS code
 
 - drop EXIF data from file uploads !!
 
 COMPLETE:
+
+- add online indicators
 
 - typing indicators
 

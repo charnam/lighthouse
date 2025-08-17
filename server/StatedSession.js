@@ -760,7 +760,6 @@ class StatedSession {
 										for(let uploadid of event.attachments) {
 											await this.db.run("UPDATE uploads SET autodelete = 0 WHERE uploadid = ?", uploadid);
 											await this.db.run("INSERT INTO message_attachments (messageid, uploadid) VALUES (?,?)", [messageid, uploadid]);
-											
 										}
 									}
 									
@@ -946,8 +945,6 @@ class StatedSession {
 				this.special_programs = {
 					friends: async () => {
 						
-						await this.refresh_friends();
-						
 						let requests = await this.db.all("SELECT requestor FROM friend_requests WHERE requestee = ?", this.user.userid);
 						
 						for(let r = 0; r < requests.length; r++)
@@ -960,7 +957,6 @@ class StatedSession {
 							{
 								type: "friends",
 								title: "Friends",
-								friends: this.friends,
 								requests: requests
 							},
 							async event => {
@@ -1417,13 +1413,20 @@ class StatedSession {
 			ORDER BY last_message_time DESC`,
 			[this.user.userid, this.user.userid]
 		);
-		for(let r = 0; r < relations.length; r++)
+		for(let r = 0; r < relations.length; r++) {
 			relations[r] = await this.db.get(
-				"SELECT userid, displayname, pfp FROM users WHERE userid = ?", relations[r].userid1 == this.user.userid ? relations[r].userid2 : relations[r].userid1
+				"SELECT userid, displayname, pfp, status FROM users WHERE userid = ?", relations[r].userid1 == this.user.userid ? relations[r].userid2 : relations[r].userid1
 			);
+			relations[r].state = await GlobalState.user_state(relations[r].userid);
+		}
 		this.friends = relations;
 		this.socket.emit("friends", relations);
+		
+		if(this.currentProgram && this.currentProgram.type == "friends") {
+			this.socket.emit("program-output", {type: "update_friends"});
+		}
 	}
+	
 	
 	async refresh_notifications() {
 		if(!this.user)
@@ -1544,11 +1547,20 @@ class StatedSession {
 					}
 				}
 				break;
-				
+			case "status":
+				{
+					let status_validation = await Validation.validate_status(event.status);
+					
+					if(status_validation.type !== "success")
+						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, status_validation.message);
+					
+					await this.db.run("UPDATE users SET status = ? WHERE userid = ?", [event.status, this.user.userid]);
+					GlobalState.refresh_user(this.user.userid);
+				}
+				break;
 			case "show_profile":
 				{
-					
-					let user = await this.db.get("SELECT username, userid, displayname, pfp, wallpaper, creation, bio FROM users WHERE userid = ?", event.userid);
+					let user = await this.db.get("SELECT username, userid, displayname, pfp, wallpaper, creation, bio, status FROM users WHERE userid = ?", event.userid);
 					if(!user)
 						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to show the profile of a user that does not exist.");
 					
@@ -1557,10 +1569,12 @@ class StatedSession {
 						special: "profile"
 					});
 					
+					user.state = await GlobalState.user_state(user.userid);
+					
 					this.sync_program({
 						type: "profile",
 						title: user.username+"'s profile",
-						user
+						user,
 					}, () => {});
 					
 				}
@@ -1608,11 +1622,17 @@ class StatedSession {
 				GlobalState.remove_session(this);
 				GlobalState.refresh_user(this.user.userid);
 			}
-		})
+		});
 		
-		this.refresh_groups();
-		this.refresh_friends();
-		this.refresh_notifications();
+		(async () => {
+			await this.refresh_groups();
+			await this.refresh_friends();
+			await this.refresh_notifications();
+			if(user == null)
+				await this.join_group("special:registration");
+			else
+				await this.join_group("special:direct");
+		})();
 	}
 }
 

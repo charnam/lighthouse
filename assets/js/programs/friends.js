@@ -66,24 +66,34 @@ function FriendsView(session) {
 	
 	const friends_list = container
 		.crel("div").addc("friends-list")
-			.crel("div").addc("discrete-header").txt("Friends").prnt()
 	
-	session.currentProgram.friends.forEach(friend => {
-		
-		friends_list.crel("div").addc("friend").addc("appear-clickable")
-			.on("click", async () => {
-				
-				await animations.programOut();
-				
-				session.general_interact({
-					type: "open-dm",
-					userid: friend.userid
+	function update_friends() {
+		friends_list.html("")
+			.crel("div").addc("discrete-header").txt("Friends").prnt();
+		session.friends.forEach(friend => {
+			
+			friends_list.crel("div").addc("friend").addc("appear-clickable")
+				.on("click", async () => {
+					
+					await animations.programOut();
+					
+					session.general_interact({
+						type: "open-dm",
+						userid: friend.userid
+					})
+					
 				})
-				
-			})
-			.append(User(friend, session));
-		
+				.append(User(friend, session));
+			
+		})
+	}
+	update_friends();
+	session.socket.on("program-output", event => {
+		if(event.type == "update_friends") {
+			update_friends();
+		}
 	})
+	
 	friends_list.els(".friend").anim({
 		translateX: [-10, 0],
 		opacity: [0, 1],

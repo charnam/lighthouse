@@ -86,13 +86,11 @@ async function main() {
 		let user = await userLogin(db, socket.request.headers.cookie);
 		if(user === false) {
 			let session = new StatedSession(db, socket);
-			session.join_group("special:registration");
 		} else {
 			socket.emit("logged-in", {
 				user
 			});
 			let session = new StatedSession(db, socket, user);
-			session.join_group("special:direct");
 		}
 		
 		

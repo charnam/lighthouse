@@ -124,6 +124,18 @@ class Validation {
 		
 		
 	}
+	static async validate_status(status) {
+		
+		if(typeof status !== "string")
+			return this.error_banner("Status is not a string value");
+		
+		if(status.length > 256)
+			return this.error_banner("Status too long - 256 characters maximum");
+		
+		return this.success;
+		
+		
+	}
 	
 	static async validate_info_content(info_content) {
 		

@@ -109,6 +109,9 @@
 .message .user .user-pfp {
 	grid-area: pfp;
 }
+.message .user .user-pfp:after {
+	display: none !important;
+}
 
 .message.is-first .message-content {
 	margin-left: var(--text-message-spacing-from-pfp);

@@ -17,6 +17,10 @@ function render_user(rendered_user, session = false) {
 	let user =
 		document.createElement("div").addc("user")
 	
+	if(rendered_user.state) {
+		user.attr("state", rendered_user.state);
+	}
+	
 	let pfpEl =
 		user
 			.crel("div").addc("user-pfp").attr("style", "--image: url('/uploads/"+rendered_user.pfp+"');")
@@ -26,6 +30,10 @@ function render_user(rendered_user, session = false) {
 			.crel("div").addc("user-name")
 				.crel("div").addc("user-name-text").txt(rendered_user.displayname).prnt()
 	
+	if(rendered_user.status)
+		usernameEl
+			.crel("div").addc("user-status").txt(rendered_user.status).prnt()
+				
 	if(rendered_user.username && rendered_user.username !== rendered_user.displayname)
 		usernameEl
 			.crel("div")
