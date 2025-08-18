@@ -77,6 +77,7 @@ async function main() {
 	});
 	
 	expressApp.use(express.static('assets'));
+	expressApp.use('/icons/', express.static('server/node_modules/bootstrap-icons/icons'));
 	
 	
 	// # Server code

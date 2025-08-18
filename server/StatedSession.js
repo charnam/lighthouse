@@ -230,6 +230,13 @@ class StatedSession {
 								await this.join_program(programid);
 								
 								break;
+							/* case "bulletin":
+								
+								await this.db.run("INSERT INTO programs (programid, type, groupid, name, position, creation, modification) VALUES (?,?,?,?,?,?,?)", [programid, "bulletin", group.groupid, "Bulletin", Date.now(), Date.now(), Date.now()]);
+								await this.refresh_group();
+								await this.join_program(programid);
+								
+								break; */
 							case "info":
 								
 								await this.db.run("INSERT INTO programs (programid, type, groupid, name, position, creation, modification) VALUES (?,?,?,?,?,?,?)", [programid, "info", group.groupid, "Info", Date.now(), Date.now(), Date.now()]);
