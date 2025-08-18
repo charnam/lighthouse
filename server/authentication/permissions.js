@@ -189,7 +189,7 @@ class Permissions {
 			WHERE user_group_relationships.userid = ?
 			OR groups.userid = ?
 			ORDER BY user_group_relationships.position, user_group_relationships.id`,
-			[userid, userid]
+			[userid, userid, userid]
 		);
 		return groups;
 	}
