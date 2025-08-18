@@ -765,7 +765,7 @@ class StatedSession {
 									
 									let message_content_validation = await Validation.validate_message_content(event.text, hasAttachments);
 									if(message_content_validation.type !== "success")
-										this.show_server_error(SERVER_ERRORS.BAD_ACTION, message_content_validation.message);
+										return this.show_server_error(SERVER_ERRORS.BAD_ACTION, message_content_validation.message);
 									
 									if(hasAttachments) {
 										// validation
