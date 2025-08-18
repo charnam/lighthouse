@@ -531,17 +531,6 @@ class StatedSessionHandler {
 									duration: 400,
 									easing: "ease-in-out"
 								});
-								/*
-								doc.el("#status-group .icon").anim({
-									rotate: [0, -40, 30, -30, 0],
-									scale: [1, 1.2, 1.1, 0.9, 1],
-									translateX: [0, 3, -1, 2, 0],
-									translateY: [0, -1, 3, 2, 0],
-									scaleY: [1, 0.8, 0.9, 1.2, 1],
-									duration: 500,
-									easing: "ease-in-out"
-								});
-								*/
 								doc.el("#status-group")
 									.addc("open")
 									.addc("open-anim");
@@ -588,6 +577,7 @@ class StatedSessionHandler {
 						.crel("input")
 							.attr("type", "text")
 							.attr("placeholder", "What's up?")
+							.attr("maxlength", "256")
 						.prnt()
 						.crel("button")
 							.txt("Update Status")
