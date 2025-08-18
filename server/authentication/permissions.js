@@ -185,6 +185,7 @@ class Permissions {
 			FROM groups
 				LEFT JOIN user_group_relationships
 				ON user_group_relationships.groupid = groups.groupid
+				AND user_group_relationships.userid = ?
 			WHERE user_group_relationships.userid = ?
 			OR groups.userid = ?
 			ORDER BY user_group_relationships.position, user_group_relationships.id`,
