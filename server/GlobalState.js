@@ -54,11 +54,11 @@ class GlobalState {
 					let member = members.find(member => member.userid == session.user.userid);
 					if(!member) continue;
 					
-					if(!(session.currentProgram && session.currentProgram.programid == message.programid)) {
-						session.refresh_notifications();
-					} else {
+					if(session.currentProgram && session.currentProgram.programid == message.programid) {
 						// give the client some time to read the message
 						setTimeout(() => session.refresh_notifications().catch(err => console.error(err)), 2000);
+					} else {
+						session.refresh_notifications();
 					}
 				}
 			

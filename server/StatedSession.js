@@ -60,13 +60,13 @@ class StatedSession {
 			groupid = this.currentGroup.groupid;
 		
 		if(!groupid)
-			return this.show_server_error(SERVER_ERRORS.SERVER_ERROR, ""); // TODO: label this error
+			return false;
 		
 		let group = await this.db.get("SELECT * FROM groups WHERE groupid = ?", [groupid]);
 		
 		if(!group)
 			if(id !== false)
-				return false; // return false if the group is initially, loading so that a different error can be returned
+				return false; // return false if the group is initially loading so that a different error can be returned
 			else
 				return this.show_server_error(SERVER_ERRORS.SERVER_ERROR, "Group has been removed.");
 		
@@ -76,7 +76,24 @@ class StatedSession {
 		if(await this.permissions.permissions_group(group.groupid) & Permissions.ByName.EDIT_ROLES)
 			group.roles = await this.db.all("SELECT roleid, name, icon FROM roles WHERE groupid = ? ORDER BY position", group.groupid);
 		
-		group.programs = await this.db.all("SELECT programid, name, type, position FROM programs WHERE groupid = ? ORDER BY position", [groupid]);
+		group.programs = await this.db.all(`
+			SELECT programs.programid, name, type, position, latest_read_time IS NOT NULL AS unread
+			FROM programs
+			LEFT JOIN (
+				SELECT messages.programid, MAX(read_indicators.creation) AS latest_read_time
+				FROM messages
+				LEFT JOIN read_indicators
+				ON messages.messageid = read_indicators.messageid
+				AND read_indicators.userid = ?
+				GROUP BY messages.programid
+				HAVING latest_read_time < MAX(messages.creation)
+				ORDER BY latest_read_time
+			) unread_message
+			ON unread_message.programid = programs.programid
+			WHERE groupid = ?
+			ORDER BY position`,
+			[this.user.userid, groupid]
+		);
 		
 		this.currentGroup = group;
 		if(id === false)
@@ -1496,6 +1513,8 @@ class StatedSession {
 		
 		notifications = notifications.sort((notifA, notifB) => notifA.creation - notifB.creation);
 		this.socket.emit("notifications", notifications);
+		
+		this.refresh_group();
 	}
 	
 	async general_interaction(event) {

@@ -56,6 +56,16 @@
 	box-shadow: inset 0 0 0 1px gray;
 	background: #fff1;
 }
+.program[unread="1"]:not(.open)::after {
+	content: "";
+	background: #fff9;
+	border-radius: 50%;
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	width: 5px;
+	height: 5px;
+}
 
 .program:before {
 	

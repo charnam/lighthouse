@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "./start.sh"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bootstrap-icons": "^1.13.1",

@@ -191,6 +191,7 @@ class StatedSessionHandler {
 									.attr("programid", program.programid)
 									.attr("program-type", program.type)
 									.attr("position", program.position)
+									.attr("unread", program.unread)
 									.txt(program.name)
 									.on("click", () => {
 										if(program.type !== "separator")
