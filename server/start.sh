@@ -4,7 +4,7 @@
 cd "$(dirname "$0")/";
 
 # don't do dependency install if fast startup is desired
-if ! [[ "$1" == "--quick" ]]; then
+if ! [ "$1" = "--quick" ]; then
 	# install dependencies
 	npm install
 fi
