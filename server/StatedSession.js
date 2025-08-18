@@ -1514,7 +1514,7 @@ class StatedSession {
 		notifications = notifications.sort((notifA, notifB) => notifA.creation - notifB.creation);
 		this.socket.emit("notifications", notifications);
 		
-		if(!this.currentGroup.special)
+		if(this.currentGroup && !this.currentGroup.special)
 			this.refresh_group();
 	}
 	
