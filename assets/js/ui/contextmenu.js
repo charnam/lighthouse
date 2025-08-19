@@ -19,7 +19,7 @@ function ContextMenu(event, options) {
 			addOptions(contextMenuEl, options, contextMenu);
 		},
 		close: function(){
-			contextMenuOverlayEl.attr("style", "pointer-events: none;");
+			contextMenuOverlayEl.style.pointerEvents = "none";
 			contextMenuOverlayEl.anim({
 				translateY: [0, 30],
 				opacity: [1, 0],
@@ -73,7 +73,7 @@ function ContextMenu(event, options) {
 	let x = event.clientX;
 	let y = event.clientY;
 	
-	contextMenuEl.attr("style", `--x: ${x}px; --y: ${y}px;`);
+	contextMenuOverlayEl.attr("style", `--x: ${x}px; --y: ${y}px;`);
 	
 	for(let menu of [contextMenuEl, ...contextMenuEl.els(".submenu")]) {
 		let boundingBox = menu.getBoundingClientRect();
