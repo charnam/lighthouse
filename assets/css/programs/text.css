@@ -12,13 +12,12 @@
 	position: absolute;
 }
 
-.messages-screen:before {
+#app-container:has(.wallpaper) .messages-screen::before {
 	content: "";
 	position: absolute;
 	z-index: -100;
-	opacity: 0.8;
-	inset: 6px;
-	background: var(--color-background-primary);
+	inset: 5px 2px;
+	background: #0003;
 	border-radius: 10px;
 }
 
