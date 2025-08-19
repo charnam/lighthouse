@@ -92,6 +92,15 @@
 	"pfp text"
 	"attachments attachments";
 }
+.message.is-first:has(.reply-to) {
+	grid-template-rows: auto auto auto auto;
+	grid-template-areas:
+	"reply reply"
+	"pfp name"
+	"pfp text"
+	"attachments attachments";
+}
+
 .message {
 	display: grid;
 	grid-template-columns: auto;
@@ -484,6 +493,7 @@
 	box-sizing: border-box;
 	display: inline-block;
 	font-size: 0.8em;
+	flex: none;
 }
 .typing-indicators .user {
 	display: inline-flex;
@@ -496,4 +506,76 @@
 }
 
 
+.replying-to {
+    display: flex;
+    justify-content: space-between;
+    background: var(--color-background-secondary);
+    margin: 5px;
+    border-radius: 8px;
+    align-items: center;
+    padding: 8px;
+}
 
+.replyto-leftside {
+    display: flex;
+	white-space: pre;
+}
+
+.replying-to .user-pfp {
+    display: none;
+}
+.replying-to .user-name {
+	margin: 0;
+}
+
+.cancel-reply {
+    height: 16px;
+	cursor: pointer;
+}
+
+
+
+.reply-to {
+	display: flex;
+	position: relative;
+	align-items: center;
+	height: 18px;
+	grid-area: reply;
+	padding-left: 16px;
+	padding-bottom: 8px;
+	overflow: visible;
+}
+
+.reply-to .user-name {
+	display: inline-flex;
+	margin-right: 5px;
+}
+
+.reply-to .user-pfp {
+	height: 100%;
+	width: unset;
+	aspect-ratio: 1 / 1;
+}
+
+.reply-to .user {
+	height: 100%;
+}
+
+.reply-to::before {
+	content: "";
+	width: 16px;
+	height: 8px;
+	border: 1px solid gray;
+	border-bottom: none;
+	border-right: none;
+	border-top-left-radius: 10px;
+	margin-top: 8px;
+	margin-right: 10px;
+	flex: none;
+}
+
+.reply-text {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

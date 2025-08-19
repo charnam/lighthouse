@@ -115,6 +115,25 @@ function TextProgram(session) {
 			.crel("img").addc("icon").attr("src", "/icons/upload.svg").prnt()
 			.crel("input").attr("type", "file").prnt();
 	
+	async function cancel_reply() {
+		let reply_to = doc.el(".replying-to")
+		if(reply_to)
+			reply_to.remove();
+	}
+	async function add_reply(message) {
+		cancel_reply();
+		message_box
+			.crelBefore("div").addc("replying-to").attr("messageid", message.messageid)
+				.crel("div").addc("replyto-leftside")
+					.txt("Replying to ")
+					.append(User(message.user, session))
+				.prnt()
+				.crel("div").addc("cancel-reply")
+					.crel("img").addc("icon").attr("src", "/icons/x-circle-fill.svg").prnt()
+					.on("click", () => cancel_reply())
+				.prnt()
+				
+	}	
 	async function add_attachment(file) {
 		
 		let attachmentEl = attachments_container
@@ -183,7 +202,14 @@ function TextProgram(session) {
 						return upload;
 					});
 					
-					session.program_interact({type: "send-message", text: event.target.value, attachments});
+					let replyTo = null;
+					
+					if(doc.el(".replying-to")) {
+						replyTo = doc.el(".replying-to").attr("messageid");
+						cancel_reply();
+					}
+					
+					session.program_interact({type: "send-message", text: event.target.value, attachments, replyTo});
 					event.target.value = "";
 					lastTypingIndicator = 0;
 					event.target.style.height = "";
@@ -369,6 +395,14 @@ function TextProgram(session) {
 									contextMenu.close();
 									editMessage(messageEl);
 								}
+							},
+							{
+								text: "Reply",
+								icon: "icons/forward.svg",
+								action: contextMenu => {
+									contextMenu.close();
+									add_reply(message);
+								}
 							}
 						])
 				})
@@ -378,6 +412,15 @@ function TextProgram(session) {
 					.crel("div").addc("message-text").prnt()
 				.prnt()
 		
+		if(message.replyTo)
+			messageEl
+				.remc("is-not-first").addc("is-first")
+				.prel("div").addc("reply-to")
+					.append(User(message.replyTo.user, session))
+					.crel("div").addc("reply-text")
+						.txt(message.replyTo.content)
+					.prnt()
+				.prnt()
 				
 		if(message.attachments.length > 0) {
 			let attachments_container = messageEl.crel("div").addc("attachments");

@@ -787,9 +787,16 @@ class StatedSession {
 										}
 									}
 									
+									let reply = null;
+									if(event.replyTo) {
+										reply = await this.db.get("SELECT * FROM messages WHERE messageid = ? AND programid = ?", [event.replyTo, this.currentProgram.programid]);
+										if(!reply)
+											reply = null; // let's be extra sure, so nothing spooky happens...
+									}
+									
 									await this.db.run(
-										`INSERT INTO messages (messageid, userid, programid, content, creation) VALUES (?,?,?,?,?)`,
-										[messageid, this.user.userid, this.currentProgram.programid, event.text, creation]
+										`INSERT INTO messages (messageid, userid, programid, content, creation, reply_to) VALUES (?,?,?,?,?,?)`,
+										[messageid, this.user.userid, this.currentProgram.programid, event.text, creation, reply ? reply.messageid : null]
 									);
 									
 									const newMessage = await Messages.get_message(this.db, `
