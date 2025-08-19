@@ -125,7 +125,7 @@ function configMenu(parent, config, action, session = null) {
 						imageUploadStyle += `\n--image: url('${image}');`
 						
 						let upload = await UploadFile({
-							fileInput: event.target,
+							file: event.target.files[0],
 							uploadType: imageUploadButton.attr("type"),
 							progress: (progress) => {
 								imageUploadButton.attr("style", `

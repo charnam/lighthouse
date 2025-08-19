@@ -925,7 +925,16 @@ class StatedSession {
 								if(event.fields.password2 !== event.fields.password)
 									return show_error_banner("Passwords do not match!");
 								
-								let username_validation = await Validation.validate_new_username(event.fields.username, this.db);
+								let username = event.fields.username;
+								
+								if(typeof username !== "string")
+									return show_error_banner("Username is not a string value.");
+								
+								let displayname = username;
+								
+								username = username.toLowerCase();
+								
+								let username_validation = await Validation.validate_new_username(username, this.db);
 								
 								if(username_validation.type !== "success")
 									return this.socket.emit('program-output', username_validation);
@@ -938,7 +947,7 @@ class StatedSession {
 								let userid = uuid();
 								let hashed_password = await bcrypt.hash(event.fields.password, 12);
 								
-								await this.db.run("INSERT INTO users (userid, username, password, displayname, creation, modification) VALUES (?,?,?,?,?,?)", [userid, event.fields.username, hashed_password, event.fields.username, Date.now(), Date.now()]);
+								await this.db.run("INSERT INTO users (userid, username, password, displayname, creation, modification) VALUES (?,?,?,?,?,?)", [userid, username, hashed_password, displayname, Date.now(), Date.now()]);
 								
 								let token = await create_token(this.db, userid, hashed_password);
 								

@@ -1,15 +1,15 @@
 
 async function uploadFile(input) {
 	//file, uploadType, progress
-	if(!input.fileInput)
-		throw new Error("fileInput is a required argument");
+	if(!input.file)
+		throw new Error("file is a required argument");
 	
 	if(!input.uploadType)
 		throw new Error("uploadType is a required argument");
 	
 	return new Promise(res => {
 		let formData = new FormData();
-		let file = input.fileInput.files[0];
+		let file = input.file;
 		
 		formData.append("uploadType", input.uploadType);
 		formData.append("file", file, file.name);

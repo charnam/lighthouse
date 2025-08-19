@@ -270,6 +270,9 @@ body {
 	min-width: 16px;
 	text-overflow: ellipsis;
 }
+.role-icons:empty {
+	display: none;
+}
 .user-name:has(.user-status:not(:empty)) {
 	flex-direction: column;
 	align-items: start;

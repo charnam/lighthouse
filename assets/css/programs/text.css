@@ -332,7 +332,7 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	width: 100%;
-	margin: 10px;
+	margin: 0 10px;
 }
 
 
@@ -342,7 +342,7 @@
 	flex: none;
 	grid-area: size;
 	opacity: 0.6;
-	margin: 10px;
+	margin: 0 10px;
 }
 
 .attachment a.filename:hover {
@@ -384,9 +384,29 @@
 	grid-area: player;
 	padding: 0 10px;
 	display: flex;
+	align-items: center;
+    gap: 5px;
 }
 .audio .player input[type="range"] {
 	width: 100%;
+	margin: 0;
+}
+.audio .player .pause-play-button {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: stretch;
+    justify-content: center;
+    flex: none;
+	cursor: pointer;
+}
+
+.audio .player .pause-play-button:active {
+	filter: brightness(0.7);
+}
+
+.audio .player .player-time {
+    font-family: monospace;
 }
 
 .attachment[type="application/zip"] > .icon {

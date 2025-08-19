@@ -115,11 +115,11 @@ function TextProgram(session) {
 			.crel("img").addc("icon").attr("src", "/icons/upload.svg").prnt()
 			.crel("input").attr("type", "file").prnt();
 	
-	upload_field.on("change", async (event) => {
+	async function add_attachment(file) {
 		
 		let attachmentEl = attachments_container
 			.crel("div").addc("attachment")
-				.attr("type", event.target.files[0].type)
+				.attr("type", file)
 				.attr("in-progress", "")
 				.crel("div").addc("icon").prnt()
 				.crel("div").addc("filename")
@@ -127,7 +127,7 @@ function TextProgram(session) {
 				.prnt()
 		
 		let upload = await UploadFile({
-			fileInput: event.target,
+			file,
 			uploadType: "attachment",
 			progress: (progress) => {
 				attachmentEl.attr("style", `
@@ -153,6 +153,10 @@ function TextProgram(session) {
 			attachmentEl.attr(upload.banner, upload.message);
 			setTimeout(() => attachmentEl.remove(), 5000);
 		}
+	}
+	
+	upload_field.on("change", async (event) => {
+		await add_attachment(event.target.files[0]);
 	})
 	
 	let lastTypingIndicator = 0;
@@ -191,6 +195,13 @@ function TextProgram(session) {
 				}
 			})
 	
+	main_input.on("paste", async event => {
+		if(!event.clipboardData.files) return;
+		
+		for(let file of event.clipboardData.files) {
+			add_attachment(file);
+		}
+	})
 	
 	let typing_indicators = text_container
 		.crel("div").addc("typing-indicators")
@@ -383,29 +394,92 @@ function TextProgram(session) {
 						.crel("div").addc("filesize").txt(getFormattedBytes(attachment.size)).prnt();
 				
 				if(attachment.mimetype.startsWith('image/')) {
+					attachmentEl.addc("image");
+					
 					attachmentEl
-						.addc("image")
-						.crel("img").attr("src", "/uploads/"+attachment.uploadid).addc("image");
+						.crel("img").addc("image")
+							.attr("src", "/uploads/"+attachment.uploadid);
 				}
 				if(attachment.mimetype.startsWith('audio/')) {
+					attachmentEl.addc("audio");
+					
+					const button_icons = {
+						play: "/icons/play-fill.svg",
+						pause: "/icons/pause-fill.svg"
+					}
+					
 					let audio = attachmentEl
-						.addc("audio")
-						.crel("audio").attr("src", "/uploads/"+attachment.uploadid).addc("audio");
+						.crel("audio").addc("audio")
+							.attr("src", "/uploads/"+attachment.uploadid);
 					
 					let playerEl = attachmentEl
 						.crel("div").addc("player");
 					
+					let playPauseButtonEl =
+						playerEl
+							.crel("div").addc("pause-play-button")
+								.crel("img").addc("icon")
+									.attr("src", button_icons.play)
+								.prnt()
+					
+					let playerTimeEl =
+						playerEl
+							.crel("div").addc("player-time")
+								.txt("00:00")
+								
 					let playerRangeEl =
 						playerEl
-							.crel("input").attr("type", "range")
-							.attr("min", "0")
-							.attr("max", "1")
-							.attr("value", "0")
-							.attr("step", "0.001")
+							.crel("input")
+								.attr("type", "range")
+								.attr("min", "0")
+								.attr("max", "1")
+								.attr("value", "0")
+								.attr("step", "0.001")
+					
+					let playerDurationEl =
+						playerEl
+							.crel("div").addc("player-time")
+								.txt("00:00")
 							
-					audio.addEventListener("timeupdate", () => {
-						playerRangeEl.value = audio.currentTime / audio.duration
-					})
+					playPauseButtonEl.on("click", () => {
+						if(audio.paused)
+							audio.play();
+						else
+							audio.pause();
+					});
+					
+					audio.on("playing", () => {
+						playPauseButtonEl.el("img").attr("src", button_icons.pause);
+					});
+					audio.on("pause", () => {
+						playPauseButtonEl.el("img").attr("src", button_icons.play);
+					});
+					
+					function formatTime(seconds) {
+						seconds = Math.round(seconds);
+						
+						let minutes = Math.floor(seconds / 60);
+						seconds = seconds % 60;
+						
+						minutes = String(minutes).padStart(2, "0");
+						seconds = String(seconds).padStart(2, "0");
+						
+						return minutes+":"+seconds;
+					}
+					
+					playerRangeEl.on("input", () => {
+						let newTime = audio.currentTime = playerRangeEl.value * audio.duration;
+						playerTimeEl.html("").txt(formatTime(newTime));
+					});
+					
+					audio.on("timeupdate", () => {
+						playerRangeEl.value = audio.currentTime / audio.duration;
+						playerTimeEl.html("").txt(formatTime(audio.currentTime));
+					});
+					
+					audio.on("loadedmetadata", () => {
+						playerDurationEl.html("").txt(formatTime(audio.duration));
+					});
 				}
 			}
 		}
