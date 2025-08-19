@@ -398,7 +398,7 @@ function TextProgram(session) {
 							},
 							{
 								text: "Reply",
-								icon: "icons/forward.svg",
+								icon: "icons/reply-fill.svg",
 								action: contextMenu => {
 									contextMenu.close();
 									add_reply(message);
