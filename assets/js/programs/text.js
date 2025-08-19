@@ -398,7 +398,15 @@ function TextProgram(session) {
 					
 					attachmentEl
 						.crel("img").addc("image")
-							.attr("src", "/uploads/"+attachment.uploadid);
+							.attr("src", "/uploads/"+attachment.uploadid+"/"+attachment.originalname);
+				}
+				if(attachment.mimetype.startsWith('video/')) {
+					attachmentEl.addc("image");
+					
+					attachmentEl
+						.crel("video").addc("image")
+							.attr("src", "/uploads/"+attachment.uploadid+"/"+attachment.originalname)
+							.attr("controls", "");
 				}
 				if(attachment.mimetype.startsWith('audio/')) {
 					attachmentEl.addc("audio");
