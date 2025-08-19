@@ -5,6 +5,7 @@
 @import url("general/contextmenu.css");
 @import url("general/reordering.css");
 @import url("general/notifications.css");
+@import url("general/responsiveness.css");
 
 @import url("programs/friends.css");
 @import url("programs/login.css");
@@ -115,14 +116,12 @@ body {
 	top: 0;
 	width: 100vw;
 	height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 #app-container {
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100vw;
-	height: 100vh;
+	height: 100%;
 	background: var(--color-background-primary);
 }
 
@@ -355,23 +354,3 @@ input[type="text"] :-webkit-placeholder, input[type="password"] :placeholder, te
 	width: 100% !important;
 }
 
-@media (max-width: 800px) {
-	body:before {
-		content: "This window is not wide enough, and support for smaller screens has not been added yet. If you are on a phone, try rotating it sideways. A more fully-featured version of this app for smaller screens will be added soon.";
-		position: fixed;
-		left: 0;
-		top: 0;
-		width: 100vw;
-		height: 100vh;
-		padding: 30px;
-		box-sizing: border-box;
-		text-align: center;
-		display: flex;
-		align-items: center;
-		z-index: 1000;
-		background: var(--color-background-primary);
-	}
-	#app-container {
-		display: none;
-	}
-}

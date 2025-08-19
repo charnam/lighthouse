@@ -1,0 +1,59 @@
+#titlebar-container {
+	display: none;
+	justify-content: space-between;
+	padding: 10px;
+	border-bottom: 1px solid #fff2;
+	background: #0005;
+}
+
+@media (max-width: 900px) {
+	body:not(:has(#responsive-groups-sidebar-toggle:checked)) :is(#all-groups-container, #group-programs-container) {
+		display: none;
+	}
+	body:not(:has(#responsive-members-sidebar-toggle:checked)) #program-members-container {
+		display: none;
+	}
+	body:has(.responsive-sidebar-toggle:checked) #current-program-container {
+		display: none;
+	}
+	
+	body:not(:has(#program-members-container)) #responsive-members-sidebar-toggle {
+		visibility: hidden;
+	}
+	
+	#current-group-container {
+		justify-content: center;
+	}
+	.sidebar {
+		width: calc(100% - 10px);
+		box-sizing: border-box;
+		margin: 0;
+	}
+	#titlebar-container {
+		display: flex;
+	}
+	body:has(.responsive-sidebar-toggle:checked) .responsive-sidebar-toggle:not(:checked) {
+		visibility: hidden;
+	}
+}
+
+@media (max-width: 200px) {
+	body:before {
+		content: "This window is not wide enough, and support for smaller screens has not been added yet. If you are on a phone, try rotating it sideways. A more fully-featured version of this app for smaller screens will be added soon.";
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100vw;
+		height: 100vh;
+		padding: 30px;
+		box-sizing: border-box;
+		text-align: center;
+		display: flex;
+		align-items: center;
+		z-index: 1000;
+		background: var(--color-background-primary);
+	}
+	#app-container {
+		display: none;
+	}
+}

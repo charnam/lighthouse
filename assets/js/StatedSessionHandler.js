@@ -348,13 +348,18 @@ class StatedSessionHandler {
 		
 	}
 	
+	set_title(title) {
+		document.title = title;
+		doc.el("#titlebar-title").html("").txt(title);
+	}
+	
 	sync_program(program) {
 		this.socket.off("program-output");
 		this.currentProgram = program;
 		
 		doc.els('.program.open').forEach(programButton => programButton.remc("open"));
 		
-		if(program == null) return document.title = "...";
+		if(program == null) return this.set_title("...");
 		
 		doc.el("#current-program-container").html("")
 		animations.programIn();
@@ -364,8 +369,10 @@ class StatedSessionHandler {
 			programButton.addc("open");
 		
 		if(program.title) {
-			document.title = program.title;
+			this.set_title(program.title);
 		}
+		
+		doc.els(".responsive-sidebar-toggle").forEach(el => el.checked = false);
 		
 		let membersSidebar = doc.el("#program-members-container");
 		if(membersSidebar) membersSidebar.remove();
@@ -496,6 +503,13 @@ class StatedSessionHandler {
 		
 		
 		doc.el("#app").html("")
+			.crel("div").sid("titlebar-container")
+				.crel("input").attr("type", "checkbox").sid("responsive-groups-sidebar-toggle").addc("responsive-sidebar-toggle")
+				.prnt()
+				.crel("div").sid("titlebar-title").txt("Loading").prnt()
+				.crel("input").attr("type", "checkbox").sid("responsive-members-sidebar-toggle").addc("responsive-sidebar-toggle")
+				.prnt()
+			.prnt()
 			.crel("div").sid("app-container")
 				.crel("div").sid("all-groups-container")
 					.crel("div").sid("home-group-container")
