@@ -31,6 +31,8 @@
 .profile-page .user-name {
 	flex-direction: column;
 	justify-content: center;
+	display: flex;
+	align-items: start;
 }
 
 .profile-page .user-name-text {
