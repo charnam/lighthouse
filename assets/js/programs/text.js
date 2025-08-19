@@ -387,6 +387,26 @@ function TextProgram(session) {
 						.addc("image")
 						.crel("img").attr("src", "/uploads/"+attachment.uploadid).addc("image");
 				}
+				if(attachment.mimetype.startsWith('audio/')) {
+					let audio = attachmentEl
+						.addc("audio")
+						.crel("audio").attr("src", "/uploads/"+attachment.uploadid).addc("audio");
+					
+					let playerEl = attachmentEl
+						.crel("div").addc("player");
+					
+					let playerRangeEl =
+						playerEl
+							.crel("input").attr("type", "range")
+							.attr("min", "0")
+							.attr("max", "1")
+							.attr("value", "0")
+							.attr("step", "0.001")
+							
+					audio.addEventListener("timeupdate", () => {
+						playerRangeEl.value = audio.currentTime / audio.duration
+					})
+				}
 			}
 		}
 		if(!message.seenBy.includes(session.user.userid)) {

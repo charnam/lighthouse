@@ -88,7 +88,11 @@ function render_user(rendered_user, session = false) {
 					relationshipButton =
 						{
 							text: "Friend request",
-							icon: "icons/person-plus-fill.svg"
+							icon: "icons/person-plus-fill.svg",
+							action: (contextMenu) => {
+								contextMenu.close();
+								session.general_interact({type: "friend-request", userid: rendered_user.userid});
+							}
 						};
 				
 				let addRoleSubmenu = null;

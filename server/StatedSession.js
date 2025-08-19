@@ -80,7 +80,7 @@ class StatedSession {
 			SELECT programs.programid, name, type, position, latest_read_time IS NOT NULL AS unread
 			FROM programs
 			LEFT JOIN (
-				SELECT messages.programid, MAX(read_indicators.creation) AS latest_read_time
+				SELECT messages.programid, COALESCE(MAX(read_indicators.creation), 0) AS latest_read_time
 				FROM messages
 				LEFT JOIN read_indicators
 				ON messages.messageid = read_indicators.messageid
@@ -1553,6 +1553,10 @@ class StatedSession {
 					
 					await this.db.run("INSERT INTO friend_requests (requestor, requestee) VALUES (?, ?)", [this.user.userid, requestUser.userid]);
 					
+					await GlobalState.refresh_notification(this, {
+						type: "friend_request",
+						to: requestUser.userid
+					});
 				}
 				break;
 			case "open-dm":

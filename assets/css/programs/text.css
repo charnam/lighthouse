@@ -372,6 +372,23 @@
 	display: none;
 }
 
+.attachment.audio {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto auto;
+	grid-template-areas:
+		"icon filename size"
+		"icon player player";
+}
+.attachment.audio .player {
+	grid-area: player;
+	padding: 0 10px;
+	display: flex;
+}
+.audio .player input[type="range"] {
+	width: 100%;
+}
+
 .attachment[type="application/zip"] > .icon {
 	background-image: url("/icons/file-earmark-zip-fill.svg");
 }
