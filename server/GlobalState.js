@@ -99,6 +99,9 @@ class GlobalState {
 			
 			if(Array.isArray(session.friends) && session.friends.some(friend => friend.userid == userid))
 				await session.refresh_friends();
+			
+			//if(session.user.userid == userid) TODO
+				//await session.refresh_user();
 		}
 	}
 	
