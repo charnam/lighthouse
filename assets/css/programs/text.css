@@ -128,6 +128,7 @@
 
 .message.is-first .message-text {
 	margin-left: var(--text-message-spacing-from-pfp);
+	grid-area: text;
 }
 .message.is-first .message-time {
 	grid-area: time;
