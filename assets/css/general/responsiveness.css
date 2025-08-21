@@ -1,9 +1,7 @@
 #titlebar-container {
 	display: none;
-	justify-content: space-between;
-	padding: 10px;
-	border-bottom: 1px solid #fff2;
-	background: #0005;
+	user-select: none;
+	font-style: italic;
 }
 
 @keyframes fadein {
@@ -63,7 +61,7 @@
 		transform: translateX(-20px);
 	}
 	
-	body:not(:has(#program-members-container)) #responsive-members-sidebar-toggle {
+	body:not(:has(#program-members-container)) .responsive-sidebar-toggle-container:has(#responsive-members-sidebar-toggle) {
 		visibility: hidden;
 	}
 	
@@ -77,10 +75,40 @@
 	}
 	#titlebar-container {
 		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1px solid #fff2;
+		background: #0005;
 	}
-	body:has(.responsive-sidebar-toggle:checked) .responsive-sidebar-toggle:not(:checked) {
-		visibility: hidden;
+	.responsive-sidebar-toggle-container {
+		transition: 0.2s ease-out;
+		transition-property: transform, opacity;
+		opacity: 0.5;
+		transform: scale(0.9);
 	}
+	
+	body:has(.responsive-sidebar-toggle:checked) .responsive-sidebar-toggle-container:has(.responsive-sidebar-toggle:not(:checked)) {
+		transform: scale(0);
+		opacity: 0;
+		pointer-events: none;
+	}
+	
+	.responsive-sidebar-toggle-container label {
+		display: flex;
+		height: 24px;
+		width: 24px;
+		padding: 10px;
+		cursor: pointer;
+	}
+	.responsive-sidebar-toggle-container:has(.responsive-sidebar-toggle:checked) {
+		opacity: 1;
+		transform: scale(1);
+	}
+	.responsive-sidebar-toggle {
+		display: none;
+	}
+	
+	
 	.context-menu-overlay {
 		background: #0005;
 		animation: fadein 0.2s ease-out;
