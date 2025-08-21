@@ -368,7 +368,7 @@
 .attachment.image {
 	max-width: min(90vw, 480px);
 	max-height: min(90vh, 480px);
-	display: grid;
+	display: inline-grid;
 	grid-template-columns: auto 1fr auto;
 	grid-template-rows: 1fr auto;
 	grid-template-areas:
