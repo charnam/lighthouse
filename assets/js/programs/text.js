@@ -377,6 +377,8 @@ function TextProgram(session) {
 						evt.target.classList.contains("message-content") ||
 						evt.target.classList.contains("message") ||
 						evt.target.classList.contains("message-text") ||
+						evt.target.classList.contains("reply-to") ||
+						evt.target.classList.contains("reply-text") ||
 						evt.target.classList.contains("attachments") ||
 						evt.target.classList.contains("message-time"))
 						ContextMenu(evt, [

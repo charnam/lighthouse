@@ -73,6 +73,7 @@
 
 .sender .user-name {
 	user-select: none;
+	margin-left: 0;
 }
 
 .sender .user {
@@ -89,7 +90,7 @@
 	grid-template-areas:
 	"pfp name time"
 	"pfp text text"
-	"attachments attachments attachments";
+	"pfp attachments attachments";
 }
 .message.is-first:has(.reply-to) {
 	grid-template-rows: auto auto auto auto;
@@ -97,41 +98,33 @@
 	"reply reply reply"
 	"pfp name time"
 	"pfp text text"
-	"attachments attachments attachments";
+	"pfp attachments attachments";
 }
 
 .message {
 	display: grid;
-	grid-template-columns: auto;
+	grid-template-columns: auto 1fr;
 	grid-template-rows: auto auto;
 	grid-template-areas:
-	"text"
-	"attachments";
+	"time text"
+	"time attachments";
 }
 
 .message .attachments {
 	grid-area: attachments;
-	margin-left: 48px;
 }
 
-.message .user .user-pfp {
+.message > .sender .user-pfp {
 	grid-area: pfp;
+	width: 40px;
+	margin-right: var(--text-message-spacing-from-pfp);
 }
 .message .user .user-pfp:after {
 	display: none !important;
 }
 
-.message.is-first .message-content {
-	/*margin-left: var(--text-message-spacing-from-pfp);*/
-	display: contents;
-}
-
-.message.is-first .message-text {
-	margin-left: var(--text-message-spacing-from-pfp);
+.message-text {
 	grid-area: text;
-}
-.message.is-first .message-time {
-	grid-area: time;
 }
 
 .messages-screen .message-box {
@@ -178,12 +171,13 @@
 }
 
 .message-content {
-	display: flex;
 	width: 100%;
 	white-space: pre-wrap;
 	overflow-wrap: anywhere;
+	display: contents;
 }
 .message-time {
+	grid-area: time;
 	width: 40px;
 	display: inline-block;
 	padding-right: 8px;
@@ -218,6 +212,7 @@
 	width: 100%;
 	display: flex;
 	flex-direction: column;
+	grid-area: text;
 }
 
 .message-editor textarea {
@@ -550,6 +545,7 @@
 	padding-left: 16px;
 	padding-bottom: 8px;
 	overflow: visible;
+	user-select: none;
 }
 
 .reply-to .user-name {
@@ -565,6 +561,7 @@
 
 .reply-to .user {
 	height: 100%;
+	max-width: 100%;
 }
 
 .reply-to::before {
