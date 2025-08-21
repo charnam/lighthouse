@@ -21,7 +21,8 @@
 	#program-members-container,
 	.responsive-sidebar-toggle,
 	#current-program-container {
-		transition: opacity 0.2s ease-in-out;
+		transition: 0.2s ease-in-out;
+		transition-property: opacity, transform, width, padding;
 	}
 	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #group-programs-container,
 	body:not(:has(#responsive-members-sidebar-toggle:checked)) #program-members-container,
@@ -29,9 +30,20 @@
 		opacity: 0 !important;
 		pointer-events: none;
 		position: absolute;
+		transform: var(--movement) !important;
+	}
+	#group-programs-container {
+		--movement: translateX(-40px);
+		transform-origin: left;
+	}
+	#program-members-container {
+		--movement: translateX(40px);
+		transform-origin: right;
 	}
 	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #all-groups-container {
-		display: none;
+		width: 0px;
+		padding: 0px;
+		opacity: 0 !important;
 	}
 	
 	#current-program-container {
