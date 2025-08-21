@@ -204,7 +204,7 @@
 }
 
 .message:has(.message-text:empty):not(:has(.message-editor)) .user-name {
-	height: 40px;
+	/*height: 40px;*/
 }
 .message:has(.message-text:empty):not(:has(.message-editor)) .message-content {
 	height: 0;
