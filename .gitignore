@@ -1,14 +1,13 @@
 
+# Lighthouse directories
+cache/
 config/
-etc/
-tools/
-assets/icons/
-assets/css/fonts/
 
+# Node.JS
+server/node_modules/
+package-lock.json
+
+# VSCode / VSCodium
 .termdbms/
 .vscode/
 workspace.code-workspace
-
-server/node_modules/
-package-lock.json
-cache/
