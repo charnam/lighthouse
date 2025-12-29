@@ -88,7 +88,7 @@
 	height: 50%;
 	aspect-ratio: 1 / 1;
 }
-.group::before {
+.group:not(#notifications-group)::before {
 	content: "";
 	border-radius: 50%;
 	position: absolute;
