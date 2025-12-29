@@ -12,12 +12,13 @@ function createWallpaper(image) {
 			)
 }
 function removeWallpapers() {
-	doc.els(".wallpaper").forEach(wallpaper =>
+	doc.els(".wallpaper").forEach(wallpaper => {
+		wallpaper.addc("hidden");
 		wallpaper.anim({
 			opacity: [0.25, 0],
 			duration: 200
 		}).onfinish(() => wallpaper.remove())
-	);
+	});
 }
 
 export default {

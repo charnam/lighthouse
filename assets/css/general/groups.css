@@ -88,6 +88,19 @@
 	height: 50%;
 	aspect-ratio: 1 / 1;
 }
+.group::before {
+	content: "";
+	border-radius: 50%;
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	width: 5px;
+	height: 5px;
+	z-index: 100;
+}
+.group:not(.open).unread::before {
+	background: #fff9;
+}
 
 .sidebar {
 	width: 230px;

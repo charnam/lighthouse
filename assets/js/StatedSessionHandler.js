@@ -701,6 +701,9 @@ class StatedSessionHandler {
 					})
 					.crel("img").addc("icon").attr("src", "/icons/people-fill.svg").prnt()
 			
+			if(group.unread)
+				groupEl.addc("unread");
+				
 			if(this.currentGroup.groupid == group.groupid)
 				groupEl.addc("open");
 			

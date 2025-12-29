@@ -4,12 +4,22 @@
 	height: 100%;
 }
 
-.settings-container {
+.roles-manager .settings-container {
 	width: 100%;
 	background: var(--color-background-secondary);
 	margin: 5px;
 	border-radius: 8px;
 	border: 1px solid gray;
+}
+.roles-manager .settings-container:empty::after {
+	content: "Click the small plus on the left side to add a new role";
+	font-style: italic;
+	color: #fff8;
+}
+.roles-manager .settings-container:empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .roles-list {

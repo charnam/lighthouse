@@ -1532,6 +1532,8 @@ class StatedSession {
 		
 		if(this.currentGroup && !this.currentGroup.special)
 			this.refresh_group();
+		
+		this.refresh_groups();
 	}
 	
 	async general_interaction(event) {

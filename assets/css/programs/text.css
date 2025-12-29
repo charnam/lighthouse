@@ -12,13 +12,17 @@
 	position: absolute;
 }
 
-#app-container:has(.wallpaper) .messages-screen::before {
+.messages-screen::before {
 	content: "";
 	position: absolute;
 	z-index: -100;
 	inset: 5px 2px;
-	background: #0003;
+	background: #0000;
 	border-radius: 10px;
+	transition: background-color 0.2s ease-in-out;
+}
+#app-container:has(.wallpaper:not(.hidden)) .messages-screen::before {
+	background-color: #0003;
 }
 
 .messages-screen .messages {
