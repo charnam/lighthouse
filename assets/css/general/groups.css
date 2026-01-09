@@ -3,7 +3,7 @@
 	width: 64px;
 	height: 100%;
 	flex: none;
-	padding: 6px;
+	padding: 0px;
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
@@ -12,19 +12,22 @@
 #home-group-container {
 	border-bottom: 1px solid var(--separator-color-primary);
 	flex: none;
+	margin: 6px;
+	margin-bottom: 0;
 }
 
 #system-groups-container {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
-	padding: 10px;
+	padding: 16px;
 	padding-top: 5px;
 }
 #groups-container {
 	height: 100%;
 	overflow-y: auto;
 	padding-top: 6px;
+	padding: 6px;
 }
 
 #user-group .user-pfp {
@@ -54,7 +57,6 @@
 	align-items: center;
 	cursor: pointer;
 	position: relative;
-	overflow: hidden;
 	transition: outline 0.2s ease-out;
 	outline: 1px solid transparent;
 	outline-offset: -1px;
@@ -88,18 +90,43 @@
 	height: 50%;
 	aspect-ratio: 1 / 1;
 }
+/* groups.css | https://lighthouse.lunarsphere.net/css/general/groups.css */
+
+@keyframes group-unread-pulsate {
+	0%, 10% {
+		outline-offset: 0px;
+		outline-width: 0px;
+		outline-color: #fff0;
+	}
+	50% {
+		outline-offset: 2px;
+		outline-width: 2px;
+		outline-color: #fff8;
+	}
+	90%, 100% {
+		outline-offset: 5px;
+		outline-width: 0px;
+		outline-color: #fff0;
+	}
+}
+
 .group:not(#notifications-group)::before {
 	content: "";
 	border-radius: 50%;
 	position: absolute;
-	left: 5px;
-	top: 5px;
-	width: 5px;
-	height: 5px;
+	left: 0px;
+	top: 0px;
+	width: 8px;
+	height: 8px;
 	z-index: 100;
+	border: 1px solid transparent;
+	box-sizing: border-box;
 }
-.group:not(.open).unread::before {
-	background: #fff9;
+.group.unread::before {
+	background: #999;
+	border-color: #0009 !important;
+	outline: 1px solid #fff;
+	animation: group-unread-pulsate 1s ease-out infinite;
 }
 
 .sidebar {
