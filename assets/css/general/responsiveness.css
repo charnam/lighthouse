@@ -175,6 +175,16 @@
 	.release-info {
 		display: none !important;
 	}
+	
+	.messages-screen .typing-indicators {
+		order: 1;
+	}
+	.messages-screen .message-box {
+		order: 2;
+	}
+	.messages-screen .messages {
+		padding-bottom: 0;
+	}
 }
 
 @media (max-width: 370px) {
