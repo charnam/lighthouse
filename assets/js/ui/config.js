@@ -249,7 +249,12 @@ function configMenu(parent, config, action, session = null) {
 							.txt("Log out")
 							.attr('type', 'button')
 							.on("click", function(evt){
-								document.cookie = "do_not_send_your_token_to_anyone=loggedout; path=/";
+								var now = new Date();
+								var time = now.getTime();
+								var expireTime = time + 1000*36000;
+								now.setTime(expireTime);
+								
+								document.cookie = "do_not_send_your_token_to_anyone=loggedout; expires="+now.toUTCString()+"; path=/";
 								session.socket.disconnect();
 								session.socket.connect();
 							})
