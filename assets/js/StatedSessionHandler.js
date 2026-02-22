@@ -36,6 +36,8 @@ class StatedSessionHandler {
 		
 		if(hash.startsWith("#/")) {
 			const hashParts = hash.split("/");
+			if(hashParts[1] == "special:registration") return;
+			
 			if(hashParts[1] !== this.currentGroup.groupid) {
 				await this.join_group(hashParts[1], hashParts[2]);
 			} else if(hashParts[2] !== this.currentProgram.programid) {

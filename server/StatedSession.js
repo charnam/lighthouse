@@ -855,6 +855,7 @@ class StatedSession {
 					login: () => {
 						this.sync_program(
 							{
+								programid: "special:login",
 								type: "settings",
 								title: "Log in",
 								config: {
@@ -903,6 +904,7 @@ class StatedSession {
 					signup: () => {
 						this.sync_program(
 							{
+								programid: "special:signup",
 								type: "settings",
 								title: "Sign up",
 								config: {

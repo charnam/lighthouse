@@ -171,6 +171,10 @@
 		padding-top: 10px;
 		padding-left: 40px;
 	}
+	
+	.release-info {
+		display: none !important;
+	}
 }
 
 @media (max-width: 370px) {
