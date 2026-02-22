@@ -15,6 +15,7 @@ const userLogin = require("authentication/userLogin.js");
 const StatedSession = require("StatedSession.js");
 const Upload = require("Upload.js");
 const Permissions = require("authentication/permissions.js");
+const Settings = require('variables/enums/settings.js');
 
 function mkdirSilent(dirname) {
 	if(!fs.existsSync(dirname))
@@ -71,6 +72,15 @@ async function main() {
 		res.send(
 			`
 				export default ${JSON.stringify(Permissions.ByName)};
+			`
+			.trim()
+		);
+	});
+	expressApp.get('/js/variables/settings.js', (req, res) => {
+		res.type('text/javascript');
+		res.send(
+			`
+				export default ${JSON.stringify(Settings.ByName)};
 			`
 			.trim()
 		);

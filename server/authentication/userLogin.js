@@ -1,6 +1,6 @@
 const cookieParser = require('cookie');
 
-async function login(db, cookie) {
+async function userLogin(db, cookie) {
 	if(!cookie) return false;
 	let cookies = cookieParser.parse(cookie);
 	let token = cookies.do_not_send_your_token_to_anyone;
@@ -18,4 +18,4 @@ async function login(db, cookie) {
 	return user;
 }
 
-module.exports = login;
+module.exports = userLogin;

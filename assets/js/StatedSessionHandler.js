@@ -23,9 +23,26 @@ class StatedSessionHandler {
 	currentGroup = null
 	currentProgram = null
 	
-	
 	user = null
 	groups = null
+	
+	_currentWindowHash = null;
+	async check_window_hash() {
+		if(this._currentWindowHash == window.location.hash) return;
+		if(!this.socket.connected) return;
+		
+		const hash = window.location.hash;
+		this._currentWindowHash = hash;
+		
+		if(hash.startsWith("#/")) {
+			const hashParts = hash.split("/");
+			if(hashParts[1] !== this.currentGroup.groupid) {
+				await this.join_group(hashParts[1], hashParts[2]);
+			} else if(hashParts[2] !== this.currentProgram.programid) {
+				await this.join_program(hashParts[2]);
+			}
+		}
+	}
 	
 	sync_group(group) {
 		this.socket.off("group-output");
@@ -372,6 +389,8 @@ class StatedSessionHandler {
 			this.set_title(program.title);
 		}
 		
+		window.location.hash = this._currentWindowHash = "#/"+this.currentGroup.groupid+"/"+this.currentProgram.programid;
+		
 		doc.els(".responsive-sidebar-toggle").forEach(el => el.checked = false);
 		
 		let membersSidebar = doc.el("#program-members-container");
@@ -461,16 +480,15 @@ class StatedSessionHandler {
 		}
 	}
 	
-	join_group(id) {
+	join_group(groupid, programid) {
 		return new Promise(async res => {
 			
 			await animations.groupOut();
 			
-			this.socket.emit("group-open", id);
+			this.socket.emit("group-open", groupid, programid);
 			
 			// all groups will automatically open a placeholder program
 			this.socket.once("program-open", res);
-			
 		});
 	}
 	
@@ -658,7 +676,12 @@ class StatedSessionHandler {
 			if(info.user)
 				this.user = info.user;
 			
+			this.check_window_hash();
 		});
+		
+		socket.on("user-update", (user) => {
+			this.user = user;
+		})
 		
 		this.socket.on("log-in", (token) => {
 			document.cookie = "do_not_send_your_token_to_anyone="+token+"; path=/";
@@ -668,8 +691,10 @@ class StatedSessionHandler {
 		
 		this.socket.on("disconnect", () => {
 			animations.appOut();
-			doc.el("#app-container")
+			doc.el("#titlebar-title").html("Disconnected...");
 		});
+		
+		window.addEventListener("hashchange", () => this.check_window_hash());
 		
 		this.notifications = new NotificationHandler(this);
 	}

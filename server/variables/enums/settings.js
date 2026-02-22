@@ -1,0 +1,30 @@
+const enums = require("helpers/enums.js");
+
+const settings = enums.make_bitmask(
+	"USER_HAS_SETTINGS_V1",
+	"SHOW_READ_INDICATORS",
+	"SHOW_WHEN_TYPING",
+	"MESSAGE_CHIMES",
+	"NOTIFICATION_SOUNDS",
+	"GROUP_NOTIFICATION_SOUNDS",
+	"RECEIVE_NOTIFICATIONS_FROM_GROUPS",
+	"HIDE_ACTIVITY",
+	"JOIN_MESSAGE_NOTIFICATIONS_TOGETHER",
+	"JOIN_INVITE_NOTIFICATIONS_TOGETHER",
+)
+
+class Settings {
+	static ByName = settings;
+	
+	static DEFAULT_SETTINGS =
+		settings.USER_HAS_SETTINGS_V1 |
+		settings.SHOW_READ_INDICATORS |
+		settings.SHOW_WHEN_TYPING |
+		settings.MESSAGE_CHIMES |
+		settings.NOTIFICATION_SOUNDS |
+		settings.JOIN_MESSAGE_NOTIFICATIONS_TOGETHER |
+		settings.JOIN_INVITE_NOTIFICATIONS_TOGETHER |
+		settings.GROUP_NOTIFICATION_SOUNDS;
+}
+
+module.exports = Settings;

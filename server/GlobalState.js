@@ -56,7 +56,7 @@ class GlobalState {
 					
 					if(session.currentProgram && session.currentProgram.programid == message.programid) {
 						// give the client some time to read the message
-						setTimeout(() => session.refresh_notifications().catch(err => console.error(err)), 2000);
+						setTimeout(() => session.refresh_notifications().catch(err => console.error(err)), 5000);
 					} else {
 						session.refresh_notifications();
 					}
@@ -100,8 +100,8 @@ class GlobalState {
 			if(Array.isArray(session.friends) && session.friends.some(friend => friend.userid == userid))
 				await session.refresh_friends();
 			
-			//if(session.user.userid == userid) TODO
-				//await session.refresh_user();
+			if(session.user.userid == userid)
+				await session.refresh_user();
 		}
 	}
 	

@@ -4,6 +4,8 @@ import MembersSidebar from "../ui/membersSidebar.js";
 import ContextMenu from "../ui/contextmenu.js";
 import UploadFile from "../ui/upload.js";
 
+import Settings from "../variables/settings.js";
+
 const messageReceiveSound = new Audio();
 messageReceiveSound.src = "/audio/message-receive.mp3";
 
@@ -632,14 +634,16 @@ function TextProgram(session) {
 			delete typing_users[event.user.userid];
 			check_typing();
 			
-			let sound;
-			if(event.user.userid == session.user.userid) {
-				sound = messageSendSound.cloneNode(true);
-			} else {
-				sound = messageReceiveSound.cloneNode(true);
+			if(session.user.settings & Settings.MESSAGE_CHIMES) {
+				let sound;
+				if(event.user.userid == session.user.userid) {
+					sound = messageSendSound.cloneNode(true);
+				} else {
+					sound = messageReceiveSound.cloneNode(true);
+				}
+				sound.play();
+				sound.onended = () => sound.remove();
 			}
-			sound.play();
-			sound.onended = () => sound.remove();
 		}
 		if(event.type == "load") {
 			loadMessages(doc.el(".load-wrapper[offset=\""+event.offset+"\"]"), event.messages);

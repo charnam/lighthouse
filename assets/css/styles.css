@@ -24,6 +24,7 @@
 }
 * {
 	outline: none;
+	-webkit-tap-highlight-color: transparent;
 }
 
 ::-webkit-scrollbar {
@@ -32,8 +33,20 @@
 
 body {
 	background: var(--color-background-primary);
-	font-family: Arimo;
+	font-family: "DM Sans", Helvetica, Arial, sans-serif;
+	
+	--device-safe-area-top: env(safe-area-inset-top, 0);
+	--device-safe-area-bottom: env(safe-area-inset-bottom, 0);
+	--device-safe-area-left: env(safe-area-inset-left, 0);
+	--device-safe-area-right: env(safe-area-inset-right, 0);
 }
+#app {
+	--safe-area-top-full: var(--device-safe-area-top);
+	--safe-area-bottom-full: var(--device-safe-area-bottom);
+	--safe-area-left-full: var(--device-safe-area-left);
+	--safe-area-right-full: var(--device-safe-area-right);
+}
+
 @keyframes loading-ball-sizing {
 	
 	0% {
@@ -112,10 +125,7 @@ body {
 
 #app {
 	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100vw;
-	height: 100vh;
+	inset: 0;
 	display: flex;
 	flex-direction: column;
 }
@@ -136,6 +146,7 @@ body {
 	padding: 32px;
 	box-sizing: border-box;
 	opacity: 0.8;
+	pointer-events: none;
 }
 
 .wallpaper,
@@ -146,6 +157,8 @@ body {
 	object-fit: cover;
 	filter: blur(8px);
 	z-index: -100;
+	left: 0;
+	top: 0;
 }
 #app-container:before {
 	content: "";
@@ -319,17 +332,18 @@ input[type="submit"], input[type="reset"], button {
 	font-size: 0.9em;
 	border: none;
 	border-radius: 6px;
-	/*box-shadow: inset 0 -3px 5px -2px #0005, inset 0 8px 5px -2px #fff5;*/
-	text-shadow: 0 1px #fff8;
+	text-shadow: 0 1px 1px #fff8;
 	transition: filter var(--quick-transition);
 	filter: brightness(1);
 	cursor: pointer;
 	color: var(--color-button-text-primary);
+	box-shadow: inset 0 0 0px 1px #ccc, 0 5px 5px #0003;
 }
 button:not(.primary), input[type="reset"] {
 	background: var(--color-button-secondary);
 	color: var(--color-button-text-secondary);
 	text-shadow: 0 1px #0008;
+	box-shadow: inset 0 0 0px 1px #0009, 0 5px 5px #0003;
 }
 input[type="submit"]:hover, button:hover, input[type="reset"]:hover {
 	filter: brightness(0.9);
@@ -341,6 +355,7 @@ input[type="text"], input[type="password"], textarea {
 	border-radius: 6px;
 	color: inherit;
 	font-family: inherit;
+	font-size: inherit;
 	border: none;
 	/*outline: 3px solid #0005;*/
 }

@@ -50,7 +50,7 @@ function configMenu(parent, config, action, session = null) {
 						.attr("type", "checkbox")
 						.attr("name", configItem.name);
 					
-					if(config.defaults[configItem.name] != undefined)
+					if(config.defaults[configItem.name])
 						input.attr("checked", "true");
 					
 					break;
@@ -274,7 +274,7 @@ function configMenu(parent, config, action, session = null) {
 	
 	let saveButtonContainer =
 		configFormEl.crel("div").addc("config-save-button-container")
-			.crel("label").txt("You've made changes. Do you want to save them?").prnt()
+			.crel("label").txt("Save changes?").prnt()
 			.crel("div").addc("config-save-button-buttons")
 				.crel("input").attr("type", "submit").attr("value", "Yes").prnt()
 				.crel("input").attr("type", "reset").attr("value", "Undo Changes").prnt()

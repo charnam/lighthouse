@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const uuid = require("uuid").v4;
 const Validation = require("authentication/Validation.js");
 const Permissions = require("authentication/permissions.js");
+const Settings = require("variables/enums/settings.js");
 const create_token = require("authentication/create_token.js");
 const logger = require("helpers/logger.js");
 const Reorder = require("helpers/reorder.js");
@@ -103,14 +104,14 @@ class StatedSession {
 		
 	}
 	
-	async join_group(id) {
+	async join_group(id, should_join_default) {
 		if(!id) return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Group ID is not a string value");
 		
 		if(this.user == null && id !== "special:registration") return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Logged-out user attempted to open restricted group 'settings'");
 		
 		if(id.startsWith("special:")) {
 			id = id.slice(8);
-			await this.join_special_group(id);
+			await this.join_special_group(id, should_join_default);
 		} else {
 			if(!await this.permissions.in_group(id))
 				return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "User attempted to open a group without permission");
@@ -226,10 +227,11 @@ class StatedSession {
 					case "open_program":
 						let program = await this.db.get("SELECT programid FROM programs WHERE programid = ? AND groupid = ?", [event.programid, this.currentGroup.groupid]);
 						
-						if(program !== null)
+						if(program) {
 							this.join_program(program.programid);
-						else
+						} else {
 							return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to join program ID which is not part of the current group");
+						}
 						
 						break;
 					case "add_program":
@@ -550,18 +552,14 @@ class StatedSession {
 						break;
 				}
 				
-				if(event.type == "edit") {
-					
-				}
-				if(event.type == "add_program") {
-					
-				}
-				
 			});
 			
-			let joinable_programs = this.currentGroup.programs.filter(program => program.type !== "separator");
-			if(joinable_programs.length > 0) await this.join_program(joinable_programs[0].programid);
-			
+			if(this.currentGroup.programs.some(program => program.programid == should_join_default)) {
+				await this.join_program(should_join_default);
+			} else {
+				let joinable_programs = this.currentGroup.programs.filter(program => program.type !== "separator");
+				if(joinable_programs.length > 0) await this.join_program(joinable_programs[0].programid);
+			}
 		}
 	}
 	async join_program(id) {
@@ -574,7 +572,7 @@ class StatedSession {
 			let program = await this.db.get("SELECT * FROM programs WHERE programid = ?", [id]);
 			if(!program) return this.show_server_error(SERVER_ERRORS.UNKNOWN_PROGRAM_ID);
 			
-			{ // wrapped in a block to prevent the `permissions` variable from being reused accidentally - they may be changed later
+			{ // wrapped in a block to prevent the `permissions` variable from being reused accidentally - permissions may be changed later
 				let permissions = await this.permissions.permissions_program(id)
 				
 				if(!(permissions & Permissions.ByName.VIEW_PROGRAM))
@@ -582,6 +580,43 @@ class StatedSession {
 						SERVER_ERRORS.BAD_ACTION,
 						"User does not have the required privilege level to open this program."
 					);
+			}
+			
+			let dm_details = null;
+			
+			let title;
+			
+			if(program.is_dm) {
+				
+				let relationship = await this.db.get(
+					"SELECT userid1, userid2 FROM friends WHERE programid = ?", program.programid
+				);
+				
+				if(!relationship ||
+					(
+						relationship.userid1 !== this.user.userid &&
+						relationship.userid2 !== this.user.userid
+					)
+				)
+					return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to join DM without permission");
+				
+				let other_userid = relationship.userid1;
+				
+				if(other_userid == this.user.userid)
+					other_userid = relationship.userid2;
+				
+				let other_user = await this.db.get("SELECT username FROM users WHERE userid = ?", other_userid);
+				
+				dm_details = {
+					other_username: other_user.username
+				}
+				
+				title = "Chat with @" + dm_details.other_username;
+				
+			} else {
+				const group = await this.db.get("SELECT groupname FROM groups WHERE groupid = ?", program.groupid);
+				
+				title = (group ? program.name + " - " + group.groupname : program.name);
 			}
 			
 			switch(program.type) {
@@ -593,7 +628,7 @@ class StatedSession {
 						{
 							type: "info",
 							name: program.name,
-							title: program.name,
+							title,
 							programid: program.programid,
 							info_content: program.info_content
 						},
@@ -601,35 +636,6 @@ class StatedSession {
 					);
 					break;
 				case "text":
-					let dm_details = null;
-					
-					
-					if(program.is_dm) {
-						
-						let relationship = await this.db.get(
-							"SELECT userid1, userid2 FROM friends WHERE programid = ?", program.programid
-						);
-						
-						if(!relationship ||
-							(
-								relationship.userid1 !== this.user.userid &&
-								relationship.userid2 !== this.user.userid
-							)
-						)
-							return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to join DM without permission");
-						
-						let other_userid = relationship.userid1;
-						
-						if(other_userid == this.user.userid)
-							other_userid = relationship.userid2;
-						
-						let other_user = await this.db.get("SELECT username FROM users WHERE userid = ?", other_userid);
-						
-						dm_details = {
-							other_username: other_user.username
-						}
-						
-					}
 					
 					
 					
@@ -646,7 +652,7 @@ class StatedSession {
 						{
 							type: program.type,
 							name: program.name,
-							title: program.is_dm ? "Chat with "+dm_details.other_username : program.name,
+							title,
 							programid: program.programid,
 							messageHistory: messageHistory,
 						},
@@ -654,16 +660,18 @@ class StatedSession {
 							switch(event.type) {
 								case "typing":
 									
-									this.socket.to(this.currentProgram.programid).emit("program-output", {
-										type: "typing",
-										time: Date.now(),
-										user: {
-											displayname: this.user.displayname,
-											username: this.user.username,
-											userid: this.user.userid,
-											pfp: this.user.pfp,
-										}
-									});
+									if(this.user.settings & Settings.ByName.SHOW_WHEN_TYPING) {
+										this.socket.to(this.currentProgram.programid).emit("program-output", {
+											type: "typing",
+											time: Date.now(),
+											user: {
+												displayname: this.user.displayname,
+												username: this.user.username,
+												userid: this.user.userid,
+												pfp: this.user.pfp,
+											}
+										});
+									}
 									
 									break;
 								case "read-message":
@@ -830,7 +838,7 @@ class StatedSession {
 		}
 	}
 	
-	async join_special_group(id) {
+	async join_special_group(id, should_join_default) {
 		// helper function - to be put in a better place later
 		let show_error_banner = (error) => {
 			this.socket.emit("program-output", Banners.error(error));
@@ -972,13 +980,20 @@ class StatedSession {
 				this.sync_group({
 					groupid: "special:direct",
 					special: "direct"
-				}, event => {
+				}, async event => {
 					switch(event.type) {
 						case "friends_list":
 							this.join_program("special:friends");
 							break;
 						case "invites":
 							this.join_program("special:invites");
+							break;
+						case "open_program":
+							if(event.programid.startsWith("special")) {
+								this.join_program(event.programid);
+							} else if(await this.db.get("SELECT * FROM friends WHERE programid = ? AND (userid1 = ? OR userid2 = ?)", [event.programid, this.user.userid, this.user.userid])) {
+								this.join_program(event.programid);
+							}
 							break;
 					}
 				});
@@ -995,6 +1010,7 @@ class StatedSession {
 						
 						this.sync_program(
 							{
+								programid: "special:friends",
 								type: "friends",
 								title: "Friends",
 								requests: requests
@@ -1063,6 +1079,7 @@ class StatedSession {
 						
 						this.sync_program(
 							{
+								programid: "special:invites",
 								type: "invites",
 								title: "Invites",
 								invites
@@ -1091,7 +1108,11 @@ class StatedSession {
 						);
 					}
 				}
-				await this.join_program("special:friends");
+				if(should_join_default) {
+					await this.join_program(should_join_default);
+				} else {
+					await this.join_program("special:friends");
+				}
 				break;
 			case "settings":
 				if(this.user == null) return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Logged-out user attempted to open restricted group 'direct'");
@@ -1103,6 +1124,7 @@ class StatedSession {
 					settings: async () => {
 						this.sync_program(
 							{
+								programid: "special:settings",
 								type: "settings",
 								title: "Settings",
 								config: {
@@ -1143,16 +1165,14 @@ class StatedSession {
 											"uploadType": "wallpaper",
 											"separator": true
 										},
-										/*
-										TODO: these options
 										{
 											"label": "Privacy"
 										},
-										{
+										/*{
 											"input": "toggle",
 											"name": "readindicators",
 											"label": "Send 'read' indicators"
-										},
+										},*/
 										{
 											"input": "toggle",
 											"name": "typingindicators",
@@ -1164,15 +1184,20 @@ class StatedSession {
 										},
 										{
 											"input": "toggle",
-											"name": "notifications",
-											"label": "Notifications"
+											"name": "ntfychimes",
+											"label": "Notification sounds"
 										},
 										{
 											"input": "toggle",
 											"name": "msgchimes",
-											"label": "Send and receive chimes",
+											"label": "Send and receive chimes"
+										},
+										{
+											"input": "toggle",
+											"name": "programchimes",
+											"label": "Group notification chimes",
 											"separator": true
-										},*/
+										},
 										{
 											"special": "logout"
 										}
@@ -1182,7 +1207,11 @@ class StatedSession {
 										username: this.user.username,
 										pfp: this.user.pfp,
 										wallpaper: this.user.wallpaper,
-										bio: this.user.bio
+										bio: this.user.bio,
+										readindicators: this.user.settings & Settings.ByName.SHOW_READ_INDICATORS,
+										typingindicators: this.user.settings & Settings.ByName.SHOW_WHEN_TYPING,
+										ntfychimes: this.user.settings & Settings.ByName.NOTIFICATION_SOUNDS,
+										msgchimes: this.user.settings & Settings.ByName.MESSAGE_CHIMES,
 									}
 								}
 							},
@@ -1230,18 +1259,37 @@ class StatedSession {
 										return this.socket.emit("program-output", bio_validation);
 									
 									// change values
+									let settings = Settings.ByName.USER_HAS_SETTINGS_V1;
+									
+									if(event.fields.readindicators) {
+										settings = settings | Settings.ByName.SHOW_READ_INDICATORS;
+									}
+									if(event.fields.typingindicators) {
+										settings = settings | Settings.ByName.SHOW_WHEN_TYPING;
+									}
+									
+									if(event.fields.ntfychimes) {
+										settings = settings | Settings.ByName.NOTIFICATION_SOUNDS;
+									}
+									if(event.fields.msgchimes) {
+										settings = settings | Settings.ByName.MESSAGE_CHIMES;
+									}
+									
+									
 									this.user.username = event.fields.username;
 									this.user.displayname = event.fields.displayname;
 									this.user.bio = event.fields.bio;
+									this.user.settings = settings;
 									
 									// sync changes
-									await this.db.run("UPDATE users SET username = ?, displayname = ?, pfp = ?, wallpaper = ?, bio = ? WHERE userid = ?", [
+									await this.db.run("UPDATE users SET username = ?, displayname = ?, pfp = ?, wallpaper = ?, bio = ?, settings = ? WHERE userid = ?", [
 										this.user.username,
 										this.user.displayname,
 										this.user.pfp,
 										this.user.wallpaper,
 										this.user.bio,
-										this.user.userid
+										this.user.settings,
+										this.user.userid,
 									]);
 									
 									GlobalState.refresh_user(this.user.userid);
@@ -1313,7 +1361,7 @@ class StatedSession {
 									],
 									defaults: defaults
 								},*/
-								{
+								/*{
 									groupCreation: true,
 									items: [
 										{
@@ -1322,7 +1370,7 @@ class StatedSession {
 										stepsItem
 									],
 									defaults: defaults
-								}
+								}*/
 							]
 							
 							stepsItem.steps = pages.length;
@@ -1339,6 +1387,7 @@ class StatedSession {
 						}
 						this.sync_program(
 							{
+								programid: "special:new",
 								type: "new",
 								title: "Group Creation Wizard",
 								enteredValues: {}
@@ -1407,6 +1456,27 @@ class StatedSession {
 				this.join_program("special:new");
 				break;
 			case "profile":
+				if(should_join_default) {
+					let user = await this.db.get("SELECT username, userid, displayname, pfp, wallpaper, creation, bio, status FROM users WHERE userid = ?", should_join_default);
+					if(!user)
+						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to show the profile of a user that does not exist.");
+					
+					this.sync_group({
+						groupid: "special:profile",
+						special: "profile"
+					});
+					
+					user.state = await GlobalState.user_state(user.userid);
+					
+					this.sync_program({
+						programid: user.userid,
+						type: "profile",
+						title: "@"+user.username+"'s profile",
+						user,
+					}, () => {});
+				} else {
+					return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to show the profile of no one.");
+				}
 				break;
 			default:
 				this.show_server_error(SERVER_ERRORS.UNKNOWN_GROUP_ID, "Group "+id+" not found");
@@ -1607,27 +1677,6 @@ class StatedSession {
 					GlobalState.refresh_user(this.user.userid);
 				}
 				break;
-			case "show_profile":
-				{
-					let user = await this.db.get("SELECT username, userid, displayname, pfp, wallpaper, creation, bio, status FROM users WHERE userid = ?", event.userid);
-					if(!user)
-						return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Attempted to show the profile of a user that does not exist.");
-					
-					this.sync_group({
-						groupid: "special:profile",
-						special: "profile"
-					});
-					
-					user.state = await GlobalState.user_state(user.userid);
-					
-					this.sync_program({
-						type: "profile",
-						title: user.username+"'s profile",
-						user,
-					}, () => {});
-					
-				}
-				break;
 			case "reorder_group":
 				{
 					if(typeof event.position !== "number")
@@ -1642,6 +1691,11 @@ class StatedSession {
 				return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Unknown interaction type");
 				break;
 		}
+	}
+	
+	async refresh_user() {
+		this.user = await this.db.get("SELECT * FROM users WHERE userid = ?", this.user.userid);
+		this.socket.emit("user-update", this.user);
 	}
 	
 	constructor(db, socket, user = null) {
@@ -1659,8 +1713,8 @@ class StatedSession {
 			GlobalState.add_session(this);
 			GlobalState.refresh_user(this.user.userid);
 		}
-		socket.on("group-open", async (id) => {
-			await this.join_group(id);
+		socket.on("group-open", async (groupid, programid = null) => {
+			await this.join_group(groupid, programid);
 		})
 		socket.on("general-interaction", (event) => {
 			this.general_interaction(event);
@@ -1679,8 +1733,17 @@ class StatedSession {
 			await this.refresh_notifications();
 			if(user == null)
 				await this.join_group("special:registration");
-			else
+			else {
+				if(!(this.user.settings & Settings.ByName.USER_HAS_SETTINGS_V1)) {
+					this.user.settings = Settings.DEFAULT_SETTINGS;
+					await this.db.run("UPDATE users SET settings = ? WHERE userid = ?", [
+						this.user.settings,
+						this.user.userid,
+					]);
+				}
+				
 				await this.join_group("special:direct");
+			}
 		})();
 	}
 }

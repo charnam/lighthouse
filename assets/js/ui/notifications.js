@@ -1,4 +1,5 @@
 import animations from "./animations.js";
+import Settings from "../variables/settings.js";
 
 class NotificationHandler {
 	
@@ -12,7 +13,9 @@ class NotificationHandler {
 	receive_notification_animation(new_count) {
 		
 		
-		this.play_sound();
+		if(this.session.user.settings & Settings.NOTIFICATION_SOUNDS) {
+			this.play_sound();
+		}
 		let button = doc.el("#notifications-group");
 		let ball = button.crel("div").addc("notification-ball");
 		
