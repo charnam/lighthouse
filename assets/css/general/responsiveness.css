@@ -32,9 +32,14 @@
 	body:not(:has(#responsive-members-sidebar-toggle:checked)) #program-members-container,
 	body:has(.responsive-sidebar-toggle:checked) #current-program-container {
 		opacity: 0 !important;
-		pointer-events: none;
 		position: absolute;
+		pointer-events: none;
 		transform: var(--movement) !important;
+	}
+	#group-programs-container,
+	#program-members-container,
+	#current-program-container {
+		position: absolute;
 	}
 	#group-programs-container {
 		--movement: translateX(-40px);
