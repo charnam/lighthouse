@@ -219,8 +219,9 @@ class StatedSessionHandler {
 									.attr("unread", program.unread)
 									.txt(program.name)
 									.on("click", () => {
-										if(program.type !== "separator")
+										if(program.type !== "separator") {
 											this.join_program(program.programid);
+										}
 									})
 									.on("contextmenu", event => {
 										ContextMenu(event, [
@@ -378,6 +379,10 @@ class StatedSessionHandler {
 		doc.el("#titlebar-title").html("").txt(title);
 	}
 	
+	responsive_sidebar_close() {
+		doc.els(".responsive-sidebar-toggle").forEach(el => el.checked = false);
+	}
+	
 	sync_program(program) {
 		this.socket.off("program-output");
 		this.currentProgram = program;
@@ -399,7 +404,9 @@ class StatedSessionHandler {
 		
 		window.location.hash = this._currentWindowHash = "#/"+this.currentGroup.groupid+"/"+this.currentProgram.programid;
 		
-		doc.els(".responsive-sidebar-toggle").forEach(el => el.checked = false);
+		if(program.isImportant !== false) {
+			this.responsive_sidebar_close();
+		}
 		
 		let membersSidebar = doc.el("#program-members-container");
 		if(membersSidebar) membersSidebar.remove();
@@ -700,6 +707,7 @@ class StatedSessionHandler {
 		this.socket.on("disconnect", () => {
 			animations.appOut();
 			doc.el("#titlebar-title").html("Disconnected...");
+			delete this._currentWindowHash;
 		});
 		
 		window.addEventListener("hashchange", () => this.check_window_hash());

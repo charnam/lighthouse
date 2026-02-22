@@ -24,7 +24,7 @@ function programOut() {
 	});
 }
 function groupIn() {
-	doc.el("#current-group-container")
+	doc.els("#group-programs-container, #current-program-container")
 		.anim({
 			opacity: [0, 1],
 			translateY: [-20, 0],

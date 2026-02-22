@@ -555,19 +555,19 @@ class StatedSession {
 			});
 			
 			if(this.currentGroup.programs.some(program => program.programid == should_join_default)) {
-				await this.join_program(should_join_default);
+				await this.join_program(should_join_default, false);
 			} else {
 				let joinable_programs = this.currentGroup.programs.filter(program => program.type !== "separator");
-				if(joinable_programs.length > 0) await this.join_program(joinable_programs[0].programid);
+				if(joinable_programs.length > 0) await this.join_program(joinable_programs[0].programid, false);
 			}
 		}
 	}
-	async join_program(id) {
+	async join_program(id, isImportant = true) {
 		if(!id) return this.show_server_error(SERVER_ERRORS.BAD_ACTION, "Program ID is not a string value");
 		
 		if(id.startsWith("special:")) {
 			id = id.slice(8);
-			await this.join_special_program(id);
+			await this.join_special_program(id, isImportant);
 		} else {
 			let program = await this.db.get("SELECT * FROM programs WHERE programid = ?", [id]);
 			if(!program) return this.show_server_error(SERVER_ERRORS.UNKNOWN_PROGRAM_ID);
@@ -630,7 +630,8 @@ class StatedSession {
 							name: program.name,
 							title,
 							programid: program.programid,
-							info_content: program.info_content
+							info_content: program.info_content,
+							isImportant
 						},
 						() => {}
 					);
@@ -655,6 +656,7 @@ class StatedSession {
 							title,
 							programid: program.programid,
 							messageHistory: messageHistory,
+							isImportant
 						},
 						async event => {
 							switch(event.type) {
@@ -998,7 +1000,7 @@ class StatedSession {
 					}
 				});
 				this.special_programs = {
-					friends: async () => {
+					friends: async (isImportant) => {
 						
 						let requests = await this.db.all("SELECT requestor FROM friend_requests WHERE requestee = ?", this.user.userid);
 						
@@ -1013,7 +1015,8 @@ class StatedSession {
 								programid: "special:friends",
 								type: "friends",
 								title: "Friends",
-								requests: requests
+								requests: requests,
+								isImportant
 							},
 							async event => {
 								switch(event.type) {
@@ -1064,7 +1067,7 @@ class StatedSession {
 						
 						
 					},
-					invites: async () => {
+					invites: async (isImportant) => {
 						let invites = await this.db.all("SELECT * FROM group_invites WHERE to_userid = ? ORDER BY creation", this.user.userid);
 						
 						for(let row in invites)
@@ -1082,7 +1085,8 @@ class StatedSession {
 								programid: "special:invites",
 								type: "invites",
 								title: "Invites",
-								invites
+								invites,
+								isImportant
 							},
 							async event => {
 								if(event.type == "accept" || event.type == "reject") {
@@ -1109,9 +1113,9 @@ class StatedSession {
 					}
 				}
 				if(should_join_default) {
-					await this.join_program(should_join_default);
+					await this.join_program(should_join_default, false);
 				} else {
-					await this.join_program("special:friends");
+					await this.join_program("special:friends", false);
 				}
 				break;
 			case "settings":
@@ -1488,12 +1492,12 @@ class StatedSession {
 		}
 	}
 	
-	async join_special_program(id) {
+	async join_special_program(id, isImportant = true) {
 		if(!this.special_programs) return this.show_server_error(SERVER_ERRORS.SERVER_ERROR, `program ${id} not found in special programs list. group ${JSON.stringify(this.currentGroup)}`);
 		if(this.special_programs[id])
-			await this.special_programs[id]();
+			await this.special_programs[id](isImportant);
 		else if(this.special_program_handler)
-			this.special_program_handler(id);
+			this.special_program_handler(id, isImportant);
 		else
 			return this.show_server_error(SERVER_ERRORS.UNKNOWN_PROGRAM_ID, "Unknown special program ID: "+id);
 	}

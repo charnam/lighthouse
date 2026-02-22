@@ -28,37 +28,40 @@
 		transition: 0.2s ease-in-out;
 		transition-property: opacity, transform, width, padding;
 	}
+	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #all-groups-container,
 	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #group-programs-container,
 	body:not(:has(#responsive-members-sidebar-toggle:checked)) #program-members-container,
 	body:has(.responsive-sidebar-toggle:checked) #current-program-container {
 		opacity: 0 !important;
-		position: absolute;
 		pointer-events: none;
 		transform: var(--movement) !important;
 	}
-	#group-programs-container,
 	#program-members-container,
 	#current-program-container {
 		position: absolute;
 	}
+	#all-groups-container,
 	#group-programs-container {
-		--movement: translateX(-40px);
+		--movement: translateX(-90px);
 		transform-origin: left;
+	}
+	#group-programs-container {
+		width: calc(100% - 74px);
 	}
 	#program-members-container {
 		--movement: translateX(40px);
 		transform-origin: right;
 		position: absolute;
 	}
-	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #all-groups-container {
-		width: 0px;
-		padding: 0px;
-		opacity: 0 !important;
+	
+	#all-groups-container {
+		--movement: translateX(-80px);
 	}
 	
 	#current-program-container {
 		position: absolute;
 		z-index: -100;
+		--movement: translateY(-40px) scale(0.95) rotateX(-2deg);
 	}
 	
 	
@@ -78,7 +81,7 @@
 	}
 	
 	#current-group-container {
-		justify-content: center;
+		display: contents !important;
 	}
 	.sidebar {
 		width: calc(100% - 10px);
@@ -98,6 +101,7 @@
 	}
 	#app-container {
 		padding-top: 0;
+		perspective: 500px;
 	}
 	.responsive-sidebar-toggle-container {
 		transition: 0.2s ease-out;
@@ -126,7 +130,6 @@
 	.responsive-sidebar-toggle {
 		display: none;
 	}
-	
 	
 	.context-menu-overlay {
 		background: #0005;

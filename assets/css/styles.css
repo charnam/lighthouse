@@ -5,7 +5,6 @@
 @import url("general/contextmenu.css");
 @import url("general/reordering.css");
 @import url("general/notifications.css");
-@import url("general/responsiveness.css");
 
 @import url("programs/friends.css");
 @import url("programs/login.css");
@@ -18,6 +17,7 @@
 @import url("programs/profile.css");
 
 @import url("themes/dark.css");
+@import url("general/responsiveness.css");
 /*@import url("themes/light.css");*/
 :root {
 	--error-bg: repeating-linear-gradient(45deg, #f003 0px, #f003 5px, #f001 5px, #f001 10px);
@@ -156,7 +156,7 @@ body {
 	position: fixed;
 	object-fit: cover;
 	filter: blur(8px);
-	z-index: -100;
+	z-index: -1000;
 	left: 0;
 	top: 0;
 }
