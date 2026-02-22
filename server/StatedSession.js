@@ -1212,6 +1212,7 @@ class StatedSession {
 										typingindicators: this.user.settings & Settings.ByName.SHOW_WHEN_TYPING,
 										ntfychimes: this.user.settings & Settings.ByName.NOTIFICATION_SOUNDS,
 										msgchimes: this.user.settings & Settings.ByName.MESSAGE_CHIMES,
+										programchimes: this.user.settings & Settings.ByName.GROUP_NOTIFICATION_SOUNDS
 									}
 								}
 							},
@@ -1273,6 +1274,9 @@ class StatedSession {
 									}
 									if(event.fields.msgchimes) {
 										settings = settings | Settings.ByName.MESSAGE_CHIMES;
+									}
+									if(event.fields.programchimes) {
+										settings = settings | Settings.ByName.GROUP_NOTIFICATION_SOUNDS;
 									}
 									
 									

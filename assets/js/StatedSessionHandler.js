@@ -183,6 +183,14 @@ class StatedSessionHandler {
 					let lastWallpaper = null;
 					
 					const refresh_group = () => {
+						if(this.currentGroup.programs.some(program => {
+							const programEl = doc.el(".program[programid=\""+program.programid+"\"]");
+							return program.unread && programEl && programEl.getAttribute("unread") == "0";
+						})) {
+							const aud = new Audio("./audio/notify-program.mp3");
+							aud.play();
+							aud.onended = () => aud.remove();
+						}
 						
 						group_sidebar.el(".group-title-container").html("").txt(this.currentGroup.groupname);
 						
@@ -701,6 +709,15 @@ class StatedSessionHandler {
 	refresh_groups(groups) {
 		
 		this.groups = groups;
+		
+		if(groups.some(group => {
+			const groupEl = doc.el(".group[groupid=\""+group.groupid+"\"]:not(.open)");
+			return group.unread && groupEl && !groupEl.classList.contains("unread")
+		})) {
+			const aud = new Audio("./audio/notify-program.mp3");
+			aud.play();
+			aud.onended = () => aud.remove();
+		}
 		
 		doc.el("#groups-container").html("");
 		
