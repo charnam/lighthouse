@@ -701,7 +701,12 @@ class StatedSessionHandler {
 		})
 		
 		this.socket.on("log-in", (token) => {
-			document.cookie = "do_not_send_your_token_to_anyone="+token+"; path=/";
+			var now = new Date();
+			var time = now.getTime();
+			var expireTime = time + 1000*36000;
+			now.setTime(expireTime);
+			
+			document.cookie = "do_not_send_your_token_to_anyone="+token+"; expires="+now.toUTCString()+"; path=/";
 			this.socket.disconnect();
 			this.socket.connect();
 		});
