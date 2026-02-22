@@ -43,6 +43,7 @@
 	#program-members-container {
 		--movement: translateX(40px);
 		transform-origin: right;
+		position: absolute;
 	}
 	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #all-groups-container {
 		width: 0px;
