@@ -177,6 +177,9 @@ body:has(.image-upload[in-progress]) .config-save-button-container {
 	border: 8px solid black;
 }
 
+.config-option:has(.config-option-separator) {
+	margin-bottom: 32px;
+}
 .config-option-separator {
 	--margin: 10px;
 	width: calc(100% - (var(--margin) * 2));
@@ -185,7 +188,7 @@ body:has(.image-upload[in-progress]) .config-save-button-container {
 	left: 50%;
 	position: absolute;
 	transform: translateX(-50%);
-	bottom: -6px;
+	bottom: -16px;
 	flex-basis: 100%;
 }
 
