@@ -35,6 +35,7 @@
 		opacity: 0 !important;
 		pointer-events: none;
 		transform: var(--movement) !important;
+		user-select: none;
 	}
 	#program-members-container,
 	#current-program-container {
