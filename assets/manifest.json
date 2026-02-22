@@ -3,9 +3,7 @@
 	"short_name": "Lighthouse",
 	"description": "Instant messaging",
 	"start_url": "/",
-	"id": "/",
 	"display": "standalone",
-	"background_color": "#1c2c3e",
 	"theme_color": "#000000",
 	"icons": [
 		{
