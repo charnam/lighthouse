@@ -35,7 +35,7 @@ body:not([style*="device-safe-area"]) .message-box .send-button {
 	#program-members-container,
 	.responsive-sidebar-toggle,
 	#current-program-container {
-		transition: 0.2s ease-in-out;
+		transition: 0.25s ease-in-out;
 		transition-property: opacity, transform, width, padding;
 	}
 	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #all-groups-container,
@@ -47,6 +47,12 @@ body:not([style*="device-safe-area"]) .message-box .send-button {
 		transform: var(--movement) !important;
 		user-select: none;
 	}
+	body:has(#responsive-members-sidebar-toggle:checked) #current-program-container {
+		--movement: translateX(-100vw);
+	}
+	body:has(#responsive-groups-sidebar-toggle:checked) #current-program-container {
+		--movement: translateX(100vw);
+	}
 	#program-members-container,
 	#current-program-container {
 		position: absolute;
@@ -57,20 +63,20 @@ body:not([style*="device-safe-area"]) .message-box .send-button {
 	}
 	#all-groups-container,
 	#group-programs-container {
-		--movement: translateX(-90px);
+		--movement: translateX(-100vw);
 		transform-origin: left;
 	}
 	#group-programs-container {
 		width: calc(100% - 74px);
 	}
 	#program-members-container {
-		--movement: translateX(40px);
+		--movement: translateX(100vw);
 		transform-origin: right;
 		position: absolute;
 	}
 	
 	#all-groups-container {
-		--movement: translateX(-80px);
+		--movement: translateX(-100vw);
 	}
 	
 	#current-program-container {
