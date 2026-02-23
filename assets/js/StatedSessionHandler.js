@@ -719,6 +719,10 @@ class StatedSessionHandler {
 		
 		window.addEventListener("hashchange", () => this.check_window_hash());
 		
+		window.addEventListener("touchstart", (event) => {
+			
+		})
+		
 		this.notifications = new NotificationHandler(this);
 	}
 	refresh_groups(groups) {

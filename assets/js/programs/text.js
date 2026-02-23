@@ -232,6 +232,11 @@ function TextProgram(session) {
 			.crel("img").addc("icon").attr("src", "/icons/send.svg").prnt()
 			.on("click", () => {
 				send_message();
+			})
+			.on("touchend", (event) => {
+				event.preventDefault();
+				main_input.focus();
+				send_message();
 			});
 	
 	main_input.on("paste", async event => {
