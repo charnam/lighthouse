@@ -385,6 +385,65 @@ class StatedSessionHandler {
 		doc.els(".responsive-sidebar-toggle").forEach(el => el.checked = false);
 	}
 	
+	responsive_sidebar_start_drag(sidebar, touchOrigin) {
+		const overlay = document.body.crel("div").addc("sidebar-drag-overlay");
+		let do_nothing = () => {};
+		let action = do_nothing;
+		
+		const moveHandler = event => {
+			const touch = [...event.changedTouches].find(touch => touch.identifier == touchOrigin.identifier);
+			if(!touch) return;
+			
+			sidebar.style.transition = "unset";
+			sidebar.style.transform = "translateX("+(touch.clientX - touchOrigin.clientX)+"px)";
+			
+			if(
+				(touch.clientX < touchOrigin.clientX && sidebar.id == "group-programs-container") ||
+				(touch.clientX > touchOrigin.clientX && sidebar.id == "program-members-container")
+			) {
+				action = () => {
+					this.responsive_sidebar_close();
+				};
+			} else if(
+				touch.clientX < touchOrigin.clientX && sidebar.id == "current-program-container"
+			) {
+				action = () => {
+					if(doc.el("#program-members-container")) {
+						doc.el("#responsive-members-sidebar-toggle").checked = true;
+					} else {
+						do_nothing();
+					}
+				};
+			} else if(
+				touch.clientX > touchOrigin.clientX && sidebar.id == "current-program-container"
+			) {
+				action = () => {
+					doc.el("#responsive-groups-sidebar-toggle").checked = true;
+				};
+			} else {
+				action = do_nothing;
+			}
+		}
+		const touchEndHandler = event => {
+			const touch = [...event.changedTouches].find(touch => touch.identifier == touchOrigin.identifier);
+			if(!touch) return;
+			
+			sidebar.style.transition = "";
+			sidebar.style.transform = "";
+			
+			window.removeEventListener("touchmove", moveHandler);
+			window.removeEventListener("touchend", touchEndHandler);
+			overlay.remove();
+			if(Math.abs(touch.clientX - touchOrigin.clientX) > 50) {
+				action();
+			} else {
+				do_nothing();
+			}
+		}
+		window.addEventListener("touchmove", moveHandler);
+		window.addEventListener("touchend", touchEndHandler);
+	}
+	
 	sync_program(program) {
 		this.socket.off("program-output");
 		this.currentProgram = program;
@@ -719,9 +778,35 @@ class StatedSessionHandler {
 		
 		window.addEventListener("hashchange", () => this.check_window_hash());
 		
-		window.addEventListener("touchstart", (event) => {
+		window.addEventListener("touchstart", (tap_event) => {
+			let sidebar = tap_event.target;
+			while(!(sidebar.classList.contains("sidebar") || sidebar.id == "current-program-container") && sidebar) {
+				sidebar = sidebar.parentElement;
+			}
+			if(!sidebar) return;
 			
-		})
+			const originalTouch = tap_event.changedTouches[0];
+			const moveCheck = (move_event) => {
+				const thisTouch = [...move_event.changedTouches].find(touch => touch.identifier == originalTouch.identifier);
+				if(!thisTouch) return;
+				
+				if(Math.abs(thisTouch.clientY - originalTouch.clientY) > 30) {
+					endMoveCheck();
+					return;
+				}
+				
+				if(Math.abs(thisTouch.clientX - originalTouch.clientX) > 30) {
+					endMoveCheck();
+					this.responsive_sidebar_start_drag(sidebar, originalTouch);
+				}
+			};
+			const endMoveCheck = () => {
+				window.removeEventListener("touchmove", moveCheck);
+				window.removeEventListener("touchend", endMoveCheck);
+			}
+			window.addEventListener("touchmove", moveCheck);
+			window.addEventListener("touchend", endMoveCheck);
+		});
 		
 		this.notifications = new NotificationHandler(this);
 	}
