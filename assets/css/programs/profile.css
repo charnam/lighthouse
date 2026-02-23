@@ -49,10 +49,12 @@
 .profile-page .bio {
 	padding: 10px;
 	margin-top: 10px;
-	background: var(--color-background-tertiary);
 	border-radius: 5px;
 	white-space: pre-wrap;
 	box-sizing: border-box;
+	border: 1px solid #fff3;
+	background: #0002;
+	border-left-width: 8px;
 }
 .profile-page .bio:empty {
 	display: none;

@@ -35,7 +35,7 @@ body:not([style*="device-safe-area"]) .message-box .send-button {
 	#program-members-container,
 	.responsive-sidebar-toggle,
 	#current-program-container {
-		transition: 0.25s ease-in-out;
+		transition: 0.2s ease-out;
 		transition-property: opacity, transform, width, padding;
 	}
 	body:not(:has(#responsive-groups-sidebar-toggle:checked)) #all-groups-container,
@@ -88,7 +88,7 @@ body:not([style*="device-safe-area"]) .message-box .send-button {
 	
 	.wallpaper {
 		transform: translateX(0);
-		transition: transform 0.5s ease-out;
+		transition: transform 0.2s ease-out;
 	}
 	body:has(#responsive-groups-sidebar-toggle:checked) .wallpaper {
 		transform: translateX(20px);
@@ -125,6 +125,8 @@ body:not([style*="device-safe-area"]) .message-box .send-button {
 	#app-container {
 		padding-top: 0;
 		perspective: 500px;
+		transition: 0.25s ease-out;
+		
 	}
 	.responsive-sidebar-toggle-container {
 		transition: 0.2s ease-out;
