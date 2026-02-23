@@ -10,6 +10,10 @@
 	padding-right: var(--safe-area-right-full);
 }
 
+body:not([style*="device-safe-area"]) .message-box .send-button {
+	display: none;
+}
+
 @keyframes fadein {
 	0% {
 		opacity: 0;
@@ -184,6 +188,10 @@
 	}
 	.messages-screen .messages {
 		padding-bottom: 0;
+	}
+	.messages-screen::before {
+		inset: 0;
+		border-radius: 0;
 	}
 }
 

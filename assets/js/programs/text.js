@@ -180,6 +180,30 @@ function TextProgram(session) {
 		await add_attachment(event.target.files[0]);
 	})
 	
+	const send_message = () => {
+		if(attachments_container.el(".attachment[in-progress]")) return false;
+		
+		
+		let attachments = [...attachments_container.els(".attachment[upload-id]")];
+		attachments = attachments.map(attachmentEl => {
+			let upload = attachmentEl.attr("upload-id");
+			attachmentEl.remove();
+			return upload;
+		});
+		
+		let replyTo = null;
+		
+		if(doc.el(".replying-to")) {
+			replyTo = doc.el(".replying-to").attr("messageid");
+			cancel_reply();
+		}
+		
+		session.program_interact({type: "send-message", text: main_input.value, attachments, replyTo});
+		main_input.value = "";
+		lastTypingIndicator = 0;
+		main_input.style.height = "";
+	}
+	
 	let lastTypingIndicator = 0;
 	let main_input = message_box
 		.crel("textarea")
@@ -193,28 +217,8 @@ function TextProgram(session) {
 				}
 			})
 			.on("keydown", function(event) {
-				if(event.key == "Enter" && !event.shiftKey) {
-					if(attachments_container.el(".attachment[in-progress]")) return false;
-					
-					
-					let attachments = [...attachments_container.els(".attachment[upload-id]")];
-					attachments = attachments.map(attachmentEl => {
-						let upload = attachmentEl.attr("upload-id");
-						attachmentEl.remove();
-						return upload;
-					});
-					
-					let replyTo = null;
-					
-					if(doc.el(".replying-to")) {
-						replyTo = doc.el(".replying-to").attr("messageid");
-						cancel_reply();
-					}
-					
-					session.program_interact({type: "send-message", text: event.target.value, attachments, replyTo});
-					event.target.value = "";
-					lastTypingIndicator = 0;
-					event.target.style.height = "";
+				if(event.key == "Enter" && !event.shiftKey && !send_message_button.checkVisibility()) {
+					send_message();
 					event.preventDefault();
 				}
 				if(event.key == "ArrowUp" && event.target.value == "") {
@@ -222,6 +226,13 @@ function TextProgram(session) {
 					editMessageDirection("up");
 				}
 			})
+	
+	let send_message_button = message_box
+		.crel("div").addc("upload-extra").addc("send-button")
+			.crel("img").addc("icon").attr("src", "/icons/send.svg").prnt()
+			.on("click", () => {
+				send_message();
+			});
 	
 	main_input.on("paste", async event => {
 		if(!event.clipboardData.files) return;

@@ -159,6 +159,9 @@
 	width: 40px;
 	cursor: pointer;
 }
+.message-box .upload-extra:hover {
+	filter: brightness(1.3);
+}
 .upload-extra input {
 	display: none;
 }
