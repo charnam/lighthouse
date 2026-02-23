@@ -790,12 +790,12 @@ class StatedSessionHandler {
 				const thisTouch = [...move_event.changedTouches].find(touch => touch.identifier == originalTouch.identifier);
 				if(!thisTouch) return;
 				
-				if(Math.abs(thisTouch.clientY - originalTouch.clientY) > 30) {
+				if(Math.abs(thisTouch.clientY - originalTouch.clientY) > 13) {
 					endMoveCheck();
 					return;
 				}
 				
-				if(Math.abs(thisTouch.clientX - originalTouch.clientX) > 30) {
+				if(Math.abs(thisTouch.clientX - originalTouch.clientX) > 13) {
 					endMoveCheck();
 					this.responsive_sidebar_start_drag(sidebar, originalTouch);
 				}
