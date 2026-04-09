@@ -1,0 +1,25 @@
+@import url("../node_modules/@fontsource/dm-sans/latin.css");
+@import url("../node_modules/@fontsource/dm-sans/latin-italic.css");
+@import url("../node_modules/@fontsource/dm-sans/latin-ext.css");
+@import url("../node_modules/@fontsource/dm-sans/latin-ext-italic.css");
+
+:root {
+	--color-background-primary: hsl(220deg, 20%, 20%);
+	--color-background-secondary: hsl(220deg, 10%, 32%);
+	--color-background-tertiary: hsl(220deg, 5%, 40%);
+	
+	--color-button-primary: hsl(220deg, 100%, 85%);
+	--color-button-text-primary: black;
+	--color-button-secondary: hsl(220deg, 10%, 30%);
+	--color-button-text-secondary: white;
+	
+	--color-input-primary: hsl(220deg, 5%, 36%);
+	--quick-transition: 0.025s ease-in-out;
+	
+	--separator-color-primary: #fff5;
+	
+}
+body {
+	color: #eee;
+	font-family: "DM Sans", Helvetica, Arial, sans-serif;
+}

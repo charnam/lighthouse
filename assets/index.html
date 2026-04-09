@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Lighthouse</title>
-		<link rel="stylesheet" href="/css/styles.css" />
+		<link rel="stylesheet" href="./app/main.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<style>
 			#has-test {
@@ -21,6 +21,13 @@
 				display: none;
 			}
 		</style>
+		<script type="importmap">
+			{
+				"imports": {
+					"imperative-html": "./node_modules/imperative-html/dist/esm/elements.js"
+				}
+			}
+		</script>
 		<link rel="manifest" href="manifest.json" />
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,19 +35,13 @@
 	</head>
 	<body>
 		<div id="loading-screen"></div>
-		<div id="app">
-			
-			
-			
-		</div>
+		<div id="app"></div>
 		<div id="has-test">
-			<div class="banner error">It looks like your browser is too old to be running this application. Please try using an updated browser.</div>
+			<div class="banner error">It looks like your browser is too old to be running this application. Please try using a more up-to-date browser.</div>
 		</div>
 		<noscript>
 			<div class="banner error">This page does not function without JavaScript! Please enable JavaScript or use a browser that supports it.</div>
 		</noscript>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="/js/lib/solar.js"></script>
-		<script type="module" src="/js/main.js" defer></script>
+		<script type="module" src="./app/main.js" defer></script>
 	</body>
 </html>

@@ -4,10 +4,17 @@ cache/
 config/
 
 # Node.JS
-server/node_modules/
+node_modules
 package-lock.json
 
 # VSCode / VSCodium
 .termdbms/
 .vscode/
 workspace.code-workspace
+
+# Discord integration
+server/discord-token.txt
+
+# WIP
+server-old/
+assets-old/

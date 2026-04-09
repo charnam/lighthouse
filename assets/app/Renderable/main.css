@@ -1,0 +1,8 @@
+
+.is-debug-target {
+	outline: 1px solid gray;
+}
+
+.is-loading-style {
+	display: none;
+}

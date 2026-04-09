@@ -1,0 +1,65 @@
+
+@keyframes loading-ball-sizing {
+	
+	0% {
+		
+		transform: scale(1);
+		background: var(--bg2);
+		top: 2px;
+		
+	}
+	50% {
+		
+		transform: scale(0.5);
+		background: var(--bg1);
+		top: -4px;
+	}
+	100% {
+		transform: scale(1);
+		background: var(--bg2);
+		top: 2px;
+	}
+	
+}
+@keyframes loading-ball-movement {
+	
+	0% {
+		left: 10px;
+	}
+	50% {
+		left: -10px;
+	}
+	100% {
+		left: 10px;
+	}
+	
+}
+
+#loading-screen {
+	position: fixed;
+	left: 50vw;
+	top: 50vh;
+	transform: translate(-50%, -50%);
+	width: 10px;
+	height: 10px;
+	--bg1: #fff8;
+	--bg2: #fff;
+}
+
+#loading-screen::before, #loading-screen:after {
+	content: "";
+	position: fixed;
+	animation: 2s ease-in-out infinite;
+	animation-name: loading-ball-sizing, loading-ball-movement;
+	animation-duration: 1s, 1s;
+	animation-delay: -0.25s, 0s;
+	width: 10px;
+	height: 10px;
+	background: var(--bg2);
+	display: inline-block;
+}
+
+
+#loading-screen::after {
+	animation-delay: -0.75s, -0.5s;
+}
