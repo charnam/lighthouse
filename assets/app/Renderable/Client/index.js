@@ -1,3 +1,5 @@
+import Connection from "../../Connection/index.js";
+import LoadingScreen from "../LoadingScreen/index.js";
 import Overlay from "../Overlay/index.js";
 
 class Client extends Overlay {
@@ -9,8 +11,15 @@ class Client extends Overlay {
 		this.connection = connection;
 	}
 	
+	//openPath
+	
 	static async create() {
-		
+		const loader = new LoadingScreen();
+		loader.open();
+		const connection = new Connection("/") // TODO: localsettings key
+		const client = new Client(connection);
+		client.renderTo(document.getElementById("app"));
+		loader.remove();
 	}
 }
 

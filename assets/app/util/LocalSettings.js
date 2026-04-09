@@ -12,6 +12,10 @@ class LocalSettings {
 		}
 	}
 	
+	static async getKey(key) {
+		
+	}
+	
 	static overrideServerSettings(serverSettings) {
 		
 	}
