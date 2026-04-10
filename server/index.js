@@ -1,13 +1,15 @@
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import express from "express";
 import expressWs from "express-ws";
-import sqlite from "sqlite";
+import * as sqlite from "sqlite";
 import sqlite3 from "sqlite3";
 import mkdirSilent from "./util/simple/mkdirSilent.js";
 import Upload from "./plugins/Upload.js";
+import Connection from "../assets/shared/Connection.js";
+import Logger from "./util/Logger.js";
 
 // # Variables and Configuration
-logger.setLogLevel(0);
+Logger.setLogLevel(0);
 const cwd = process.cwd();
 
 // # Initialization
@@ -17,9 +19,9 @@ mkdirSilent(Upload.UPLOAD_FILE_PATH);
 mkdirSilent(Upload.TEMP_UPLOAD_FILE_PATH);
 
 if(!existsSync("config/release.txt"))
-	copyFileSync("server/variables/default-release.txt", "config/release.txt");
+	copyFileSync("variables/default-release.txt", "config/release.txt");
 
-let server_version = readFileSync("server/variables/version.txt").toString();
+let server_version = readFileSync("variables/version.txt").toString();
 let release_info = readFileSync("config/release.txt").toString();
 
 release_info = release_info.replace("{version}", server_version);
@@ -32,7 +34,7 @@ let db = await sqlite.open({
 	driver: sqlite3.Database
 });
 
-let database_structure = readFileSync("server/variables/structure.sql").toString();
+let database_structure = readFileSync("variables/structure.sql").toString();
 await db.exec(database_structure);
 
 // # Server setup
@@ -70,10 +72,9 @@ expressApp.get('/js/variables/settings.js', (req, res) => {
 
 expressApp.use(express.static('assets'));
 
-expressApp.ws("/lighthouse", (ws, req) => {
-	
-	
-	
+expressApp.ws("/lighthouse", (socket, req) => {
+	const conn = new Connection(socket);
+	new ClientHandler(conn);
 });
 
 

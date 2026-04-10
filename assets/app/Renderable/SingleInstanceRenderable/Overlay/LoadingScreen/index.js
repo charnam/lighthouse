@@ -1,4 +1,4 @@
-import Overlay from "../Overlay/index.js";
+import Overlay from "../SingleInstanceRenderable/Overlay/index.js";
 
 class LoadingScreen extends Overlay {
 	render() {

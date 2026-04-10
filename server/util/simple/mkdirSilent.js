@@ -1,4 +1,5 @@
-const { existsSync, mkdirSync } = require("node:fs");
+
+import {existsSync, mkdirSync} from "fs";
 
 function mkdirSilent(dirname) {
 	if(!existsSync(dirname))

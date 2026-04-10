@@ -1,4 +1,4 @@
-import SingleInstanceRenderable from "../SingleInstanceRenderable/index.js";
+import SingleInstanceRenderable from "../index.js";
 
 class ClientPane extends SingleInstanceRenderable {
 	style = [...this.style, "app/Renderable/ClientPane/main.css"];

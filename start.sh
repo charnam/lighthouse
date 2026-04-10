@@ -19,4 +19,5 @@ fi
 cd ..
 
 # start server
-NODE_PATH=server/ node server/index.js;
+cd server;
+node index.js;

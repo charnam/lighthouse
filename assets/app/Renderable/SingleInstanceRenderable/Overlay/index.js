@@ -1,4 +1,4 @@
-import SingleInstanceRenderable from "../SingleInstanceRenderable/index.js";
+import SingleInstanceRenderable from "../index.js";
 
 class Overlay extends SingleInstanceRenderable {
 	style = [...this.style, "app/Renderable/Overlay/main.css"];

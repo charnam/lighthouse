@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import multer, { diskStorage } from "multer";
 import sharp from "sharp";
 
-import { log } from "helpers/logger.js";
+import Logger from "../util/Logger.js";
 import { rename, unlink } from 'fs/promises';
 
 class Upload {
@@ -183,7 +183,7 @@ class Upload {
 				try {
 					await unlink(`${this.UPLOAD_FILE_PATH}/${upload.filename}`);
 				} catch(err) {
-					log(4, err)
+					Logger.log(4, err)
 				}
 			});
 		}, 30*1000) // every 30 seconds
