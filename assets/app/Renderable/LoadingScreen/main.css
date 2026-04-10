@@ -44,6 +44,16 @@
 	height: 10px;
 	--bg1: #fff8;
 	--bg2: #fff;
+	transition: opacity 0.2s ease-in-out;
+}
+
+#loading-screen.is-removing {
+	opacity: 0;
+}
+@starting-style {
+	#loading-screen {
+		opacity: 0;
+	}
 }
 
 #loading-screen::before, #loading-screen:after {

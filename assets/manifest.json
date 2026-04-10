@@ -7,7 +7,7 @@
 	"theme_color": "#000000",
 	"icons": [
 		{
-			"src": "/icons/balloon-fill.svg",
+			"src": "/node_modules/bootstrap-icons/icons/balloon-fill.svg",
 			"sizes": "192x192",
 			"type": "image/svg+xml"
 		}

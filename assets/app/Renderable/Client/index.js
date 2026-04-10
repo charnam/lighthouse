@@ -11,8 +11,6 @@ class Client extends Overlay {
 		this.connection = connection;
 	}
 	
-	//openPath
-	
 	static async create() {
 		const loader = new LoadingScreen();
 		loader.open();
