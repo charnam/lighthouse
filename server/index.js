@@ -7,6 +7,7 @@ import mkdirSilent from "./util/simple/mkdirSilent.js";
 import Upload from "./plugins/Upload.js";
 import Connection from "../assets/shared/Connection.js";
 import Logger from "./util/Logger.js";
+import path from "node:path";
 
 // # Variables and Configuration
 Logger.setLogLevel(0);
@@ -40,11 +41,15 @@ await db.exec(database_structure);
 // # Server setup
 const expressApp = express();
 const expressAppWs = expressWs(expressApp);
-const httpServer = http.createServer(expressApp);
 
 // # Helper functions
+expressApp.ws("/lighthouse", (socket, req) => {
+	const conn = new Connection(socket);
+	new ClientHandler(conn);
+});
+
 expressApp.get('/', (_req, res) => {
-	res.sendFile(path.join(cwd, 'assets/index.html'));
+	res.sendFile(path.join(cwd, '../assets/index.html'));
 });
 
 expressApp.get('/js/variables/release.txt', (req, res) => {
@@ -70,18 +75,11 @@ expressApp.get('/js/variables/settings.js', (req, res) => {
 	);
 });
 
-expressApp.use(express.static('assets'));
-
-expressApp.ws("/lighthouse", (socket, req) => {
-	const conn = new Connection(socket);
-	new ClientHandler(conn);
-});
+expressApp.use(express.static('../assets'));
 
 
 // # Server code
 Upload.setup(db, expressApp);
 
 // # Start server
-httpServer.listen(8001, () => {
-	logger.log(1, "Application ready, hosting on localhost:8001");
-});
+expressApp.listen(8001);

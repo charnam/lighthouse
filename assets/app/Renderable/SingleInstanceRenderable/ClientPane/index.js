@@ -1,7 +1,7 @@
 import SingleInstanceRenderable from "../index.js";
 
 class ClientPane extends SingleInstanceRenderable {
-	style = [...this.style, "app/Renderable/ClientPane/main.css"];
+	style = [...this.style, "app/Renderable/SingleInstanceRenderable/ClientPane/main.css"];
 	classes = [...this.classes, "client-pane"];
 	
 	constructor(client) {

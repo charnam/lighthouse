@@ -3,5 +3,6 @@
     "@fontsource/dm-sans": "^5.2.8",
     "bootstrap-icons": "^1.13.1",
     "imperative-html": "^0.1.2"
-  }
+  },
+  "type": "module"
 }

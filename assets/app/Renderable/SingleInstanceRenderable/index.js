@@ -36,7 +36,6 @@ class SingleInstanceRenderable extends Renderable {
 				this._overlay.remove();
 			}
 			el.remove();
-			this.collectGarbageBoundNodes();
 		}
 	}
 

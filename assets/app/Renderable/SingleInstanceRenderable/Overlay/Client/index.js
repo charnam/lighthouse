@@ -3,7 +3,7 @@ import LoadingScreen from "../LoadingScreen/index.js";
 import Overlay from "../index.js";
 
 class Client extends Overlay {
-	style = [...this.style, "app/Renderable/Client/main.css"];
+	style = [...this.style, "app/Renderable/SingleInstanceRenderable/Overlay/Client/main.css"];
 	classes = [...this.classes, "client"];
 	
 	constructor(connection) {

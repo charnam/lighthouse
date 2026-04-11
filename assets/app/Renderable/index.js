@@ -3,7 +3,7 @@ import { HTML } from "imperative-html";
 class Renderable {
 	DEBUG = true;
 	
-	style = ["app/renderable/main.css"];
+	style = ["app/Renderable/main.css"];
 	_classes = ["renderable"];
 	set classes(val) {
 		this._classes = val;
@@ -22,7 +22,7 @@ class Renderable {
 		}
 		
 		Promise.all(this.style.map(style => this.loadStyle(style))).then(() => {
-			renderedElement.classList.remove("is-loading-style");
+			target.classList.remove("is-loading-style");
 		});
 		
 		if(this.DEBUG) {
@@ -33,6 +33,8 @@ class Renderable {
 			target.classList.add(cl);
 		}
 		this.boundTo.push(target);
+		
+		return target;
 	}
 	
 	update() {

@@ -1,0 +1,6 @@
+Lighthouse {version}
+
+This development server has not been verified, and may present dangerous exploits or usability issues for end users.
+DO NOT USE THIS SERVER IN PRODUCTION
+
+To edit this message, modify config/release.txt

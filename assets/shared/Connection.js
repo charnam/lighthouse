@@ -69,6 +69,10 @@ class Connection {
 		return (await this.request(...args)).data.data;
 	}
 	
+	async handle(message, callback) {
+		
+	}
+	
 	/*
 	async sendMessage(room, content) {
 		return await this.sendRequest("send-message", {room, content});
