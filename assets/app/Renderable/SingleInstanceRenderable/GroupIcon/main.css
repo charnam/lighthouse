@@ -1,0 +1,49 @@
+.group-icon {
+	aspect-ratio: 1 / 1;
+	margin: 6px;
+	width: 52px;
+	background: #fff2;
+	border-radius: 24%;
+	outline-offset: -1px;
+	outline: 1px solid transparent;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 150%;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+}
+
+.group-icon:not(.has-image):not([class*="bi-"])[group-icon-sym]::before {
+	content: attr(group-icon-sym);
+	padding-bottom: 2px;
+}
+
+.group-icon.has-image::before {
+	position: absolute;
+	inset: 0;
+	background-position: center;
+	background-size: cover;
+	background-image: var(--icon);
+	content: "";
+	border-radius: inherit;
+	margin: 1px;
+	transition: 0.8s ease-out;
+}
+
+@starting-style {
+	.group-icon.group-icon.has-image::before {
+		opacity: 0;
+		transform: scale(1.2);
+	}
+}
+
+.group-icon:hover {
+	background: #fff5;
+}
+
+.group-icon.group-icon-opening {
+	opacity: 0.8;
+	pointer-events: none;
+}

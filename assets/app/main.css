@@ -1,4 +1,76 @@
 @import url("../node_modules/bootstrap-icons/font/bootstrap-icons.min.css");
+@import url("../node_modules/@fontsource/dm-sans/latin.css");
+@import url("./skins/dark.css");
 
+#app {
+	position: fixed;
+	inset: 0;
+	overflow: hidden;
+}
 
+body {
+	font-family: "DM Sans", Helvetica, Arial, sans-serif;
+	user-select: none;
+}
+
+h1 {
+	font-weight: bold;
+}
+
+.base-popup {
+	position: absolute;
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	padding: 20px;
+	gap: 20px;
+}
+
+.base-buttonbox {
+	display: flex;
+	justify-content: flex-end;
+	gap: 20px;
+}
+
+.base-button {
+	width: fit-content;
+	display: block;
+	font-size: 0.9em;
+	text-shadow: rgba(255, 255, 255, 0.533) 0px 1px 1px;
+	filter: brightness(1);
+	cursor: pointer;
+	color: var(--color-button-text-primary);
+	box-shadow: rgb(204, 204, 204) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.2) 0px 5px 5px;
+	background: var(--color-button-primary);
+	padding: 6px 10px;
+	border-width: initial;
+	border-style: none;
+	border-color: initial;
+	border-image: initial;
+	border-radius: 6px;
+	transition: filter var(--quick-transition);
+}
+
+.base-button.base-button-secondary {
+	appearance: none;
+	font-family: inherit;
+	color: var(--color-button-text-secondary);
+	text-shadow: rgba(0, 0, 0, 0.533) 0px 1px;
+	box-shadow: rgba(0, 0, 0, 0.6) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.2) 0px 5px 5px;
+	background: var(--color-button-secondary);
+}
+
+.base-input {
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	background: var(--color-input-primary);
+	padding: 7px 10px;
+	border-radius: 6px;
+	border-width: initial;
+	border-style: none;
+	border-color: initial;
+	border-image: initial;
+}
 

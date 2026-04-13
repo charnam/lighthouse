@@ -1,3 +1,10 @@
-import Client from "./Renderable/SingleInstanceRenderable/Overlay/Client/index.js";
+import LoadingScreen from "./Renderable/SingleInstanceRenderable/Overlay/LoadingScreen/index.js";
+const loader = new LoadingScreen();
+loader.open();
 
-Client.create()
+await (async () => {
+	const Client = (await import("./Renderable/SingleInstanceRenderable/Overlay/Client/index.js")).default;
+	Client.create()
+})();
+
+loader.remove();

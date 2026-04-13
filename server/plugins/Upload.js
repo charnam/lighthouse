@@ -135,16 +135,20 @@ class Upload {
 				return fail("Unable to determine filetype of uploaded file.");
 			
 			let id = uuid();
-			await db.run("INSERT INTO uploads (uploadid, userid, type, originalname, filename, size, mimetype, autodelete) VALUES (?,?,?,?,?,?,?,?)", [
-				id,
-				user.userid,
-				req.body.uploadType,
-				req.file.originalname,
-				req.file.filename,
-				req.file.size,
-				mimetype,
-				Date.now()+30*60*1000
-			]);
+			await db.run(`
+				INSERT INTO uploads
+					(uploadid, userid, type, originalname, filename, size, mimetype, autodelete)
+				VALUES (
+					${db.val(id)},
+					${db.val(user.userid)},
+					${db.val(req.body.uploadType)},
+					${db.val(req.file.originalname)},
+					${db.val(req.file.filename)},
+					${db.val(req.file.size)},
+					${db.val(mimetype)},
+					${db.val(Date.now()+30*60*1000)}
+				)
+			`);
 			res.json({
 				type: "success",
 				uploadid: id,
@@ -155,7 +159,7 @@ class Upload {
 		
 		expressApp.use("/uploads/", async (req, res) => {
 			let requestedFile = req.path.split("/")[1];
-			let uploadData = await db.get("SELECT * FROM uploads WHERE uploadid = ?", requestedFile);
+			let uploadData = await db.get(`SELECT * FROM uploads WHERE uploadid = ${db.val(requestedFile)}`);
 			if(uploadData == null)
 				return res.json({type: "error", message: "Not found"});
 			else {
@@ -174,10 +178,10 @@ class Upload {
 		});
 		
 		setInterval(async () => {
-			let toDelete = await db.all("SELECT * FROM uploads WHERE autodelete < ? AND NOT autodelete = 0", Date.now());
+			let toDelete = await db.all(`SELECT * FROM uploads WHERE autodelete < ${db.val(Date.now())} AND NOT autodelete = 0`);
 			toDelete.forEach(async upload => {
 				console.log(upload, "deleted");
-				await db.run("DELETE FROM uploads WHERE uploadid = ?", upload.uploadid);
+				await db.run(`DELETE FROM uploads WHERE uploadid = ${db.val(upload.uploadid)}`);
 				if(upload.filename.includes("."))
 					throw new Error("Uploaded file path contains a dot. This is unsafe! Halted.");
 				try {

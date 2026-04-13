@@ -1,7 +1,7 @@
 import { HTML } from "imperative-html";
 
 class Renderable {
-	DEBUG = true;
+	DEBUG = false;
 	
 	style = ["app/Renderable/main.css"];
 	_classes = ["renderable"];
@@ -16,17 +16,20 @@ class Renderable {
 	boundTo = [];
 	render() {
 		const target = new HTML.div({class: "is-renderable is-loading-style"});
+		target.renderable = this;
 		
 		if(this.DEBUG) {
 			target.classList.add("is-debug-target");
 		}
 		
 		Promise.all(this.style.map(style => this.loadStyle(style))).then(() => {
-			target.classList.remove("is-loading-style");
+			setTimeout(() => {
+				target.classList.remove("is-loading-style");
+			}, 10);
 		});
 		
 		if(this.DEBUG) {
-			console.log("Created attached instance of %s at %d", this.constructor.name, new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", fractionalSecondDigits: 3 }), target);
+			console.log("Created attached instance of %s at %s", this.constructor.name, new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", fractionalSecondDigits: 3 }), target);
 		}
 		
 		for(let cl of this.classes) {
@@ -38,16 +41,16 @@ class Renderable {
 	}
 	
 	update() {
-		this.boundTo = this.boundTo.filter(item => document.body.contains(item));
-		return Promise.all(this.boundTo.map(target => this.updateRendered(target)));
+		//this.boundTo = this.boundTo.filter(item => document.body.contains(item));
+		return Promise.all(this.boundTo.map(target => target ? this.updateRendered(target) : true));
 	}
 	
 	updateRendered(el) {
 		if(this.DEBUG) {
-			console.log("Updated attached instance of %s at %d", this.constructor.name, new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", fractionalSecondDigits: 3 }), el);
+			console.log("Updated attached instance of %s at %s", this.constructor.name, new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", fractionalSecondDigits: 3 }), el);
 		}
 		for(let cl of this.classes) {
-			target.classList.add(cl);
+			el.classList.add(cl);
 		}
 	}
 	

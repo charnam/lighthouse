@@ -1,0 +1,31 @@
+
+.login-menu-popup {
+	display: flex;
+	flex-direction: column;
+	max-width: 400px;
+	width: 100vw;
+	transition: 0.2s ease-out;
+}
+@starting-style {
+	.login-menu-popup {
+		opacity: 0;
+		top: calc(50% + 20px);
+	}
+}
+.login-menu-popup.is-removing {
+	opacity: 0;
+	top: calc(50% - 20px);
+}
+
+.login-menu-popup h1:first-child {
+	margin: 20px 0;
+	margin-top: 0;
+	text-align: center;
+}
+
+.login-menu-popup label {
+	display: flex;
+	justify-content: space-between;
+	gap: 30px;
+	align-items: center;
+}

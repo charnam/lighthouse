@@ -1,7 +1,7 @@
-@import url("../node_modules/@fontsource/dm-sans/latin.css");
-@import url("../node_modules/@fontsource/dm-sans/latin-italic.css");
-@import url("../node_modules/@fontsource/dm-sans/latin-ext.css");
-@import url("../node_modules/@fontsource/dm-sans/latin-ext-italic.css");
+@import url("../../node_modules/@fontsource/dm-sans/latin.css");
+@import url("../../node_modules/@fontsource/dm-sans/latin-italic.css");
+@import url("../../node_modules/@fontsource/dm-sans/latin-ext.css");
+@import url("../../node_modules/@fontsource/dm-sans/latin-ext-italic.css");
 
 :root {
 	--color-background-primary: hsl(220deg, 20%, 20%);
@@ -20,6 +20,7 @@
 	
 }
 body {
+	background: var(--color-background-primary);
 	color: #eee;
 	font-family: "DM Sans", Helvetica, Arial, sans-serif;
 }

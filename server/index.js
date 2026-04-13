@@ -1,13 +1,13 @@
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import express from "express";
 import expressWs from "express-ws";
-import * as sqlite from "sqlite";
-import sqlite3 from "sqlite3";
 import mkdirSilent from "./util/simple/mkdirSilent.js";
 import Upload from "./plugins/Upload.js";
 import Connection from "../assets/shared/Connection.js";
 import Logger from "./util/Logger.js";
 import path from "node:path";
+import ClientHandler from "./base/ClientHandler.js"
+import Database from "./util/Database.js";
 
 // # Variables and Configuration
 Logger.setLogLevel(0);
@@ -30,13 +30,7 @@ release_info = release_info.replace("{version}", server_version);
 writeFileSync("cache/release.txt", release_info);
 
 // # Database setup
-let db = await sqlite.open({
-	filename: "config/database.db",
-	driver: sqlite3.Database
-});
-
-let database_structure = readFileSync("variables/structure.sql").toString();
-await db.exec(database_structure);
+const db = new Database("file-uploads");
 
 // # Server setup
 const expressApp = express();

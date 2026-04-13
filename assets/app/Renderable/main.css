@@ -5,5 +5,5 @@
 }
 
 .is-loading-style {
-	display: none;
+	display: none !important;
 }

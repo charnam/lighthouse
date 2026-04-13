@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.8.0",
     "bootstrap-icons": "^1.13.1",
     "express": "^5.2.1",
     "express-ws": "^5.0.2",
@@ -11,7 +12,6 @@
     "sharp": "^0.34.5",
     "socket.io": "^4.8.3",
     "sqlite": "^5.1.1",
-    "sqlite3": "^6.0.1",
     "uuid": "^13.0.0"
   },
   "type": "module"

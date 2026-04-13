@@ -1,3 +1,4 @@
+import ConnectionMessage from "./ConnectionMessage.js";
 
 class Connection {
 	_socket = null;
@@ -52,25 +53,36 @@ class Connection {
 				const object = JSON.parse(event.data);
 				
 				if(object.type == "reply" && object.data.to == eventId) {
-					res(object);
+					const message = new ConnectionMessage(this, object);
+					res(message);
 				}
 			});
 		});
 	}
 	
 	reply(to, data) {
-		this.sendEvent("reply", {
+		return this.request("reply", {
 			to,
 			data
-		})
+		});
 	}
 	
 	async requestObject(...args) {
 		return (await this.request(...args)).data.data;
 	}
 	
-	async handle(message, callback) {
-		
+	async handle(type, callback) {
+		this.socket.addEventListener("message", async event => {
+			const object = JSON.parse(event.data);
+			
+			if(type == "*" || object.type == type) {
+				const message = new ConnectionMessage(this, object);
+				const res = await callback(message);
+				if(res) {
+					message.reply(res);
+				}
+			}
+		})
 	}
 	
 	/*

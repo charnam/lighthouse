@@ -1,0 +1,7 @@
+
+.messages-group-icon::before {
+	content: attr(title);
+	max-width: 70%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

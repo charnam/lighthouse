@@ -1,6 +1,7 @@
 import Renderable from "../index.js";
 
 class SingleInstanceRenderable extends Renderable {
+	style = [...this.style, "app/Renderable/SingleInstanceRenderable/main.css"];
 	animateRemoveDuration = 0;
 
 	get element() {
@@ -27,7 +28,8 @@ class SingleInstanceRenderable extends Renderable {
 		}
 		this.boundTo = [];
 	}
-
+	
+	removeListeners = [];
 	async remove() {
 		if (this.element) {
 			const el = this.element;
@@ -35,8 +37,21 @@ class SingleInstanceRenderable extends Renderable {
 			if (this._overlay) {
 				this._overlay.remove();
 			}
+			for(let listener of this.removeListeners) {
+				listener();
+			}
 			el.remove();
 		}
+	}
+	
+	untilRemove() {
+		return new Promise(res => {
+			const tListener = () => {
+				this.removeListeners = this.removeListeners.filter(listener => listener !== tListener);
+				res();
+			}
+			this.removeListeners.push(tListener);
+		})
 	}
 
 }

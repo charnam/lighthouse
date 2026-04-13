@@ -1,0 +1,25 @@
+
+.group-list {
+	grid-area: groups;
+	display: flex;
+	flex-direction: column;
+}
+
+.group-list-messages-group-wrapper {
+	display: flex;
+	flex-direction: column;
+	margin: 6px;
+	margin-bottom: 0;
+	border-bottom: 1px solid var(--color-background-secondary);
+}
+
+.group-list-messages-group-wrapper > .messages-group-icon {
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: 0;
+}
+
+.group-list-joined-groups {
+	width: 100%;
+	height: 100%;
+}

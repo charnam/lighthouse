@@ -35,30 +35,35 @@
 	
 }
 
-#loading-screen {
-	position: fixed;
-	left: 50vw;
-	top: 50vh;
-	transform: translate(-50%, -50%);
+.loading-screen {
+	background: #0008;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: opacity 0.2s ease-in-out;
+	cursor: progress;
+}
+
+.loading-screen-wrap {
+	position: relative;
 	width: 10px;
 	height: 10px;
 	--bg1: #fff8;
 	--bg2: #fff;
-	transition: opacity 0.2s ease-in-out;
 }
 
-#loading-screen.is-removing {
+.loading-screen.is-removing {
 	opacity: 0;
 }
 @starting-style {
-	#loading-screen {
+	.loading-screen {
 		opacity: 0;
 	}
 }
 
-#loading-screen::before, #loading-screen:after {
+.loading-screen-wrap::before, .loading-screen-wrap:after {
 	content: "";
-	position: fixed;
+	position: absolute;
 	animation: 2s ease-in-out infinite;
 	animation-name: loading-ball-sizing, loading-ball-movement;
 	animation-duration: 1s, 1s;
@@ -70,6 +75,6 @@
 }
 
 
-#loading-screen::after {
+.loading-screen-wrap::after {
 	animation-delay: -0.75s, -0.5s;
 }
