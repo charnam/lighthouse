@@ -1,17 +1,12 @@
 
 class MessageHandler {
 	connection = null;
-	handle = () => {}
+	callback = () => {}
 	
-	constructor(connection, handle = () => {}) {
+	constructor(connection, callback = () => {}) {
 		this.connection = connection;
-		this.handle = handle;
+		this.callback = callback;
 	}
-	
-	remove() {
-		this.connection.handlers = this.connection.handlers.filter(handler => handler !== this);
-	}
-	
 }
 
 export default MessageHandler;

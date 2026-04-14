@@ -1,11 +1,14 @@
 
 class ConnectionMessage {
 	message = null;
+	get type() {
+		return this.message.type;
+	}
 	get isReply() {
-		return this.message.type == "reply";
+		return this.type == "reply";
 	}
 	get data() {
-		if(this.message.type == "reply") {
+		if(this.type == "reply") {
 			return this.message?.data?.data;
 		} else {
 			return this.message?.data;

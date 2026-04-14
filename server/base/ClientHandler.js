@@ -2,18 +2,23 @@ import bcrypt from "bcrypt"
 import Database from "../util/Database.js";
 import UserSession from "./UserSession.js";
 import Banners from "../util/simple/Banners.js";
+import MessageHandlerGroup from "../../assets/shared/MessageHandlerGroup.js";
 
 class ClientHandler {
 	constructor(connection) {
 		this.logindb = new Database(null);
 		this.connection = connection;
-		this.connection.handle("token", async message => {
-			if(!this.user) {
-				const success = await this.login(message?.data);
-				message.reply(success);
+		this.loginHandlers = new MessageHandlerGroup(this.connection);
+		
+		this.loginHandlers.handle("token", async message => {
+			const success = await this.login(message?.data);
+			message.reply(success);
+			if(success) {
+				this.loginHandlers.disable();
 			}
 		});
-		this.connection.handle("log-in", async message => {
+		
+		this.loginHandlers.handle("log-in", async message => {
 			if(!this.user) {
 				const username = message?.data?.username;
 				const password = message?.data?.password;
@@ -44,7 +49,7 @@ class ClientHandler {
 				message.reply(token);
 			}
 		});
-		this.connection.handle("sign-up", async message => {
+		this.loginHandlers.handle("sign-up", async message => {
 			if(!this.user) {
 				const success = await this.login(message?.data?.token);
 				message.reply(success);

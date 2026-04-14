@@ -1,13 +1,13 @@
 
 class DatabaseHelpers {
-	constructor(database) {
-		this.database = database;
+	constructor(db) {
+		this.db = db;
 	}
 	
 	async selectGroupsForUser(userid) {
-		const uid = await this.database.val(userid);
+		const uid = await this.db.val(userid);
 		
-		return await this.database.all(`
+		return await this.db.all(`
 			SELECT groups.*, user_group_relationships.position, latest_read_time IS NOT NULL AS unread
 				FROM groups
 					LEFT JOIN user_group_relationships
@@ -30,6 +30,51 @@ class DatabaseHelpers {
 				ORDER BY user_group_relationships.position, user_group_relationships.id
 		`);
 	}
+	
+	async group_members(groupid, programid = null) {
+		let groupidVal = this.db.val(groupid);
+		
+		let members = await this.db.all(
+			`SELECT userid, username, displayname, pfp, status FROM users
+			WHERE userid IN
+				(
+					SELECT userid FROM user_group_relationships WHERE groupid = ${groupidVal}
+						UNION
+					SELECT userid FROM groups WHERE groupid = ${groupidVal}
+				)
+			ORDER BY displayname`
+		);
+
+		for (let member of members) {
+			member.roles = await this.db.all(
+				`SELECT roles.roleid, roles.name, roles.icon FROM roles
+				WHERE roleid IN
+					(
+						SELECT roleid FROM role_assignation WHERE userid = ${this.db.val(member.userid)}
+					)
+				AND
+					groupid = ${this.db.val(groupid)}
+				ORDER BY position`);
+			member.state = GlobalState.user_state(member.userid, programid, groupid);
+		}
+
+		if (programid) {
+			// TODO: return group members as well as program members
+			// sort them on the client in different categories
+
+			let program_members = [];
+
+			// TODO: don't iterate with database queries over all group members
+			for (let member of members)
+				if (await this.user_permissions_program(member.userid, programid) & Permissions.ByName.VIEW_PROGRAM)
+					program_members.push(member);
+			
+			return program_members;
+		}
+
+		return members;
+	}
+
 }
 
 export default DatabaseHelpers;
