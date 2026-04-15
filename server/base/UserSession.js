@@ -3,6 +3,30 @@ import Database from "../util/Database.js";
 import UserPermissions from "./UserPermissions.js";
 
 class UserSession {
+	static sessions = [];
+	static registerSession(session) {
+		this.sessions.push(session);
+	}
+	static deregisterSession(session) {
+		this.sessions = this.sessions.filter(tSession => tSession !== session);
+	}
+	static findSessionsByUserId(userid) {
+		return this.sessions.filter(session => session.userid == userid);
+	}
+	static getState(userid, programid, groupid) {
+		let sessions = this.findSessionsByUserId(userid);
+		
+		if(sessions.length == 0)
+			return "offline";
+		if(sessions.some(session => session.subscriptions.includes(programid)))
+			return "program";
+		if(sessions.some(session => session.subscriptions.includes(groupid)))
+			return "group";
+		
+		return "online";
+	}
+	
+	subscriptions = [];
 	constructor(client, userid) {
 		this.client = client;
 		this.userid = userid;
@@ -16,8 +40,8 @@ class UserSession {
 		});
 		
 		this.userHandlers.handle("group-details", async message => {
-			await this.db.helpers.selectGroupsForUser(this.userid);
-			message.reply()
+			const groupDetails = await this.db.helpers.selectGroupsForUser(this.userid);
+			message.reply(groupDetails)
 		});
 	}
 	

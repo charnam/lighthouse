@@ -8,6 +8,7 @@ import Logger from "./util/Logger.js";
 import path from "node:path";
 import ClientHandler from "./base/ClientHandler.js"
 import Database from "./util/Database.js";
+import Permissions from "./variables/Permissions.js";
 
 // # Variables and Configuration
 Logger.setLogLevel(0);
@@ -50,25 +51,7 @@ expressApp.get('/js/variables/release.txt', (req, res) => {
 	res.sendFile(path.join(cwd, "cache/release.txt"));
 });
 
-expressApp.get('/js/variables/permissions.js', (req, res) => {
-	res.type('text/javascript');
-	res.send(
-		`
-			export default ${JSON.stringify(Permissions.ByName)};
-		`
-		.trim()
-	);
-});
-expressApp.get('/js/variables/settings.js', (req, res) => {
-	res.type('text/javascript');
-	res.send(
-		`
-			export default ${JSON.stringify(Settings.ByName)};
-		`
-		.trim()
-	);
-});
-
+expressApp.use("variables", express.static('variables'));
 expressApp.use(express.static('../assets'));
 
 
