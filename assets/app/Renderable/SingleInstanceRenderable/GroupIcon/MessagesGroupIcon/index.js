@@ -1,7 +1,7 @@
 import GroupIcon from "../index.js";
 
 class MessagesGroupIcon extends GroupIcon {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/GroupIcon/MessagesGroupIcon/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "messages-group-icon", "bi-envelope-fill"]
 	
 	constructor(client) {

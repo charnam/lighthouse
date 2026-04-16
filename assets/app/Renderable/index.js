@@ -54,6 +54,15 @@ class Renderable {
 		}
 	}
 	
+	autoStyleByImport(metaURL) {
+		const fullURL = new URL(metaURL);
+		const splitURL = fullURL.pathname.split("/");
+		splitURL.pop();
+		splitURL.push("main.css");
+		const styleURL = splitURL.join("/")
+		return [...this.style, styleURL];
+	}
+	
 	async loadStyle(style) {
 		await new Promise(res => {
 			const thisStyle = style;

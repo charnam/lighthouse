@@ -5,7 +5,7 @@ import GroupIcon from "../../GroupIcon/index.js";
 import SettingsIcon from "../../GroupIcon/SmallGroupIcon/SettingsIcon/index.js";
 
 class GroupList extends ClientPane {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/ClientPane/GroupList/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "group-list"];
 	
 	render() {

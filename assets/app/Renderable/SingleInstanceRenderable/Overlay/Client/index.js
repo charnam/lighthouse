@@ -1,14 +1,15 @@
 import Connection from "../../../../../shared/Connection.js";
 import GroupList from "../../ClientPane/GroupList/index.js";
 import GroupSidebar from "../../ClientPane/GroupSidebar/index.js";
-import ClientProgram from "../../ClientProgram/index.js";
+import TextProgram from "../../ClientPane/ClientProgram/TextProgram/index.js";
+import ClientProgram from "../../ClientPane/ClientProgram/index.js";
 import LoadingScreen from "../LoadingScreen/index.js";
 import LoginMenu from "../LoginMenu/index.js";
 import Wallpaper from "../Wallpaper/index.js";
 import Overlay from "../index.js";
 
 class Client extends Overlay {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/Overlay/Client/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "client"];
 	
 	constructor(connection) {
@@ -86,7 +87,17 @@ class Client extends Overlay {
 		
 		const program = (await this.connection.request("program-details", id)).data;
 		if(transitionId == this._programOpenTransitionId) {
-			const programView = ClientProgram.from(program, this);
+			let programView;
+			switch(program.type) {
+				case "text":
+					programView = new TextProgram(this, program);
+					break;
+				case "info":
+					programView = new TextProgram(this, program);
+					break;
+			}
+			
+			
 			programView.renderTo(this.element);
 		}
 	}

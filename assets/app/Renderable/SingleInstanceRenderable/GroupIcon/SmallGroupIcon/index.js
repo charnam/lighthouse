@@ -1,7 +1,7 @@
 import GroupIcon from "../index.js";
 
 class SmallGroupIcon extends GroupIcon {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/GroupIcon/SmallGroupIcon/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "small-group-icon"];
 }
 

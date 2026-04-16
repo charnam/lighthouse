@@ -1,7 +1,7 @@
 import SingleInstanceRenderable from "../index.js";
 
 class ClientPane extends SingleInstanceRenderable {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/ClientPane/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "client-pane"];
 	
 	animateRemoveDuration = 180;

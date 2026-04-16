@@ -4,7 +4,7 @@ import BannerBox from "../../BannerBox/index.js";
 import LoadingScreen from "../LoadingScreen/index.js";
 
 class LoginMenu extends Overlay {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/Overlay/LoginMenu/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	animateRemoveDuration = 1000;
 	banners = new BannerBox();
 	

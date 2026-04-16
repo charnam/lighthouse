@@ -1,7 +1,7 @@
 import Overlay from "../index.js";
 
 class Wallpaper extends Overlay {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/Overlay/Wallpaper/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "wallpaper"];
 	
 	animateRemoveDuration = 1000;

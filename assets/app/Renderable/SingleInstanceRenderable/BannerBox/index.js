@@ -3,7 +3,7 @@ import SingleInstanceRenderable from "../index.js";
 import Banner from "../Banner/index.js";
 
 class BannerBox extends SingleInstanceRenderable {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/BannerBox/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	
 	render() {
 		const target = super.render();

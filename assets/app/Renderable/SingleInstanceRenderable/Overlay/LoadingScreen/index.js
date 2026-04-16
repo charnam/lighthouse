@@ -2,7 +2,7 @@ import { HTML } from "imperative-html";
 import Overlay from "../index.js";
 
 class LoadingScreen extends Overlay {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/Overlay/LoadingScreen/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	animateRemoveDuration = 1000;
 	
 	render() {

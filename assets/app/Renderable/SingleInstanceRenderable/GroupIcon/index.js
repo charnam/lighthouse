@@ -1,7 +1,7 @@
 import SingleInstanceRenderable from "../index.js";
 
 class GroupIcon extends SingleInstanceRenderable {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/GroupIcon/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "group-icon"]
 	
 	client = null;

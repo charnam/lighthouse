@@ -2,8 +2,8 @@
 .client {
 	display: grid;
 	grid-template-areas:
-		"groups programs program program-sidebar devtools";
-	grid-template-columns: 64px 270px 100% 270px 270px;
+		"groups programs program program-sidebar";
+	grid-template-columns: 64px 270px 1fr 270px;
 }
 
 #app.is-mobile-ui .client {

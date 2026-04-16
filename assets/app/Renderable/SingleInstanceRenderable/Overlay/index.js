@@ -1,7 +1,7 @@
 import SingleInstanceRenderable from "../index.js";
 
 class Overlay extends SingleInstanceRenderable {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/Overlay/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	
 	render() {
 		const target = super.render();

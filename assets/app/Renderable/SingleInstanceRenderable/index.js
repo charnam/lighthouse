@@ -1,7 +1,7 @@
 import Renderable from "../index.js";
 
 class SingleInstanceRenderable extends Renderable {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	animateRemoveDuration = 0;
 
 	get element() {

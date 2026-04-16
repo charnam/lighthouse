@@ -1,7 +1,7 @@
 import SmallGroupIcon from "../index.js";
 
 class SettingsIcon extends SmallGroupIcon {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/GroupIcon/SmallGroupIcon/SettingsIcon/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "bi-gear-fill"];
 	
 	constructor(client) {

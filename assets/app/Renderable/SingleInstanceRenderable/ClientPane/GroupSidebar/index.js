@@ -3,7 +3,7 @@ import ClientPane from "../index.js";
 import GroupSidebarProgram from "../../GroupSidebarProgram/index.js";
 
 class GroupSidebar extends ClientPane {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/ClientPane/GroupSidebar/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "group-pane", "group-sidebar"];
 	
 	groupid = null;

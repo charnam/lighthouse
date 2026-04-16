@@ -1,9 +1,9 @@
 import { HTML } from "imperative-html";
 import SingleInstanceRenderable from "../index.js";
-import ClientProgram from "../ClientProgram/index.js";
+import ClientProgram from "../ClientPane/ClientProgram/index.js";
 
 class GroupSidebarProgram extends SingleInstanceRenderable {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/GroupSidebarProgram/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "group-sidebar-program"];
 	
 	constructor(client, details) {

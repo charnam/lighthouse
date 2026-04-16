@@ -56,9 +56,13 @@ class UserSession {
 		this.userHandlers.handle("get-subscriptions", async message => {
 			message.reply(this.subscriptions);
 		});
+		
+		this.userHandlers.handle("program-details", async message => {
+			if(typeof message.data == "string") {
+				message.reply(await this.db.helpers.getProgramDetailsAsUser(message.data, this.userid));
+			}
+		});
 	}
-	
-	
 }
 
 export default UserSession;

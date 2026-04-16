@@ -2,7 +2,7 @@ import { HTML } from "imperative-html";
 import SingleInstanceRenderable from "../index.js";
 
 class Banner extends SingleInstanceRenderable {
-	style = [...this.style, "app/Renderable/SingleInstanceRenderable/Banner/main.css"];
+	style = this.autoStyleByImport(import.meta.url);
 	animateRemoveDuration = 1000;
 	
 	constructor(type, text) {
