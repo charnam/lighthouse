@@ -40,8 +40,21 @@ class UserSession {
 		});
 		
 		this.userHandlers.handle("group-details", async message => {
-			const groupDetails = await this.db.helpers.selectGroupsForUser(this.userid);
-			message.reply(groupDetails)
+			if(typeof message.data == "string") {
+				const groupDetails = await this.db.helpers.getGroupDetailsAsUser(message.data, this.userid);
+				message.reply(groupDetails)
+			}
+		});
+		
+		this.userHandlers.handle("group-programs", async message => {
+			if(typeof message.data == "string") {
+				const groupDetails = await this.db.helpers.getGroupProgramsAsUser(message.data, this.userid);
+				message.reply(groupDetails)
+			}
+		});
+		
+		this.userHandlers.handle("get-subscriptions", async message => {
+			message.reply(this.subscriptions);
 		});
 	}
 	

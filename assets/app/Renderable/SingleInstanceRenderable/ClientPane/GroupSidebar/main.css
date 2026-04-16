@@ -1,0 +1,23 @@
+.group-sidebar {
+	background: #0003;
+	margin: 6px;
+	border-radius: 10px;
+	grid-area: programs;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	border: 1px solid var(--color-background-secondary);
+}
+
+.group-sidebar-titlebar {
+	text-align: center;
+	height: 48px;
+	align-content: center;
+	background: #0004;
+	user-select: none;
+	pointer-events: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0 10px;
+}

@@ -103,7 +103,7 @@ class DatabaseHelpers {
 			permissions = permissions | role.allow_permissions;
 		});
 		
-		if(permissions & Permissions.ByName.ADMIN)
+		if(permissions & Permissions.bitmask.byName.ADMIN)
 			return Permissions.bitmask.mask;
 		
 		return permissions;
@@ -211,10 +211,12 @@ class DatabaseHelpers {
 		if(!group)
 			return null;
 		
-		group.permissions = await this.getUserGroupPermissions(group.groupid);
+		const permissions = await this.getUserGroupPermissions(userid, group.groupid);
+		
+		group.permissions = permissions;
 		group.members = await this.getMembersInGroup(group.groupid);
 		
-		if(await this.getUserGroupPermissions(group.groupid) & Permissions.bitmask.byName.EDIT_ROLES) {
+		if(group.permissions & Permissions.bitmask.byName.EDIT_ROLES) {
 			group.roles = await this.db.all(`
 				SELECT roleid, name, icon
 					FROM roles
@@ -223,7 +225,11 @@ class DatabaseHelpers {
 			`);
 		}
 		
-		group.programs = await this.db.all(`
+		return group;
+	}
+	
+	async getGroupProgramsAsUser(groupid, userid) {
+		const programs = await this.db.all(`
 			SELECT programs.programid, name, type, position, latest_read_time IS NOT NULL AS unread
 			FROM programs
 			LEFT JOIN (
@@ -241,7 +247,34 @@ class DatabaseHelpers {
 			ORDER BY position
 		`);
 		
-		return group;
+		let programs_filtered = [];
+		for(let program of programs) {
+			if(await this.getUserProgramPermissions(userid, program.programid) & Permissions.bitmask.byName.VIEW_PROGRAM) {
+				programs_filtered.push(program);
+			}
+		}
+		
+		return programs_filtered;
+	}
+	
+	async getProgramDetailsAsUser(programid, userid) {
+		const programQuery = await this.db.get(`
+			SELECT groupid FROM programs WHERE programid = ${this.db.val(programid)}
+		`);
+		if(!programQuery)
+			return null;
+		
+		const permissions = await this.getUserProgramPermissions(userid, programid);
+		if(!(permissions & Permissions.bitmask.byName.VIEW_PROGRAM))
+			return null;
+		
+		const programs = await this.getGroupProgramsAsUser(programQuery.groupid, userid);
+		
+		const program = programs.find(program => program.programid == programid);
+		if(!program)
+			return null;
+		else
+			return program;
 	}
 
 }

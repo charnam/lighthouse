@@ -32,7 +32,7 @@ class VersionedBitmask extends Bitmask {
 		this.versions = versions;
 	}
 	
-	defaultMask() {
+	getDefaults() {
 		if(this.useFirstVersion)
 			return this.updateVersioning(0);
 		else {

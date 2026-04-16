@@ -1,0 +1,23 @@
+
+.wallpaper {
+	position: fixed;
+	object-fit: cover;
+	filter: blur(8px);
+	z-index: -1000;
+	inset: 0;
+	background-position: center;
+	background-size: cover;
+	opacity: 0.25;
+	transition: opacity 0.2s ease-in-out;
+}
+
+@starting-style {
+	.wallpaper {
+		opacity: 0;
+	}
+}
+
+.wallpaper.is-removing {
+	transition-delay: 0.2s;
+	opacity: 0;
+}

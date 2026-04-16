@@ -4,6 +4,11 @@
 	display: flex;
 	flex-direction: column;
 }
+@starting-style {
+	.group-list {
+		transform: translateY(0);
+	}
+}
 
 .group-list-messages-group-wrapper {
 	display: flex;

@@ -1,7 +1,10 @@
 import Connection from "../../../../../shared/Connection.js";
 import GroupList from "../../ClientPane/GroupList/index.js";
+import GroupSidebar from "../../ClientPane/GroupSidebar/index.js";
+import ClientProgram from "../../ClientProgram/index.js";
 import LoadingScreen from "../LoadingScreen/index.js";
 import LoginMenu from "../LoginMenu/index.js";
+import Wallpaper from "../Wallpaper/index.js";
 import Overlay from "../index.js";
 
 class Client extends Overlay {
@@ -48,18 +51,43 @@ class Client extends Overlay {
 		new GroupList(client).renderTo(client.element);
 	}
 	
+	_groupOpenTransitionId = null;
 	async openGroup(id) {
+		if(this.wallpaper)
+			this.wallpaper.remove();
+		
 		const groupPanes = this.element.querySelectorAll(".group-pane");
 		
+		let transitionId = this._groupOpenTransitionId = Date.now();
 		if(groupPanes.length > 0) {
-			await Promise.all(groupPanes.map(pane => pane.renderable.remove()));
+			await Promise.all([...groupPanes].map(pane => pane.renderable.remove()));
+		}
+		const groupDetails = (await this.connection.request("group-details", id)).data;
+		
+		if(transitionId == this._groupOpenTransitionId) {
+			const sidebar = new GroupSidebar(this, id);
+			sidebar.renderTo(this.element);
+			
+			if(groupDetails.wallpaper) {
+				this.wallpaper = new Wallpaper("/uploads/"+groupDetails.wallpaper);
+				this.wallpaper.renderTo(this.element);
+			}
+		}
+	}
+	
+	_programOpenTransitionId = null;
+	async openProgram(id) {
+		const programPanes = this.element.querySelectorAll(".program-pane");
+		
+		let transitionId = this._programOpenTransitionId = Date.now();
+		if(programPanes.length > 0) {
+			await Promise.all([...programPanes].map(pane => pane.renderable.remove()));
 		}
 		
-		const detailsResponse = await this.connection.request("group-details", id);
-		
-		console.log(detailsResponse);
-		if(detailsResponse) {
-			
+		const program = (await this.connection.request("program-details", id)).data;
+		if(transitionId == this._programOpenTransitionId) {
+			const programView = ClientProgram.from(program, this);
+			programView.renderTo(this.element);
 		}
 	}
 }

@@ -1,7 +1,22 @@
 
-.messages-group-icon::before {
-	content: attr(title);
-	max-width: 70%;
-	overflow: hidden;
-	text-overflow: ellipsis;
+.messages-group-icon.group-icon-anim::before {
+	animation: messages-group-icon-flutter 0.32s ease-in-out;
+}
+
+@keyframes messages-group-icon-flutter {
+	0% {
+		transform: translateY(0px) scaleX(1);
+	}
+	25% {
+		transform: translateY(-2px) scaleX(0.9);
+	}
+	50% {
+		transform: translateY(0px) scaleX(0.8);
+	}
+	75% {
+		transform: translateY(2px) scaleX(1.2);
+	}
+	100% {
+		transform: translateY(0px) scaleX(1);
+	}
 }

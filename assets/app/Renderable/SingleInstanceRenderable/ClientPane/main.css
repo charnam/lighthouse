@@ -1,18 +1,18 @@
 
 .client-pane {
-	transition: 0.4s ease-out;
+	transition: 0.15s ease-out;
 	transition-property: opacity, transform;
 }
 
 @starting-style {
 	.client-pane {
 		opacity: 0;
-		transform: translateY(32px);
+		transform: translateY(-32px);
 	}
 }
 
 .client-pane.is-removing {
 	transition-timing-function: ease-in;
-	transform: translateY(-32px);
+	transform: translateY(64px);
 	opacity: 0;
 }

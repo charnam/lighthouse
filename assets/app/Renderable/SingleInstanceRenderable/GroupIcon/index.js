@@ -21,6 +21,10 @@ class GroupIcon extends SingleInstanceRenderable {
 	}
 	
 	async open() {
+		this.element.classList.remove("group-icon-anim");
+		void this.element.offsetWidth;
+		this.element.classList.add("group-icon-anim");
+		
 		this.element.classList.add("group-icon-opening");
 		await this.client.openGroup(this.details.groupid);
 		this.element.classList.remove("group-icon-opening");

@@ -2,6 +2,7 @@ import { HTML } from "imperative-html";
 import ClientPane from "../index.js";
 import MessagesGroupIcon from "../../GroupIcon/MessagesGroupIcon/index.js";
 import GroupIcon from "../../GroupIcon/index.js";
+import SettingsIcon from "../../GroupIcon/SmallGroupIcon/SettingsIcon/index.js";
 
 class GroupList extends ClientPane {
 	style = [...this.style, "app/Renderable/SingleInstanceRenderable/ClientPane/GroupList/main.css"];
@@ -14,7 +15,11 @@ class GroupList extends ClientPane {
 			new HTML.div({class: "group-list-messages-group-wrapper"},
 				new MessagesGroupIcon(this.client).render(),
 			),
-			new HTML.div({class: "group-list-joined-groups"})
+			new HTML.div({class: "group-list-joined-groups"}),
+			new HTML.div({class: "group-list-system-groups"},
+				new SettingsIcon(this.client).render(),
+				
+			)
 		);
 		
 		this.update();

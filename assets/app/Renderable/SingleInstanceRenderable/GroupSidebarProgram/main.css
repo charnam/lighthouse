@@ -1,0 +1,20 @@
+.group-sidebar-program {
+	position: relative;
+	display: flex;
+	padding: 10px;
+	font-size: 15px;
+	box-sizing: border-box;
+	cursor: pointer;
+	user-select: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	align-items: center;
+}
+
+.group-sidebar-program::before {
+	font-size: 16px;
+	margin-right: 10px;
+	position: relative;
+	top: -1px;
+}
