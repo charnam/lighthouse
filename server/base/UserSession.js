@@ -53,6 +53,29 @@ class UserSession {
 			}
 		});
 		
+		this.userHandlers.handle("group-subscribe", async message => {
+			const groupDetails = await this.db.helpers.getGroupDetailsAsUser(message.data);
+			if(groupDetails) {
+				this.subscriptions.push(groupDetails.groupid);
+				message.reply(true);
+			} else {
+				message.reply(false);
+			}
+		});
+		this.userHandlers.handle("program-subscribe", async message => {
+			const programDetails = await this.db.helpers.getProgramDetailsAsUser(message.data);
+			if(programDetails) {
+				this.subscriptions.push(programDetails.programid);
+				message.reply(true);
+			} else {
+				message.reply(false);
+			}
+		});
+		this.userHandlers.handle("unsubscribe", async message => {
+			this.subscriptions = this.subscriptions.filter(subscription => subscription !== message.data);
+			message.reply();
+		});
+		
 		this.userHandlers.handle("get-subscriptions", async message => {
 			message.reply(this.subscriptions);
 		});

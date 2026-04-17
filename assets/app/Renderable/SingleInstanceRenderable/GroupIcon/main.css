@@ -32,6 +32,13 @@
 	transition: 0.8s ease-out;
 }
 
+.group-icon.group-icon-open {
+	outline-color: #fff3;
+}
+.group-icon.group-icon-anim.group-icon-open {
+	
+}
+
 @starting-style {
 	.group-icon.group-icon.has-image::before {
 		opacity: 0;

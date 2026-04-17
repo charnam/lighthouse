@@ -41,6 +41,12 @@ class GroupIcon extends SingleInstanceRenderable {
 		} else {
 			target.classList.remove("has-image")
 		}
+		const subscriptions = await this.client.connection.request("get-subscriptions");
+		if(subscriptions.data.includes(this.details.groupid)) {
+			target.classList.add("group-icon-open")
+		} else {
+			target.classList.remove("group-icon-open")
+		}
 	}
 }
 
