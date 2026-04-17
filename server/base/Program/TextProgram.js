@@ -1,4 +1,0 @@
-
-class TextProgram extends Program {
-	
-}

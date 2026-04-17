@@ -1,5 +1,6 @@
 import MessageHandlerGroup from "../../assets/shared/MessageHandlerGroup.js";
 import Database from "../util/Database.js";
+import TextUserProgramHandlers from "./Program/TextUserProgramHandlers.js";
 import UserPermissions from "./UserPermissions.js";
 
 class UserSession {
@@ -25,6 +26,9 @@ class UserSession {
 		
 		return "online";
 	}
+	static getSubscribers(id) {
+		return this.sessions.filter(session => session.subscriptions.includes(id));
+	}
 	
 	subscriptions = [];
 	constructor(client, userid) {
@@ -34,6 +38,7 @@ class UserSession {
 		this.permissions = new UserPermissions(this.db, this.userid);
 		
 		this.userHandlers = new MessageHandlerGroup(this.client.connection);
+		this.programHandlers = new MessageHandlerGroup(this.client.connection);
 		
 		this.userHandlers.handle("group-list", async message => {
 			message.reply(await this.db.helpers.selectGroupsForUser(this.userid));
@@ -80,11 +85,7 @@ class UserSession {
 			message.reply(this.subscriptions);
 		});
 		
-		this.userHandlers.handle("program-details", async message => {
-			if(typeof message.data == "string") {
-				message.reply(await this.db.helpers.getProgramDetailsAsUser(message.data, this.userid));
-			}
-		});
+		new TextUserProgramHandlers(this);
 	}
 }
 
