@@ -86,7 +86,7 @@ class Connection {
 	
 	handlers = [];
 	handle(type, callback) {
-		const handler = new MessageHandler(this, message => {
+		const handler = new MessageHandler(this, this, message => {
 			if(message.message?.type == type) {
 				callback(message);
 			}

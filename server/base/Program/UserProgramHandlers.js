@@ -1,11 +1,13 @@
+import MessageHandlerGroup from "../../../assets/shared/MessageHandlerGroup.js";
 
 class UserProgramHandlers {
 	constructor(session) {
 		this.session = session;
+		this.handlers = new MessageHandlerGroup(this.session.client.connection);
 		this.setupHandlers();
 	}
 	setupHandlers() {
-		this.session.programHandlers.handle("program-details", async message => {
+		this.handlers.handle("program-details", async message => {
 			const programid = message.data;
 			if(!programid) return;
 			

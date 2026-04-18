@@ -38,7 +38,6 @@ class UserSession {
 		this.permissions = new UserPermissions(this.db, this.userid);
 		
 		this.userHandlers = new MessageHandlerGroup(this.client.connection);
-		this.programHandlers = new MessageHandlerGroup(this.client.connection);
 		
 		this.userHandlers.handle("group-list", async message => {
 			message.reply(await this.db.helpers.selectGroupsForUser(this.userid));

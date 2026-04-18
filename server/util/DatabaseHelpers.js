@@ -277,7 +277,7 @@ class DatabaseHelpers {
 			return program;
 	}
 	
-	async getMessages(programid, point, direction) {
+	async getMessages(programid, point, direction, limit = 50) {
 		const messages = await this.db.all(`
 			SELECT 
 				messages.messageid,
@@ -286,6 +286,9 @@ class DatabaseHelpers {
 				messages.creation,
 				messages.userid,
 				messages.edits,
+				
+				LAG(messages.creation) OVER (ORDER BY messages.creation) AS prev_creation,
+				LAG(messages.userid)   OVER (ORDER BY messages.creation) AS prev_userid,
 				
 				users.userid AS sender_userid,
 				users.displayname AS sender_displayname,
@@ -303,22 +306,33 @@ class DatabaseHelpers {
 			LEFT JOIN users ON messages.userid = users.userid
 			LEFT JOIN messages AS replyto ON messages.reply_to = replyto.messageid
 			LEFT JOIN users AS replyto_user ON replyto.userid = replyto_user.userid
-			WHERE programid = ${this.db.val(programid)}
+			WHERE messages.programid = ${this.db.val(programid)}
 				${point == "initial" ? "" : `
 					AND messages.creation ${direction == "historic" ? "<=" : ">="} (SELECT creation FROM messages WHERE messageid = ${this.db.val(point)})
 				`}
-			ORDER BY messages.creation ${direction == "historic" ? "DESC" : ""}
-			LIMIT 50
+			ORDER BY messages.creation ${direction == "historic" ? "DESC" : "ASC"}
+			LIMIT ${this.db.val(limit)}
 		`);
 		
 		await Promise.all(messages.map(async (message, index) => {
-			let seenBy = await db.all("SELECT userid FROM read_indicators WHERE messageid = ?", message.messageid);
+			let seenBy = await this.db.all(`SELECT userid FROM read_indicators WHERE messageid = ${this.db.val(message.messageid)}`);
 			seenBy = seenBy.map(event => event.userid);
 			
-			let mentions = await db.all("SELECT userid FROM message_mentions WHERE messageid = ?", message.messageid);
+			let mentions = await this.db.all(`SELECT userid FROM message_mentions WHERE messageid = ${this.db.val(message.messageid)}`);
 			mentions = mentions.map(event => event.userid);
 			
-			let attachments = await db.all("SELECT uploads.originalname, uploads.mimetype, uploads.uploadid, uploads.size FROM message_attachments JOIN uploads ON uploads.uploadid = message_attachments.uploadid WHERE message_attachments.messageid = ?", message.messageid);
+			let attachments = await this.db.all(`
+				SELECT
+					uploads.originalname,
+					uploads.mimetype,
+					uploads.uploadid,
+					uploads.size
+				FROM message_attachments
+				JOIN uploads
+				ON
+					uploads.uploadid = message_attachments.uploadid
+				WHERE message_attachments.messageid = ${this.db.val(message.messageid)}
+			`);
 			
 			let output_message = {
 				messageid: message.messageid,
@@ -333,6 +347,10 @@ class DatabaseHelpers {
 					pfp: message.sender_pfp
 				},
 				replyTo: null,
+				previous: {
+					creation: message.prev_creation,
+					userid: message.prev_userid
+				},
 				seenBy,
 				attachments
 			};
@@ -353,6 +371,18 @@ class DatabaseHelpers {
 		}));
 		
 		return messages;
+	}
+	
+	async getMessage(messageid) {
+		const message = await this.db.get(`
+			SELECT programid
+			FROM messages
+			WHERE messageid = ${this.db.val(messageid)}
+		`);
+		if(message)
+			return (await this.getMessages(message.programid, messageid, "historic", 1))[0];
+		else
+			return null;
 	}
 
 }

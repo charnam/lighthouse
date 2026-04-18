@@ -1,0 +1,78 @@
+.message {
+	position: relative;
+	padding: 2px;
+	padding-left: 10px;
+	padding-right: 40px;
+	display: grid;
+	grid-template-areas:
+		"time text"
+		"time attachments";
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto auto;
+	column-gap: 8px;
+}
+
+.message + .message.message-is-first {
+	margin-top: 10px;
+}
+.message.message-is-first {
+	display: grid;
+	grid-template-areas:
+		"pfp name time"
+		"pfp text text"
+		"pfp attachments attachments";
+	grid-template-columns: auto auto 1fr;
+	grid-template-rows: auto auto auto;
+}
+
+.message > .user {
+	display: contents;
+}
+
+.message > .user .user-pfp {
+	grid-area: pfp;
+}
+.message:not(.message-is-first) > .user .user-pfp {
+	display: none;
+}
+
+.message > .user .user-name {
+	grid-area: name;
+}
+.message:not(.message-is-first) > .user .user-name {
+	display: none;
+}
+
+.message-content {
+	display: inline-block;
+	grid-area: text;
+	user-select: text;
+}
+
+.message-time {
+	grid-area: time;
+	width: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: transparent;
+	white-space: nowrap;
+	height: 100%;
+	font-size: 0.7em;
+}
+.message.message-is-first .message-time {
+	width: fit-content;
+}
+
+.message:hover .message-time,
+.message.message-is-first .message-time {
+	color: #fff8;
+}
+
+.message-attachments {
+	grid-area: attachments;
+}
+.message-attachments:empty {
+	display: none;
+}
+

@@ -37,7 +37,7 @@ class GroupIcon extends SingleInstanceRenderable {
 		}
 		if(this.details.icon) {
 			target.classList.add("has-image")
-			target.setAttribute("style", `--icon: url("/uploads/${this.details.icon}")`);
+			target.setAttribute("style", `--image: url("/uploads/${this.details.icon}")`);
 		} else {
 			target.classList.remove("has-image")
 		}

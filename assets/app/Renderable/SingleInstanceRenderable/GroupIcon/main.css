@@ -25,7 +25,7 @@
 	inset: 0;
 	background-position: center;
 	background-size: cover;
-	background-image: var(--icon);
+	background-image: var(--image);
 	content: "";
 	border-radius: inherit;
 	margin: 1px;

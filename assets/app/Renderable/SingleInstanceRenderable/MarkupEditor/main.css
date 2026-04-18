@@ -1,0 +1,18 @@
+.markup-editor {
+	display: flex;
+	align-items: center;
+}
+.markup-editor-compose {
+	white-space: pre-wrap;
+	width: 100%;
+	word-break: break-word;
+	outline: none;
+	max-height: min(50vh, 200px);
+	overflow-y: auto;
+}
+.markup-editor-compose:empty:after {
+	content: attr(placeholder);
+	color: gray;
+	user-select: none;
+	pointer-events: none;
+}
