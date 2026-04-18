@@ -7,7 +7,6 @@
 	width: 100%;
 	word-break: break-word;
 	outline: none;
-	max-height: min(50vh, 200px);
 	overflow-y: auto;
 }
 .markup-editor-compose:empty:after {
