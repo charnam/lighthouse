@@ -24,7 +24,7 @@ class TextUserProgramHandlers extends UserProgramHandlers {
 		this.handlers.handle("text-program-get-message", async message => {
 			const id = message.data;
 			
-		})
+		});
 	}
 }
 

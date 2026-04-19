@@ -1,0 +1,14 @@
+.context-menu {
+	position: absolute;
+	left: var(--x);
+	top: var(--y);
+	bottom: 0;
+	right: 0;
+	width: fit-content;
+	height: fit-content;
+	min-width: 200px;
+	background: var(--color-background-secondary);
+	border-radius: 10px;
+	padding: 4px;
+	border: 1px solid #0005;
+}

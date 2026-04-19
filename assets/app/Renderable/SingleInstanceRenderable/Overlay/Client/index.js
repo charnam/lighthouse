@@ -7,6 +7,7 @@ import LoadingScreen from "../LoadingScreen/index.js";
 import LoginMenu from "../LoginMenu/index.js";
 import Wallpaper from "../Wallpaper/index.js";
 import Overlay from "../index.js";
+import UserPage from "../UserPage/index.js";
 
 class Client extends Overlay {
 	style = this.autoStyleByImport(import.meta.url);

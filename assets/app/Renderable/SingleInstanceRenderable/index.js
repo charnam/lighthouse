@@ -10,7 +10,11 @@ class SingleInstanceRenderable extends Renderable {
 
 	render() {
 		if (this.element) {
-			throw new Error("Attempted to re-render SingleInstanceRenderable, " + this.constructor.name);
+			if(document.body.contains(this.element)) {
+				throw new Error("Attempted to re-render SingleInstanceRenderable, " + this.constructor.name);
+			} else {
+				this.boundTo = [];
+			}
 		}
 		return super.render();
 	}

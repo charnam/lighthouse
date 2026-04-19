@@ -1,0 +1,48 @@
+
+.user-page {
+	overflow: visible;
+	transition: 0.5s ease-out;
+	z-index: 0;
+	display: flex;
+	justify-content: center;
+}
+.user-page:before {
+	content: "";
+	background-color: var(--color-background-primary);
+	position: absolute;
+	inset: 0;
+	filter: blur(10px);
+	z-index: -10;
+	transform: scale(1.1);
+}
+
+@starting-style {
+	.user-page {
+		transform: scale(0.9);
+		opacity: 0;
+	}
+}
+
+.user-page-wallpaper-wrap {
+	z-index: -10;
+	position: fixed;
+	inset: 0;
+	overflow: visible;
+}
+
+.user-page-user-details {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 10px;
+	width: 500px;
+	max-width: 80vw;
+}
+
+.user-page-user-bio {
+	border: 1px solid #fff5;
+	border-radius: 5px;
+	padding: 10px;
+	border-left-width: 8px;
+	background: #0005;
+}

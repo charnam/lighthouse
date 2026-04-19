@@ -1,5 +1,19 @@
+
+.user {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.user-has-client {
+	cursor: pointer;
+}
+
 .user-name {
 	font-weight: bold;
+}
+.user-has-client .user-name:hover {
+	text-decoration: underline;
 }
 
 .user-pfp {
@@ -12,4 +26,8 @@
 	background-repeat: no-repeat;
 	flex: none;
 	position: relative;
+}
+
+.user-pfp:active {
+	transform: scale(0.9);
 }

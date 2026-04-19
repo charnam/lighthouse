@@ -59,4 +59,4 @@ expressApp.use(express.static('../assets'));
 Upload.setup(db, expressApp);
 
 // # Start server
-expressApp.listen(8001);
+expressApp.listen(8001, () => console.log("Server is running on port 8001"));

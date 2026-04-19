@@ -384,7 +384,34 @@ class DatabaseHelpers {
 		else
 			return null;
 	}
-
+	
+	async getUserProfile(userid) {
+		const profile = await this.db.get(`
+			SELECT
+				userid,
+				username,
+				pfp,
+				displayname,
+				creation,
+				bio,
+				wallpaper
+			FROM users
+			WHERE userid = ${this.db.val(userid)}
+		`);
+		return profile;
+	}
+	async getUserDetails(userid) {
+		const user = await this.db.get(`
+			SELECT
+				userid,
+				username,
+				pfp,
+				displayname
+			FROM users
+			WHERE userid = ${this.db.val(userid)}`)
+		return user;
+	}
+	
 }
 
 export default DatabaseHelpers;

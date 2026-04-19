@@ -84,6 +84,16 @@ class UserSession {
 			message.reply(this.subscriptions);
 		});
 		
+		this.userHandlers.handle("profile-details", async message => {
+			const userid = message.data;
+			message.reply(await this.db.helpers.getUserProfile(userid));
+		})
+		
+		this.userHandlers.handle("user-details", async message => {
+			const userid = message.data;
+			message.reply(await this.db.helpers.getUserDetails(userid));
+		})
+		
 		new TextUserProgramHandlers(this);
 	}
 }
