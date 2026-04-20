@@ -17,16 +17,21 @@ class User extends SingleInstanceRenderable {
 			this.userid = detailsOrUserId.userid;
 		}
 		this.client = client;
-		this.options = options;
+		this.options = options ?? {};
 	}
 	
 	render() {
 		const target = super.render();
 		
 		target.append(
-			new HTML.div({class: "user-pfp"}),
-			new HTML.div({class: "user-name"})
+			new HTML.div({class: "user-pfp"},
+				new HTML.div({class: "user-activity"})
+			),
+			new HTML.div({class: "user-name"}),
+			new HTML.div({class: "user-status"}),
+			new HTML.div({class: "user-tag"}),
 		);
+		
 		if(this.client) {
 			target.classList.add("user-has-client");
 			
@@ -40,9 +45,12 @@ class User extends SingleInstanceRenderable {
 			]);
 			menu.handleDefaultContextMenu(target);
 			
-			target.addEventListener("click", () => {
-				this.openProfile();
-			})
+			if(this.options.clickable ?? true) {
+				target.classList.add("user-is-clickable")
+				target.addEventListener("click", () => {
+					this.openProfile();
+				})
+			}
 		}
 		
 		this.update();
@@ -56,7 +64,11 @@ class User extends SingleInstanceRenderable {
 	
 	async updateRendered(target) {
 		if(!this.details) {
-			this.details = (await this.client.connection.request("user-details", this.userid)).data;
+			this.details = (await this.client.connection.request("user-details", {
+				userid: this.userid,
+				programid: this.options.programid,
+				groupid: this.options.groupid
+			})).data;
 		}
 		
 		if(this.details.pfp) {
@@ -67,11 +79,18 @@ class User extends SingleInstanceRenderable {
 		
 		const userPfp = target.querySelector(".user-pfp");
 		const userName = target.querySelector(".user-name");
+		const userTag = target.querySelector(".user-tag");
+		const userStatus = target.querySelector(".user-status");
+		const userActivity = target.querySelector(".user-activity");
 		
 		userPfp.setAttribute("style", `
 			--image: url("/uploads/${this.details.pfp}");
 		`);
 		userName.innerText = this.details.displayname;
+		userTag.innerText = this.details.username;
+		userStatus.innerText = this.details.status;
+		userActivity.setAttribute("activity", this.details.activity);
+		
 	}
 }
 

@@ -11,6 +11,14 @@ class ClientProgram extends ClientPane {
 		this.client.connection.request("program-subscribe", this.programid)
 	}
 	
+	render() {
+		const target = super.render();
+		
+		target.setAttribute("data-program-id", this.programid);
+		
+		return target;
+	}
+	
 	async remove() {
 		return Promise.all([
 			super.remove(),

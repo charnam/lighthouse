@@ -13,13 +13,15 @@ class TextProgram extends ClientProgram {
 		const target = super.render();
 		
 		let uploadButton,
-			sendButton;
+			sendButton,
+			loadHistoric,
+			loadFuturistic;
 		
 		target.append(
 			new HTML.div({class: "text-program-message-history-scroll"},
-				new HTML.div({class: "text-program-message-history-load-historic"}),
+				loadFuturistic = new HTML.div({class: "text-program-message-history-load-futuristic"}),
 				new HTML.div({class: "text-program-message-history"}),
-				new HTML.div({class: "text-program-message-history-load-futuristic"})
+				loadHistoric = new HTML.div({class: "text-program-message-history-load-historic"}),
 			),
 			new HTML.div({class: "text-program-box"},
 				uploadButton = new HTML.div({class: "text-program-box-upload bi-upload"}),
@@ -40,14 +42,42 @@ class TextProgram extends ClientProgram {
 			this.send();
 		})
 		
+		this.handler = this.client.connection.handle("text-program-receive-message", message => {
+			const historyEl = target.querySelector(".text-program-message-history");
+			
+			new Message(message.data, this.client)
+				.renderTo(historyEl)
+			
+			const sound = new Audio();
+			sound.autoplay = true;
+			
+			if(message.data.userid == this.client.userid) {
+				sound.src = "/audio/message-receive.mp3";
+			} else {
+				sound.src = "/audio/message-send.mp3";
+			}
+		})
+		
+		
+		
 		this.updateMessageHistory(target);
 		
 		return target;
 	}
 	
+	async beforeRemove() {
+		this.handler.disable();
+		await super.beforeRemove();
+	}
+	
 	async send() {
 		const sent = this.textbox.value;
 		this.textbox.value = "";
+		
+		this.client.connection.request("text-program-send-message", {
+			programid: this.programid,
+			content: sent
+		});
 	}
 	
 	async updateMessageHistory(target, event = {}) {

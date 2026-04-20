@@ -12,6 +12,10 @@
 	align-items: center;
 }
 
+.group-sidebar-program:hover {
+	background: #fff2 !important;
+}
+
 .group-sidebar-program::before {
 	font-size: 16px;
 	margin-right: 10px;

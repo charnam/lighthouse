@@ -25,12 +25,12 @@ class ClientHandler {
 				
 				const userRow = await this.logindb.get(`SELECT userid, username, password FROM users WHERE username = ${this.logindb.val(username)}`);
 				if(!userRow) {
-					return Banners.error("Please check the username and try again.");
+					return message.reply(Banners.error("Please check the username and try again."));
 				}
 				
 				const passwordIsValid = await bcrypt.compare(password, userRow.password);
 				if(!passwordIsValid) {
-					return Banners.error("Invalid password, please try again.");
+					return message.reply(Banners.error("Invalid password, please try again."));
 				}
 				
 				const token = crypto.randomUUID();

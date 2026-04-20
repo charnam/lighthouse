@@ -1,11 +1,13 @@
 
 .user-page {
 	overflow: visible;
-	transition: 0.5s ease-out;
+	transition: 0.4s ease-out;
 	z-index: 0;
 	display: flex;
 	justify-content: center;
+	align-items: center;
 }
+
 .user-page:before {
 	content: "";
 	background-color: var(--color-background-primary);
@@ -14,13 +16,131 @@
 	filter: blur(10px);
 	z-index: -10;
 	transform: scale(1.1);
+	transition: 0.3s ease-out;
+	transition-property: transform, opacity;
 }
 
+.user-page-close {
+	position: fixed;
+	top: 30px;
+	left: 30px;
+	font-size: 32px;
+	cursor: pointer;
+	aspect-ratio: 1 / 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px;
+	background: #0008;
+	border-radius: 10px;
+	outline: 2px solid #fff4;
+	outline-offset: 1px;
+}
+
+.user-page-close:hover {
+	background: #000c;
+}
+
+.user-page-close:active {
+	transform: translateY(5px);
+}
+
+.user-page-wallpaper-wrap .wallpaper {
+	transition: 0.8s ease-out;
+	transition-property: transform, border-radius, opacity;
+	border-radius: 0px;
+}
 @starting-style {
 	.user-page {
 		transform: scale(0.9);
 		opacity: 0;
 	}
+	.user-page:before {
+		transform: scale(0.7);
+		opacity: 1.0;
+	}
+	.user-page-wallpaper-wrap .wallpaper {
+		transform: scale(0.9);
+		border-radius: 90px;
+		opacity: 0;
+	}
+}
+
+.user-page.is-removing {
+	opacity: 0;
+	transform: scale(0.9);
+	transition-timing-function: ease-in-out;
+	transition-duration: 0.2s;
+}
+.user-page.is-removing:before {
+	transform: scale(0.7);
+}
+
+
+.user-page .user-name-text {
+	white-space: wrap;
+}
+.user-page .user {
+	display: flex;
+	font-size: 2em;
+	align-items: center;
+	display: grid;
+	grid-template-areas: "pfp name" "pfp tag" "pfp status";
+	grid-template-columns: auto 1fr;
+	column-gap: 8px;
+}
+.user-page .user-pfp {
+	width: 64px;
+	height: 64px;
+	grid-area: pfp;
+	align-self: start;
+}
+.user-page .user-tag {
+	display: inline-block;
+	font-size: 0.5em;
+	align-self: flex-start;
+	color: #fff7;
+	grid-area: tag;
+	font-weight: bold;
+	user-select: text;
+}
+.user-page .user-tag:before {
+	content: "@";
+}
+.user-page .user-name {
+	font-weight: bold;
+	grid-area: name;
+	height: 33px;
+	user-select: text;
+}
+.user-page .user-status {
+	font-size: 0.6em;
+	grid-area: status;
+	color: #fffc;
+	margin-top: 10px;
+	position: relative;
+	padding-top: 5px;
+	padding-left: 24px;
+	margin-bottom: 14px;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+.user-page .user-status:empty {
+	display: none;
+}
+.user-page .user-status:before {
+	background: url("/node_modules/bootstrap-icons/icons/quote.svg");
+	content: "";
+	aspect-ratio: 1 / 1;
+	width: 32px;
+	position: absolute;
+	background-size: cover;
+	left: 0px;
+	top: -8px;
+	display: inline-block;
+	z-index: -1;
+	filter: invert(1);
+	opacity: 0.1;
 }
 
 .user-page-wallpaper-wrap {
@@ -34,9 +154,11 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	gap: 10px;
 	width: 500px;
 	max-width: 80vw;
+	background: linear-gradient(to bottom, #0001, #0005);
+	border-radius: 20px;
+	padding: 20px;
 }
 
 .user-page-user-bio {
@@ -45,4 +167,22 @@
 	padding: 10px;
 	border-left-width: 8px;
 	background: #0005;
+	user-select: text;
+	white-space: pre-wrap;
+	word-break: break-word;
+	max-height: min(400px, 50vh);
+	overflow-y: auto;
+}
+.user-page-user-creation {
+	display: flex;
+	gap: 10px;
+	padding: 10px;
+	padding-bottom: 0;
+	font-weight: 600;
+	font-size: 0.8em;
+	align-items: center;
+}
+
+.user-page-user-bio:empty {
+	display: none;
 }

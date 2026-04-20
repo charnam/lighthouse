@@ -30,12 +30,21 @@ class UserSession {
 		return this.sessions.filter(session => session.subscriptions.includes(id));
 	}
 	
-	subscriptions = [];
+	_subscriptions = [];
+	get subscriptions() {
+		return this._subscriptions
+	}
+	set subscriptions(value) {
+		this._subscriptions = value;
+		this.client.connection.sendEvent("subscriptions-update", this.subscriptions);
+	}
 	constructor(client, userid) {
 		this.client = client;
 		this.userid = userid;
 		this.db = new Database(this.userid);
 		this.permissions = new UserPermissions(this.db, this.userid);
+		
+		UserSession.registerSession(this);
 		
 		this.userHandlers = new MessageHandlerGroup(this.client.connection);
 		
@@ -58,7 +67,7 @@ class UserSession {
 		});
 		
 		this.userHandlers.handle("group-subscribe", async message => {
-			const groupDetails = await this.db.helpers.getGroupDetailsAsUser(message.data);
+			const groupDetails = await this.db.helpers.getGroupDetailsAsUser(message.data, this.userid);
 			if(groupDetails) {
 				this.subscriptions.push(groupDetails.groupid);
 				message.reply(true);
@@ -67,7 +76,7 @@ class UserSession {
 			}
 		});
 		this.userHandlers.handle("program-subscribe", async message => {
-			const programDetails = await this.db.helpers.getProgramDetailsAsUser(message.data);
+			const programDetails = await this.db.helpers.getProgramDetailsAsUser(message.data, this.userid);
 			if(programDetails) {
 				this.subscriptions.push(programDetails.programid);
 				message.reply(true);
@@ -90,8 +99,14 @@ class UserSession {
 		})
 		
 		this.userHandlers.handle("user-details", async message => {
-			const userid = message.data;
-			message.reply(await this.db.helpers.getUserDetails(userid));
+			const details = message.data;
+			message.reply(
+				await this.db.helpers.getUserDetails(
+					details.userid,
+					details.programid,
+					details.groupid
+				)
+			);
 		})
 		
 		new TextUserProgramHandlers(this);

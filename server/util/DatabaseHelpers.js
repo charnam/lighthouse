@@ -394,21 +394,26 @@ class DatabaseHelpers {
 				displayname,
 				creation,
 				bio,
-				wallpaper
+				wallpaper,
+				status
 			FROM users
 			WHERE userid = ${this.db.val(userid)}
 		`);
 		return profile;
 	}
-	async getUserDetails(userid) {
+	async getUserDetails(userid, programid, groupid) {
 		const user = await this.db.get(`
 			SELECT
 				userid,
 				username,
 				pfp,
-				displayname
+				displayname,
+				status
 			FROM users
 			WHERE userid = ${this.db.val(userid)}`)
+		
+		user.activity = UserSession.getState(userid, programid, groupid);
+		
 		return user;
 	}
 	

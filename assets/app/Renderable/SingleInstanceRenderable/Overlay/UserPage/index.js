@@ -8,6 +8,8 @@ class UserPage extends Overlay {
 	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "user-page"];
 	
+	animateRemoveDuration = 1000;
+	
 	client = null;
 	
 	constructor(userid, client, openFrom) {
@@ -20,10 +22,14 @@ class UserPage extends Overlay {
 	render() {
 		const target = super.render();
 		
+		let closeButton;
+		
 		target.append(
+			closeButton = new HTML.div({class: "user-page-close bi-arrow-left"}),
 			new HTML.div({class: "user-page-user-details"},
-				new User(this.userid, this.client).render(),
-				new HTML.div({class: "user-page-user-bio"})
+				new User(this.userid, this.client, {clickable: false}).render(),
+				new HTML.div({class: "user-page-user-bio"}),
+				new HTML.div({class: "user-page-user-creation bi-cake2"})
 			),
 			new HTML.div({class: "user-page-wallpaper-wrap"})
 		)
@@ -41,12 +47,16 @@ class UserPage extends Overlay {
 			`)
 		}
 		
+		closeButton.addEventListener("click", () => {
+			this.remove();
+		})
+		
 		this.update();
 		return target;
 	}
 	
-	beforeRemove() {
-		super.beforeRemove();
+	async beforeRemove() {
+		await super.beforeRemove();
 		
 		
 	}
@@ -67,6 +77,9 @@ class UserPage extends Overlay {
 		
 		const bio = target.querySelector(".user-page-user-bio")
 		bio.innerText = details.bio;
+		
+		const creation = target.querySelector(".user-page-user-creation")
+		creation.innerText = new Date(details.creation).toLocaleString(undefined, {dateStyle: "full", timeStyle: "short"});
 		
 		loader.remove();
 	}

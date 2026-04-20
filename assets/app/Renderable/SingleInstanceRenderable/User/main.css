@@ -2,18 +2,19 @@
 .user {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	column-gap: 6px;
 }
 
-.user-has-client {
+.user-is-clickable {
 	cursor: pointer;
+}
+
+.user:not(.user-is-clickable) .user-status {
+	user-select: text;
 }
 
 .user-name {
 	font-weight: bold;
-}
-.user-has-client .user-name:hover {
-	text-decoration: underline;
 }
 
 .user-pfp {
@@ -28,6 +29,30 @@
 	position: relative;
 }
 
-.user-pfp:active {
+.user-activity:not([activity="undefined"]) {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 30%;
+	height: 30%;
+	background: #ccc;
+	transform: translate(25%, 25%);
+	border-radius: 50%;
+	outline: 2px solid #0005;
+	box-sizing: border-box;
+	box-shadow: 0px 0px 0px 1px inset #0006;
+}
+
+.user-activity[activity="online"] {
+	background: #0c0;
+}
+.user-activity[activity="program"] {
+	background: #09c;
+}
+
+.user-is-clickable .user-pfp:hover {
+	filter: drop-shadow(0px 2px 2px #0008);
+}
+.user-is-clickable .user-pfp:active {
 	transform: scale(0.9);
 }

@@ -37,12 +37,12 @@ class SingleInstanceRenderable extends Renderable {
 	async remove() {
 		if (this.element) {
 			const el = this.element;
+			for(let listener of this.removeListeners) {
+				listener();
+			}
 			await this.beforeRemove();
 			if (this._overlay) {
 				this._overlay.remove();
-			}
-			for(let listener of this.removeListeners) {
-				listener();
 			}
 			el.remove();
 		}

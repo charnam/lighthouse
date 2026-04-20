@@ -98,7 +98,6 @@ class Client extends Overlay {
 					break;
 			}
 			
-			
 			programView.renderTo(this.element);
 		}
 	}

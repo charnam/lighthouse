@@ -8,6 +8,8 @@ class LoginMenu extends Overlay {
 	animateRemoveDuration = 1000;
 	banners = new BannerBox();
 	
+	mode = "login";
+	
 	constructor(client) {
 		super();
 		this.client = client;
@@ -19,56 +21,84 @@ class LoginMenu extends Overlay {
 		
 		let usernameField,
 			passwordField,
-			signUpButton,
-			logInButton,
+			confirmPasswordField,
+			modeSwitchButton,
+			submitButton,
 			form;
 		
 		target.append(
 			form = new HTML.form({class: "login-menu-popup base-popup"},
-				new HTML.h1("Log in"),
+				new HTML.h1(
+					new HTML.span({class: "login-menu-mode-login"},
+						"Log in"),
+					new HTML.span({class: "login-menu-mode-signup"},
+						"Sign up")
+				),
 				new HTML.label("Username",
 					usernameField = new HTML.input({type: "text", name: "username", class: "base-input"}),
 				),
 				new HTML.label("Password",
 					passwordField = new HTML.input({type: "password", name: "password", class: "base-input"}),
 				),
+				new HTML.label({class: "login-menu-mode-signup"},
+					"Confirm Password",
+					confirmPasswordField = new HTML.input({type: "password", name: "confirm-password", class: "base-input"}),
+				),
 				new HTML.div({class: "base-buttonbox base-buttonbox-right base-buttonbox-bottom"},
-					signUpButton = new HTML.button({type: "button", class: "base-button base-button-secondary"},
-						"Sign up..."
+					modeSwitchButton = new HTML.button({type: "button", class: "base-button base-button-secondary"},
+						new HTML.span({class: "login-menu-mode-login"},
+							"Sign up..."
+						),
+						new HTML.span({class: "login-menu-mode-signup"},
+							"Log in..."
+						),
 					),
-					logInButton = new HTML.button({class: "base-button base-button-primary"},
-						"Log in"
+					submitButton = new HTML.button({class: "base-button base-button-primary"},
+						new HTML.span({class: "login-menu-mode-login"},
+							"Log in"
+						),
+						new HTML.span({class: "login-menu-mode-signup"},
+							"Sign up"
+						),
 					)
 				),
 				this.banners.render(),
 			)
 		);
 		
-		signUpButton.addEventListener("click", async () => {
+		modeSwitchButton.addEventListener("click", async () => {
+			if(this.mode == "signup")
+				this.mode = "login";
+			else if(this.mode == "login")
+				this.mode = "signup"
 			
+			this.update();
 		});
-		console.log(this);
 		
 		form.addEventListener("submit", async event => {
 			event.preventDefault();
 			
-			const loader = new LoadingScreen();
-			loader.open();
-			const response = await this.client.connection.request("log-in", {
-				username: usernameField.value,
-				password: passwordField.value
-			});
-			
-			if(this.banners.detect(response)) {
+			if(this.mode == "login") {
+				const loader = new LoadingScreen();
+				loader.open();
+				const response = await this.client.connection.request("log-in", {
+					username: usernameField.value,
+					password: passwordField.value
+				});
+				
+				if(this.banners.detect(response)) {
+					loader.remove();
+					return;
+				}
+				
 				loader.remove();
-				return;
+				this.remove();
+				
+				localStorage.setItem("DO_NOT_SHARE_THIS_TOKEN_WITH_ANYONE_INCLUDING_ADMINS", response.data);
+				this.client.connection.request("token", response.data);
+			} else if(this.mode == "signup") {
+				
 			}
-			
-			loader.remove();
-			this.remove();
-			
-			localStorage.setItem("DO_NOT_SHARE_THIS_TOKEN_WITH_ANYONE_INCLUDING_ADMINS", response.data);
-			this.client.connection.request("token", response.data);
 		});
 		
 		this.update();
@@ -77,6 +107,14 @@ class LoginMenu extends Overlay {
 	
 	updateRendered(target) {
 		super.updateRendered(target);
+		
+		target.classList.remove("login-menu-mode-login");
+		target.classList.remove("login-menu-mode-signup");
+		
+		if(this.mode == "login")
+			target.classList.add("login-menu-mode-login");
+		else if(this.mode == "signup")
+			target.classList.add("login-menu-mode-signup");
 	}
 	
 	static async login(client) {

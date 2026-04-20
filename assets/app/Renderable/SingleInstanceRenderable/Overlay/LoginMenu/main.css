@@ -1,20 +1,22 @@
 
+.login-menu {
+	transition: 0.2s ease-out;
+}
 .login-menu-popup {
 	display: flex;
 	flex-direction: column;
 	max-width: 400px;
 	width: 100vw;
-	transition: 0.2s ease-out;
 }
 @starting-style {
-	.login-menu-popup {
+	.login-menu {
 		opacity: 0;
-		top: calc(50% + 20px);
+		transform: translateY(20px);
 	}
 }
-.login-menu-popup.is-removing {
+.login-menu.is-removing {
 	opacity: 0;
-	top: calc(50% - 20px);
+	transform: translateY(-20px);
 }
 
 .login-menu-popup h1:first-child {
@@ -28,4 +30,34 @@
 	justify-content: space-between;
 	gap: 30px;
 	align-items: center;
+}
+
+.login-menu-popup > * {
+	margin-top: 20px;
+}
+
+.login-menu .login-menu-mode-login,
+.login-menu .login-menu-mode-signup {
+	transition: 0.2s ease-in-out;
+	transition-property: opacity, width, height, margin, padding, filter;
+	interpolate-size: allow-keywords;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.login-menu span.login-menu-mode-login,
+.login-menu span.login-menu-mode-signup {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.login-menu.login-menu-mode-login .login-menu-mode-signup,
+.login-menu.login-menu-mode-signup .login-menu-mode-login {
+	opacity: 0;
+	width: 0;
+	height: 0;
+	margin: 0;
+	padding: 0;
+	pointer-events: none;
+	filter: blur(10px);
 }

@@ -7,6 +7,7 @@
 	flex-direction: column;
 	overflow-y: auto;
 	border: 1px solid var(--color-background-secondary);
+	margin-left: 0;
 }
 
 .group-sidebar-titlebar {
