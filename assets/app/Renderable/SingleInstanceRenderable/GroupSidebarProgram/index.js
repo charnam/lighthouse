@@ -50,7 +50,7 @@ class GroupSidebarProgram extends SingleInstanceRenderable {
 				break;
 		}
 		
-		const subscriptions = (await this.client.connection.request("get-subscriptions")).data;
+		const subscriptions = await this.client.connection.expect("get-subscriptions", null, "Failed to fetch subscriptions; error 9");
 		
 		if(subscriptions.includes(this.details.programid)) {
 			target.classList.add("open");

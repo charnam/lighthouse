@@ -1,3 +1,4 @@
+import Banners from "../../server/util/simple/Banners.js";
 import MessageHandler from "./MessageHandler.js";
 
 class MessageHandlerGroup {
@@ -33,7 +34,11 @@ class MessageHandlerGroup {
 	handle(type, callback) {
 		const handler = new MessageHandler(this, this.connection, message => {
 			if(message.message?.type == type) {
-				callback(message);
+				try {
+					callback(message);
+				} catch(err) {
+					message.reply(Banners.error("An internal error has occurred. Please report this!\n\nID: "+Date.now()));
+				}
 			}
 		});
 		this.handlers.push(handler);

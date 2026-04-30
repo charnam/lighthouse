@@ -8,7 +8,7 @@ class ClientProgram extends ClientPane {
 		super();
 		this.client = client;
 		this.programid = details.programid;
-		this.client.connection.request("program-subscribe", this.programid)
+		this.client.connection.expect("program-subscribe", this.programid, "Failed to join program; error 1")
 	}
 	
 	render() {
@@ -22,7 +22,7 @@ class ClientProgram extends ClientPane {
 	async remove() {
 		return Promise.all([
 			super.remove(),
-			this.client.connection.request("unsubscribe", this.programid)
+			this.client.connection.expect("unsubscribe", this.programid, "Failed to leave program; error 2")
 		]);
 	}
 	

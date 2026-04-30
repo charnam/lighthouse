@@ -278,7 +278,7 @@ class DatabaseHelpers {
 	}
 	
 	async getMessages(programid, point, direction, limit = 50) {
-		const messages = await this.db.all(`
+		const query = `
 			SELECT 
 				messages.messageid,
 				messages.programid,
@@ -312,7 +312,8 @@ class DatabaseHelpers {
 				`}
 			ORDER BY messages.creation ${direction == "historic" ? "DESC" : "ASC"}
 			LIMIT ${this.db.val(limit)}
-		`);
+		`;
+		const messages = await this.db.all(query);
 		
 		await Promise.all(messages.map(async (message, index) => {
 			let seenBy = await this.db.all(`SELECT userid FROM read_indicators WHERE messageid = ${this.db.val(message.messageid)}`);

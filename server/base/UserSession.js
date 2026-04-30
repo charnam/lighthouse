@@ -86,7 +86,7 @@ class UserSession {
 		});
 		this.userHandlers.handle("unsubscribe", async message => {
 			this.subscriptions = this.subscriptions.filter(subscription => subscription !== message.data);
-			message.reply();
+			message.reply(true);
 		});
 		
 		this.userHandlers.handle("get-subscriptions", async message => {

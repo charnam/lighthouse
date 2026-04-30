@@ -30,9 +30,9 @@ class GroupList extends ClientPane {
 		super.updateRendered(target);
 		const joinedGroupsEl = target.querySelector(".group-list-joined-groups")
 		
-		const groupsResponse = await this.client.connection.request("group-list");
+		const groupsResponse = await this.client.connection.expect("group-list", null, "Failed to fetch groups list; error 5");
 		
-		for(let group of groupsResponse.data) {
+		for(let group of groupsResponse) {
 			const groupInstances = [...joinedGroupsEl.children].filter(child => child.renderable.details.groupid == group.groupid);
 			if(groupInstances.length > 0) {
 				groupInstances[0].renderable.details = group;
@@ -46,7 +46,7 @@ class GroupList extends ClientPane {
 		}
 		
 		for(let groupEl of joinedGroupsEl.children) {
-			if(!groupsResponse.data.some(item => item.groupid == groupEl.renderable.details.groupid)) {
+			if(!groupsResponse.some(item => item.groupid == groupEl.renderable.details.groupid)) {
 				groupEl.renderable.remove();
 			}
 		}

@@ -30,16 +30,16 @@ class GroupSidebar extends ClientPane {
 		const titlebarEl = target.querySelector(".group-sidebar-titlebar")
 		const programsEl = target.querySelector(".group-sidebar-programs");
 		
-		const programList = await this.client.connection.request("group-programs", this.groupid);
+		const programList = await this.client.connection.expect("group-programs", this.groupid, "Failed to fetch group programs; error 6");
 		
-		for(let program of programList.data) {
+		for(let program of programList) {
 			const programRenderable = new GroupSidebarProgram(this.client, program);
 			programRenderable.renderTo(programsEl);
 		}
 		
-		const groupDetails = await this.client.connection.request("group-details", this.groupid);
+		const groupDetails = await this.client.connection.expect("group-details", this.groupid, "Failed to fetch group details; error 7");
 		
-		titlebarEl.innerText = groupDetails.data.groupname;
+		titlebarEl.innerText = groupDetails.groupname;
 	}
 }
 

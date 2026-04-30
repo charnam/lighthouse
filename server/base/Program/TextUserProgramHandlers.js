@@ -53,7 +53,7 @@ class TextUserProgramHandlers extends UserProgramHandlers {
 				
 			}
 			
-			message.reply();
+			message.reply(true);
 		});
 	}
 }

@@ -97,7 +97,27 @@ class LoginMenu extends Overlay {
 				localStorage.setItem("DO_NOT_SHARE_THIS_TOKEN_WITH_ANYONE_INCLUDING_ADMINS", response.data);
 				this.client.connection.request("token", response.data);
 			} else if(this.mode == "signup") {
+				if(passwordField.value !== confirmPasswordField.value) {
+					this.banners.showMessage("error", "Passwords do not match");
+					return;
+				}
 				
+				const loader = new LoadingScreen();
+				loader.open();
+				const response = await this.client.connection.request("sign-up", {
+					username: usernameField.value,
+					password: passwordField.value
+				});
+				loader.remove();
+				
+				if(this.banners.detect(response)) {
+					return;
+				}
+				
+				this.remove();
+				
+				localStorage.setItem("DO_NOT_SHARE_THIS_TOKEN_WITH_ANYONE_INCLUDING_ADMINS", response.data);
+				this.client.connection.request("token", response.data);
 			}
 		});
 		

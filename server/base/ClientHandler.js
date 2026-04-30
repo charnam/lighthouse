@@ -3,6 +3,7 @@ import Database from "../util/Database.js";
 import UserSession from "./UserSession.js";
 import Banners from "../util/simple/Banners.js";
 import MessageHandlerGroup from "../../assets/shared/MessageHandlerGroup.js";
+import Banner from "../../assets/app/Renderable/SingleInstanceRenderable/Banner/index.js";
 
 class ClientHandler {
 	constructor(connection) {
@@ -12,9 +13,11 @@ class ClientHandler {
 		
 		this.loginHandlers.handle("token", async message => {
 			const success = await this.login(message?.data);
-			message.reply(success);
 			if(success) {
+				message.reply(this.user.userid);
 				this.loginHandlers.disable();
+			} else {
+				message.reply(false);
 			}
 		});
 		
@@ -50,10 +53,36 @@ class ClientHandler {
 			}
 		});
 		this.loginHandlers.handle("sign-up", async message => {
-			if(!this.user) {
-				const success = await this.login(message?.data?.token);
-				message.reply(success);
-			}
+			const existingUser = await this.logindb.get(`
+				SELECT userid FROM users WHERE username = ${this.logindb.val(message.data.username)}
+			`);
+			
+			if(existingUser) return message.reply(Banners.error("User already exists!"));
+			
+			const userid = crypto.randomUUID();
+			await this.logindb.exec(`
+				INSERT INTO users
+					(
+						userid,
+						username,
+						password,
+						displayname,
+						creation,
+						modification
+					)
+				VALUES
+					(
+						${this.logindb.val(userid)},
+						${this.logindb.val(message.data.username)},
+						${this.logindb.val(await bcrypt.hash(message.data.password, 12))},
+						${this.logindb.val(message.data.username)},
+						${this.logindb.val(Date.now())},
+						${this.logindb.val(Date.now())}
+					)
+			`);
+			
+			const success = await this.login(message?.data?.token);
+			message.reply(success);
 		});
 	}
 	

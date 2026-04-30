@@ -11,6 +11,15 @@ class Connection {
 		this._socket = val;
 	}
 	
+	onerror(error) {
+		if(typeof alert !== "undefined") {
+			alert(error+"\n\nThe page will now reload. Please report this bug! :(");
+			window.location.reload();
+		} else {
+			console.log(error);
+		}
+	}
+	
 	constructor(serverOrSocket) {
 		if(typeof serverOrSocket == "object") {
 			this.socket = serverOrSocket;
@@ -71,6 +80,16 @@ class Connection {
 				}
 			});
 		});
+	}
+	
+	async expect(type, requestData, errorMessage) {
+		const reply = await this.request(type, requestData);
+		const data = reply.data;
+		if(!data || typeof data == "object" && data.type == "banner") {
+			this.onerror(errorMessage + (data?.type == "banner" ? "\n\n" + data.message : ""));
+			return false;
+		}
+		return data;
 	}
 	
 	reply(to, data) {

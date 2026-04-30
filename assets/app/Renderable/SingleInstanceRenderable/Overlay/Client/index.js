@@ -48,6 +48,9 @@ class Client extends Overlay {
 		
 		if(!loginSuccess) {
 			await LoginMenu.login(client);
+		} else {
+			console.log(loginSuccess);
+			this.userid = loginSuccess;
 		}
 		
 		new GroupList(client).renderTo(client.element);
@@ -64,7 +67,7 @@ class Client extends Overlay {
 		if(groupPanes.length > 0) {
 			await Promise.all([...groupPanes].map(pane => pane.renderable.remove()));
 		}
-		const groupDetails = (await this.connection.request("group-details", id)).data;
+		const groupDetails = await this.connection.expect("group-details", id, "Failed to fetch group details; error 10");
 		
 		if(transitionId == this._groupOpenTransitionId) {
 			const sidebar = new GroupSidebar(this, id);
@@ -80,16 +83,20 @@ class Client extends Overlay {
 	_programOpenTransitionId = null;
 	async openProgram(id) {
 		const programPanes = this.element.querySelectorAll(".program-pane");
+		const programPromise = this.connection.expect("program-details", id, "Failed to fetch program details; error 11");
 		
 		let transitionId = this._programOpenTransitionId = Date.now();
 		if(programPanes.length > 0) {
 			await Promise.all([...programPanes].map(pane => pane.renderable.remove()));
 		}
 		
-		const program = (await this.connection.request("program-details", id)).data;
+		
+		const program = await programPromise;
 		if(transitionId == this._programOpenTransitionId) {
 			let programView;
 			switch(program.type) {
+				case "separator":
+					return;
 				case "text":
 					programView = new TextProgram(this, program);
 					break;
